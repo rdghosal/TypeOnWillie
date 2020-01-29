@@ -14,7 +14,7 @@ namespace TypeOnWillie.Controllers
     [Route("api/[controller]")]
     public class SonnetsController : Controller
     {
-        private readonly string csvFilename = System.Environment.GetEnvironmentVariable("CSV_PATH");
+        private readonly string csvFilename = Environment.GetEnvironmentVariable("CSV_PATH");
 
         // GET: api/<controller>
         [HttpGet]

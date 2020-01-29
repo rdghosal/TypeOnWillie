@@ -1,5 +1,4 @@
 #!usr/bin/env python3
-
 import requests, csv, os, re, sys
 from time import sleep
 from bs4 import BeautifulSoup
@@ -27,7 +26,7 @@ def main():
     links = [ link.get("href") for link in soup.find_all("a") if re.search(r"sonnet\.[CLXVI]+\.html", str(link)) ] 
 
     filename = "sonnet_data.csv"
-    with open(os.path.join(target_dir, filename), "w") as csvfile:
+    with open(os.path.join(target_dir, filename), "w", newline="") as csvfile:
         # same as the properties of class Sonnet
         fieldnames = ["sonnet_id", "title", "first_verse", "content"]
         cout = csv.DictWriter(csvfile, fieldnames)
@@ -43,7 +42,7 @@ def main():
                 fieldnames[0]: i,
                 fieldnames[1]: sonnets[i].title,
                 fieldnames[2]: sonnets[i].first_verse,
-                fieldnames[3]: sonnets[i].content
+                fieldnames[3]: "|".join(sonnets[i].content)
             }
 
             rows.append(row) 
