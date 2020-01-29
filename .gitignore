@@ -6,6 +6,7 @@ node-modules
 
 # VS Code
 *.code-workspace
+.vscode
 
 # Python
 venv
