@@ -2,7 +2,11 @@ import React from "react";
 import { Link, useRouteMatch } from "react-router-dom";
 import Sonnet from "./Sonnet";
 
-const SonnetCard: React.FC = () => {
+type SonnetCardProps = {
+    sonnet: object
+}
+
+const SonnetCard = (sonnet: SonnetCardProps) => {
 
     return (
         <Link to="/app/:sonnet1" component={Sonnet}>

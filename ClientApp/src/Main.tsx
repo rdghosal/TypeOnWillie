@@ -1,12 +1,12 @@
 import React, { Fragment } from "react";
 import Navbar from "./Navbar";
-import SonnetCard from "./SonnetCard";
+import SonnetMenu from "./SonnetMenu";
 
 const Main: React.FC = () => {
     return (
         <Fragment>
             <Navbar />
-            <SonnetCard />
+            <SonnetMenu />
         </Fragment>
     );
 }

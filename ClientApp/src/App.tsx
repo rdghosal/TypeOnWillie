@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
 import Main from './Main';
-import Home from './Home';
+import Landing from './Landing';
 
 
 const App: React.FC = () => {
@@ -10,7 +10,7 @@ const App: React.FC = () => {
     <Router>
       <Switch>
         <Route exact path="/">
-          <Home />
+          <Landing />
         </Route>
         <Route path="/app">
           <Main />
