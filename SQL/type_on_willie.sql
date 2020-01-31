@@ -33,6 +33,7 @@ CREATE TABLE [type_on_willie].[Scores] (
     [UserId] INT NOT NULL,
     [SonnetId] INT NOT NULL,
     [DateTime] DATETIME NOT NULL,
+    [SuccessRate] FLOAT NOT NULL,
     [Misspellings] VARCHAR(MAX),
     CONSTRAINT FK_Scores_Users FOREIGN KEY (UserId)
     REFERENCES [type_on_willie].[Users] (UserId),

@@ -12,7 +12,7 @@ namespace TypeOnWillie.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class HomeController : Controller
+    public class SonnetMenuController : Controller
     {
         private readonly string csvFilename = Environment.GetEnvironmentVariable("CSV_PATH");
 
