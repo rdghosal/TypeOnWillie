@@ -7,15 +7,12 @@ namespace TypeOnWillie.Models
 {
     public class User
     {
-        private Guid guid;
-        private string name;
-        
-        public User(Guid guid, string name)
+        public int UserId { get; }
+        public string Username { get; }
+        public string Hash { get; set; }
+        public User(string username)
         {
-            this.guid = guid;
-            this.name = name;
+            Username = username;
         }
-        public string Location { get; set; }
-        public int Age { get; set; }
     }
 }

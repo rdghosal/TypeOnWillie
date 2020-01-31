@@ -1,4 +1,3 @@
-#!usr/bin/env python3
 import requests, csv, os, re, sys
 from time import sleep
 from bs4 import BeautifulSoup
@@ -28,7 +27,7 @@ def main():
     filename = "sonnet_data.csv"
     with open(os.path.join(target_dir, filename), "w", newline="") as csvfile:
         # same as the properties of class Sonnet
-        fieldnames = ["sonnet_id", "title", "first_verse", "content"]
+        fieldnames = ["SonnetId", "Number", "Text"]
         cout = csv.DictWriter(csvfile, fieldnames)
         
         sonnetor = fetch_sonnet(url, links)
@@ -41,10 +40,10 @@ def main():
         # TODO: add .title() for first word in verses to avoid caps
         for i in range(len(sonnets)):
             row = {
-                fieldnames[0]: i,
+                fieldnames[0]: i + 1, # to be used as id in db
                 fieldnames[1]: sonnets[i].title,
-                fieldnames[2]: sonnets[i].first_verse,
-                fieldnames[3]: "|".join(sonnets[i].content)
+                # fieldnames[2]: sonnets[i].first_verse, TODO
+                fieldnames[2]: "|".join(sonnets[i].content)
             }
 
             rows.append(row) 

@@ -7,21 +7,19 @@ namespace TypeOnWillie.Models
 {
     public class Sonnet
     {
-        private int sonnetNum;
-        private string title;
-        private string verses;
-        public Sonnet(int sonnetNum, string title, string verses)
+        public int SonnetId { get; }
+        public string Number { get; }
+        public string Text { get; }
+        public Sonnet(int sonnetId, string number, string text)
         {
-            this.sonnetNum = sonnetNum;
-            this.title = title;
-            this.verses = verses;
-        }
+            SonnetId = sonnetId;
+            Number = number;
+            Text = text;
 
-        public string GetFirstVerse()
+        }
+        public string GetFirstLine()
         {
-            //TODO: check delimiter for data
-            string firstVerse = verses.Split(", ")[0];
-            return firstVerse;
+            return Text.Split("|")[0];
         }
     }
 }
