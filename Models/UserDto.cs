@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace TypeOnWillie.Models
 {
-    public class UserProfileDto
+    public class UserDto
     {
-        public User UserData { get; set; }
-        public IEnumerable<Score> Scores { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
     }
 }

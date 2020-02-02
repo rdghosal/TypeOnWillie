@@ -8,12 +8,12 @@ using TypeOnWillie.DataAccess;
 
 namespace TypeOnWillie.Services
 {
-    public static class SonnetMenuService
+    public static class SonnetService
     {
-        public static IEnumerable<Sonnet> GetSonnets()
+        public static List<Sonnet> GetSonnets(SonnetSqlDao sonnetSqlDao)
         {
-            // TODO: Make less tightly coupled
-            return new SqlDao("mssql").LoadSonnets();
+            // Converts to List to be used by view
+            return sonnetSqlDao.SelectSonnets().ToList();
         }
     }
 }

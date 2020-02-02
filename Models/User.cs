@@ -10,9 +10,14 @@ namespace TypeOnWillie.Models
         public int UserId { get; }
         public string Username { get; }
         public string Hash { get; set; }
-        public User(string username)
+        public User (string username)
         {
             Username = username;
+        }
+        public User(string username, string hash)
+        {
+            Username = username;
+            Hash = hash;
         }
     }
 }
