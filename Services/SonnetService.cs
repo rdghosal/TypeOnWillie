@@ -8,9 +8,9 @@ using TypeOnWillie.DataAccess;
 
 namespace TypeOnWillie.Services
 {
-    public static class SonnetService
+    public class SonnetService
     {
-        public static List<Sonnet> GetSonnets(SonnetSqlDao sonnetSqlDao)
+        public List<Sonnet> GetSonnets(SonnetSqlDao sonnetSqlDao)
         {
             // Converts to List to be used by view
             return sonnetSqlDao.SelectSonnets().ToList();

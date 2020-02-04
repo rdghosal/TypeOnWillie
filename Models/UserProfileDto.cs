@@ -7,7 +7,7 @@ namespace TypeOnWillie.Models
 {
     public class UserProfileDto
     {
-        public User UserData { get; set; }
+        public UserDto UserData { get; set; }
         public IEnumerable<Score> Scores { get; set; }
     }
 }

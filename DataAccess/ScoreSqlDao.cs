@@ -26,12 +26,12 @@ namespace TypeOnWillie.DataAccess
                 });
             }
         }
-        public IEnumerable<Score> SelectScores(User user)
+        public IEnumerable<Score> SelectScores(UserDto userDto)
         {
             using (_sqlConnection)
             {
                 _sqlConnection.Open();
-                return _sqlConnection.Query<Score>(ScoreCommand.INSERT, new { userId = user.UserId });
+                return _sqlConnection.Query<Score>(ScoreCommand.INSERT, new { userId = userDto.UserId });
             }
         }
     }

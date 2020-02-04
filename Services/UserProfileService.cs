@@ -9,11 +9,11 @@ namespace TypeOnWillie.Services
 {
     public class UserProfileService
     {
-        public static UserProfileDto GetUserProfile(User user, ScoreSqlDao scoreSqlDao)
+        public UserProfileDto GetUserProfile(UserDto userDto, ScoreSqlDao scoreSqlDao)
         {
             // Convert to List for access in view
-            List<Score> scores = scoreSqlDao.SelectScores(user).ToList();
-            return new UserProfileDto { UserData = user, Scores = scores };
+            List<Score> scores = scoreSqlDao.SelectScores(userDto).ToList();
+            return new UserProfileDto { UserData = userDto, Scores = scores };
         }
     }
 }

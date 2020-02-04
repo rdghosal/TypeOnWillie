@@ -2,9 +2,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TypeOnWillie.DataAccess;
+using TypeOnWillie.Services;
 
 namespace TypeOnWillie
 {
@@ -18,8 +21,13 @@ namespace TypeOnWillie
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddTransient<UserService>();
+            services.AddTransient<UserProfileService>();
+            services.AddTransient<SonnetService>();
+            services.AddSingleton(new SqlConnection(configuration["mssql"]));
+            services.AddSingleton(typeof(SqlDao));
 
             services.AddControllersWithViews();
 

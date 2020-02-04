@@ -13,10 +13,10 @@ namespace TypeOnWillie.Services
         private readonly UserSqlDao _userSqlDao;
         private static PasswordHasher<UserDto> _passwordHasher;
 
-        public UserService(UserSqlDao sqlDao)
+        public UserService(UserSqlDao sqlDao, PasswordHasher<UserDto> passwordHasher)
         {
             _userSqlDao = sqlDao;
-            _passwordHasher = new PasswordHasher<UserDto>();
+            _passwordHasher = passwordHasher;
         }
         public int AddUser(UserDto userDto)
         {

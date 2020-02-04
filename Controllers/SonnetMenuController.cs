@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TypeOnWillie.DataAccess;
 using TypeOnWillie.Models;
 using TypeOnWillie.Services;
 
@@ -12,15 +13,13 @@ namespace TypeOnWillie.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SonnetMenuController : Controller
+    public class SonnetMenuController : ControllerBase
     {
-        private readonly string csvFilename = Environment.GetEnvironmentVariable("CSV_PATH");
-
         // GET: api/<controller>
         [HttpGet]
-        public List<Sonnet> Get()
+        public ActionResult Get(SonnetService sonnetService, SonnetSqlDao sonnetSqlDao)
         {
-            return HomeService.LoadSonnets(csvFilename);
+            return Ok(sonnetService.GetSonnets(sonnetSqlDao));
         }
     }
 }
