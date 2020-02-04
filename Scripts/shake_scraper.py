@@ -25,7 +25,7 @@ def main():
     links = [ link.get("href") for link in soup.find_all("a") if re.search(r"sonnet\.[CLXVI]+\.html", str(link)) ] 
 
     filename = "sonnet_data.csv"
-    with open(os.path.join(target_dir, filename), "w", newline="") as csvfile:
+    with open(os.path.join(target_dir, filename), "w", newline="\n", encoding="utf-8") as csvfile:
         # same as the properties of class Sonnet
         fieldnames = ["SonnetId", "Number", "Text"]
         cout = csv.DictWriter(csvfile, fieldnames)
@@ -48,7 +48,7 @@ def main():
 
             rows.append(row) 
 
-        cout.writeheader()
+        # cout.writeheader()
         cout.writerows(rows)
 
     # confirmation message
@@ -73,7 +73,7 @@ class Sonnet():
     def __init__(self, lines):
         self.__title = lines[0]
         self.__first_verse = lines[2] # tests reveal content starts from index 2
-        self.__content = lines[2:]
+        self.__content = [ str(line).replace(",", "`") for line in lines[2:] ]
 
     def __str__(self):
         return "{0}\n{1}...".format(self.__title, self.__first_verse) 
