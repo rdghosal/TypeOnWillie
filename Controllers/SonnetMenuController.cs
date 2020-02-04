@@ -15,11 +15,18 @@ namespace TypeOnWillie.Controllers
     [Route("api/[controller]")]
     public class SonnetMenuController : ControllerBase
     {
+        private readonly SonnetService _service;
+
+        public SonnetMenuController(SonnetService sonnetService)
+        {
+            _service = sonnetService;
+        }
+
         // GET: api/<controller>
         [HttpGet]
-        public ActionResult Get(SonnetService sonnetService, SonnetSqlDao sonnetSqlDao)
+        public ActionResult Get()
         {
-            return Ok(sonnetService.GetSonnets(sonnetSqlDao));
+            return Ok(_service.GetSonnets());
         }
     }
 }

@@ -9,9 +9,16 @@ namespace TypeOnWillie.Services
 {
     public class ScoreService
     {
-        internal object AddScore(Score score, ScoreSqlDao scoreSqlDao)
+        private readonly ScoreSqlDao _dao;
+
+        public ScoreService(ScoreSqlDao scoreSqlDao)
         {
-            return scoreSqlDao.InsertScore(score);
+            _dao = scoreSqlDao;
+        }
+
+        public int AddScore(Score score)
+        {
+            return _dao.InsertScore(score);
         }
     }
 }

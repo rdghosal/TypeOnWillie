@@ -14,11 +14,18 @@ namespace TypeOnWillie.Controllers
     [ApiController]
     public class UserProfileController : ControllerBase
     {
+        private readonly UserProfileService _service;
+
+        public UserProfileController(UserProfileService userProfileService)
+        {
+            _service = userProfileService;
+        }
+
         // GET: api/UserProfile/5
         [HttpGet("{id}", Name = "Get")]
-        public ActionResult Get(int id, UserProfileService userProfileService, ScoreSqlDao scoreSqlDao)
+        public ActionResult Get(int id)
         {
-            UserProfileDto userProfileDto = userProfileService.GetUserProfile(new UserDto { UserId = id }, scoreSqlDao);
+            UserProfileDto userProfileDto = _service.GetUserProfile(new UserDto { UserId = id });
             if (userProfileDto == null) BadRequest();
             return Ok(userProfileDto);
         }

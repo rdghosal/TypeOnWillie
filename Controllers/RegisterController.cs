@@ -13,18 +13,25 @@ namespace TypeOnWillie.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
+        private readonly UserService _service;
+
+        public RegisterController(UserService userService)
+        {
+            _service = userService;
+        }
+
         // POST: api/Register
         [HttpPost]
-        public ActionResult Post([FromBody] string username, string password, UserService userService)
+        public ActionResult Post([FromBody] UserDto userDto)
         {
-            // Status Code 400
-            if (userService.AddUser(new UserDto { Username = username, Password = password }) == -1)
+            try
             {
-                return BadRequest();
+                return CreatedAtRoute(nameof(_service.AddUser), userDto); // Status code 201
             }
-
-            // Status Code 201
-            return CreatedAtRoute(nameof(userService.AddUser), new { username, password });
+            catch
+            {
+                return BadRequest(); // Status code 400
+            }
         }
     }
 }

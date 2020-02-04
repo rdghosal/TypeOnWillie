@@ -10,10 +10,16 @@ namespace TypeOnWillie.Services
 {
     public class SonnetService
     {
-        public List<Sonnet> GetSonnets(SonnetSqlDao sonnetSqlDao)
+        private readonly SonnetSqlDao _dao;
+
+        public SonnetService(SonnetSqlDao sonnetSqlDao)
+        {
+            _dao = sonnetSqlDao;
+        }
+        public List<Sonnet> GetSonnets()
         {
             // Converts to List to be used by view
-            return sonnetSqlDao.SelectSonnets().ToList();
+            return _dao.SelectSonnets().ToList();
         }
     }
 }

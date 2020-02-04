@@ -1,33 +1,28 @@
-import React, { useState, ReactHTMLElement, FunctionComponent, Props } from "react";
+import React, { useState, Props, useEffect, Fragment } from "react";
 import SonnetCard from "./SonnetCard";
+import Sonnet from "./Sonnet";
 
-class Sonnet {
+const SonnetMenu : React.FC = () : JSX.Element => {
 
-    private sonnetNumber: number | null = null;
-    private sonnetText: string | null = null;
+    const [ sonnetCollection, setSonnetCollection ] = useState<Array<Sonnet> | null>(null);
 
-    public constructor(sonnetNumber: number, sonnetText: string) {
-        this.sonnetNumber = sonnetNumber;
-        this.sonnetText = sonnetText;
-    }
-
-}
-
-const SonnetMenu = () => {
-
-    const [ sonnetCollection, setSonnetCollection ] = useState<Array<Sonnet>|null>(null);
+    useEffect(() => {
+        if (sonnetCollection === null) {
+            fetchSonnects()
+                .then(data => setSonnetCollection(data));
+        }
+    }, [sonnetCollection]);
 
     async function fetchSonnects(): Promise<Array<Sonnet>> {
-        let res = await fetch("home");
+        let res = await fetch("sonnetmenu");
         return await res.json();
     }
 
-    if (sonnetCollection === null) {
-        fetchSonnects()
-            .then(data => setSonnetCollection(data))
-    } else {
-        sonnetCollection.map((sonnet, index) => <SonnetCard key={index} sonnet={sonnet} />);
-    }
+    return (
+        <Fragment>
+            { sonnetCollection!.map((sonnet, i) => <SonnetCard key={i} sonnet={sonnet}/>) }
+        </Fragment>
+    );
 }
 
 export default SonnetMenu;

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
 import Main from './Main';
 import Landing from './Landing';
+import TypeSession from './TypeSession';
 
 
 const App: React.FC = () => {
@@ -14,6 +15,9 @@ const App: React.FC = () => {
         </Route>
         <Route path="/app">
           <Main />
+        </Route>
+        <Route path="/app/:sonnetId">
+          <TypeSession />
         </Route>
       </Switch>
     </Router>

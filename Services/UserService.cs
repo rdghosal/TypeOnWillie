@@ -10,25 +10,25 @@ namespace TypeOnWillie.Services
 {
     public class UserService
     {
-        private readonly UserSqlDao _userSqlDao;
+        private readonly UserSqlDao _dao;
         private static PasswordHasher<UserDto> _passwordHasher;
 
         public UserService(UserSqlDao sqlDao, PasswordHasher<UserDto> passwordHasher)
         {
-            _userSqlDao = sqlDao;
+            _dao = sqlDao;
             _passwordHasher = passwordHasher;
         }
         public int AddUser(UserDto userDto)
         {
             // Check if username exists; if not, add to database
-            if (_userSqlDao.SelectUser(userDto) != null) return -1;
+            if (_dao.SelectUser(userDto) != null) return -1;
             string hashed = _passwordHasher.HashPassword(userDto, userDto.Password);
-            return _userSqlDao.InsertUser(new User(userDto.Username, hashed));
+            return _dao.InsertUser(new User(userDto.Username, hashed));
         }
         public int VerifyUser(UserDto userDto)
         {
             // Get user and verify password
-            User user = _userSqlDao.SelectUser(userDto);
+            User user = _dao.SelectUser(userDto);
             if (user == null)
             {
                 return -1;

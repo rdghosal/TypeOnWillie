@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TypeOnWillie.Services;
+using TypeOnWillie.Models;
 
 namespace TypeOnWillie.Controllers
 {
@@ -12,11 +13,17 @@ namespace TypeOnWillie.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
+        private readonly UserService _service;
+
+        public LoginController(UserService userService)
+        {
+            _service = userService;
+        }
         // POST: api/Login
         [HttpPost]
-        public ActionResult Post([FromBody] string username, string password, UserService userService)
+        public ActionResult Post([FromBody] UserDto userDto)
         {
-            if (userService.VerifyUser(new Models.UserDto { Username=username, Password=password }) == -1)
+            if (_service.VerifyUser(userDto) == -1)
             {
                 // Status code 400
                 return BadRequest();

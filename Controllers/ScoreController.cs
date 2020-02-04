@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TypeOnWillie.DataAccess;
 using TypeOnWillie.Models;
 using TypeOnWillie.Services;
 
@@ -13,11 +14,18 @@ namespace TypeOnWillie.Controllers
     [ApiController]
     public class ScoreController : ControllerBase
     {
+        private readonly ScoreService _service;
+
+        public ScoreController(ScoreService scoreService)
+        {
+            _service = scoreService;
+        }
+
         // POST: api/Score
         [HttpPost]
-        public ActionResult Post([FromBody] Score score, ScoreService scoreService)
+        public ActionResult Post([FromBody] Score score)
         {
-            return Ok(scoreService.AddScore(score));
+            return Ok(_service.AddScore(score));
         }
     }
 }
