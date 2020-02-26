@@ -9,8 +9,8 @@ namespace TypeOnWillie.Models
     {
         public int SonnetId { get; }
         public string Number { get; }
-        public string Text { get; }
-        public Sonnet(int sonnetId, string number, string text)
+        public List<string> Text { get; }
+        public Sonnet(int sonnetId, string number, List<string> text)
         {
             SonnetId = sonnetId;
             Number = number;
@@ -19,7 +19,7 @@ namespace TypeOnWillie.Models
         }
         public string GetFirstLine()
         {
-            return Text.Split("|")[0];
+            return Text[0];
         }
     }
 }

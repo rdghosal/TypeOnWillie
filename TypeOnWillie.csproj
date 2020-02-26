@@ -30,8 +30,16 @@
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
+    <Content Remove="Reference\**" />
     <None Remove="$(SpaRoot)**" />
+    <None Remove="Reference\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Reference\**" />
+    <EmbeddedResource Remove="Reference\**" />
+    <TypeScriptCompile Remove="Reference\**" />
   </ItemGroup>
 
   <ItemGroup>

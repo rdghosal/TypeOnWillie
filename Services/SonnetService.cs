@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,16 +11,40 @@ namespace TypeOnWillie.Services
 {
     public class SonnetService
     {
-        private readonly SonnetSqlDao _dao;
+        private readonly string[] _fileNames;
 
-        public SonnetService(SonnetSqlDao sonnetSqlDao)
+        public SonnetService(string path)
         {
-            _dao = sonnetSqlDao;
+            _fileNames = Directory.GetFiles(path);
         }
+
         public List<Sonnet> GetSonnets()
         {
-            // Converts to List to be used by view
-            return _dao.SelectSonnets().ToList();
+            List<Sonnet> sonnets = new List<Sonnet>();
+            foreach (string fileName in _fileNames)
+            {
+                using (StreamReader sr = File.OpenText(fileName))
+                {
+                    // Parse filename
+                    string baseName = Path.GetFileNameWithoutExtension(fileName);
+                    int sonnetId = Int32.Parse(baseName.Split("_")[0]);
+                    string sonnetTitle = baseName.Split("_")[1];
+
+                    // Load file
+                    List<string> sonnetContent = new List<string>();
+                    string line = "";
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        sonnetContent.Add(line);
+                    }
+
+                    // Instantiate Sonnet and add to list
+                    Sonnet sonnet = new Sonnet(sonnetId, sonnetTitle, sonnetContent);
+                    sonnets.Add(sonnet);
+                }
+            }
+
+            return sonnets;
         }
     }
 }

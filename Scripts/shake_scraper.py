@@ -53,8 +53,7 @@ def scrape_sonnets():
         sonnet_page = requests.get(scrape_url + link)
         sonnet_soup = BeautifulSoup(sonnet_page.text, "html.parser")
         
-        lines = [ line for line in sonnet_soup.stripped_strings ]
-        yield Sonnet(lines)
+        yield Sonnet(list(sonnet_soup.stripped_strings))
 
 
 def save_sonnets(dirname):
@@ -63,12 +62,11 @@ def save_sonnets(dirname):
     """
     # Save each sonnet as separate textfile
     for i, sonnet in enumerate(scrape_sonnets()):
-        index = i + 1
-        filename = "{0}_{1}.txt".format(index, sonnet.title)
+        filename = "{0}_{1}.txt".format(i, sonnet.title)
 
         # Write file contents                
-        with open(os.path.join(dirname, filename), "w", encoding="utf-8") as f:
-            f.writelines(sonnet.content)
+        with open(os.path.join(dirname, filename), "w", encoding="utf-8", newline="\n") as f:
+            for line in sonnet.content: f.write(line)
 
 
 class Sonnet():

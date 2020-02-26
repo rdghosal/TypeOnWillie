@@ -28,7 +28,7 @@ namespace TypeOnWillie
             services.AddTransient(typeof(PasswordHasher<>));
             services.AddTransient<UserService>();
             services.AddTransient<UserProfileService>();
-            services.AddTransient<SonnetService>();
+            services.AddTransient<SonnetService>(serviceProvider => new SonnetService(Configuration["SonnetPath"]));
             services.AddSingleton(new SqlConnection(Configuration["mssql"]));
             services.AddSingleton(typeof(SqlDao));
 
