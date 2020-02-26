@@ -9,22 +9,13 @@ def main():
         print("USAGE: shake_scraper.py <directory>")
         sys.exit(1)
     elif not os.path.isdir(sys.argv[1]):
-        print("ERROR: directory does not exist!")
+        print("ERROR: Input path is not a valid directory!")
         sys.exit(2)
     
-    # where sonnets are to be saved
+    # Where sonnets are to be saved
     target_dir = sys.argv[1]
-    dir_ = os.path.join(target_dir, "Sonnets")
 
-    # make directory for sonnets
-    if not os.path.exists(dir_):
-        os.mkdir(dir_)
-
-    print("Saving sonnets to {0}...".format(dir_))
-    save_sonnets(dirname=dir_)
-    
-    # Confirmation message
-    print("Data written in {0}".format(os.path.abspath(dir_)))
+    save_sonnets(dirname=target_dir)    
 
     # Success
     sys.exit(0)
@@ -60,13 +51,42 @@ def save_sonnets(dirname):
     """
     Saves Sonnets to specified directory, logging filenames to CSV
     """
-    # Save each sonnet as separate textfile
-    for i, sonnet in enumerate(scrape_sonnets()):
-        filename = "{0}_{1}.txt".format(i, sonnet.title)
+    csv_path = os.path.join(dirname, "sonnet_map.csv")
+    sonnet_folder = os.path.join(dirname, "Sonnets")
+    
+    # Make directory for sonnets
+    if not os.path.exists(sonnet_folder):
+        os.mkdir(sonnet_folder)
 
-        # Write file contents                
-        with open(os.path.join(dirname, filename), "w", encoding="utf-8", newline="\n") as f:
-            for line in sonnet.content: f.write(line)
+    print("Saving sonnets to {0}...".format(sonnet_folder))
+
+    # Save each sonnet as separate text file
+    # and reference to each in CSV
+    with open(csv_path, "w", encoding="utf-8", newline="") as sonnet_csv:
+        fieldnames = ["id", "sonnet_length", "filename"]
+        writer = csv.DictWriter(fieldnames=fieldnames, f=sonnet_csv)
+        for i, sonnet in enumerate(scrape_sonnets()):
+            sonnet_len = 0 # Track number of words in sonnet
+            filename = "{0}_{1}.txt".format(i + 1, sonnet.title)
+
+            # Write sonnet contents to text file         
+            with open(os.path.join(sonnet_folder, filename), "w", encoding="utf-8") as f:
+                for line in sonnet.content: 
+                    sonnet_len += len(line.split())
+                    f.write(line)
+
+            # Write sonnet metadata to csv            
+            writer.writerow({
+                fieldnames[0]: i + 1, # Increment by 1 to match SQL indexing
+                fieldnames[1]: sonnet_len,
+                fieldnames[2]: filename
+            })
+
+    # Confirmation message
+    print("Sonnets saved in: {0}\nSonnet metadata saved in: {1}".format(
+        os.path.abspath(sonnet_folder), 
+        os.path.abspath(csv_path)
+        ))
 
 
 class Sonnet():
