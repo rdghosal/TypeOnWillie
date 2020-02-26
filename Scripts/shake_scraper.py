@@ -53,7 +53,7 @@ def save_sonnets(dirname):
     """
     csv_path = os.path.join(dirname, "sonnet_map.csv")
     sonnet_folder = os.path.join(dirname, "Sonnets")
-    
+
     # Make directory for sonnets
     if not os.path.exists(sonnet_folder):
         os.mkdir(sonnet_folder)
@@ -77,7 +77,7 @@ def save_sonnets(dirname):
 
             # Write sonnet metadata to csv            
             writer.writerow({
-                fieldnames[0]: i + 1, # Increment by 1 to match SQL indexing
+                fieldnames[0]: None, # To allow auto-incrementing in SQL
                 fieldnames[1]: sonnet_len,
                 fieldnames[2]: filename
             })
