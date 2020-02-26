@@ -1,4 +1,4 @@
-import React, { useState, Props, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import SonnetCard from "./SonnetCard";
 import Sonnet from "./Sonnet";
 
@@ -20,7 +20,7 @@ const SonnetMenu : React.FC = () : JSX.Element => {
 
     return (
         <Fragment>
-            { sonnetCollection!.map((sonnet, i) => <SonnetCard key={i} sonnet={sonnet}/>) }
+            { sonnetCollection && sonnetCollection!.map((sonnet, i) => <SonnetCard key={i} sonnet={sonnet}/>) }
         </Fragment>
     );
 }

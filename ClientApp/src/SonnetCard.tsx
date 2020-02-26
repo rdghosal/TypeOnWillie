@@ -1,7 +1,7 @@
 import React from "react";
-import { Link, useRouteMatch } from "react-router-dom";
+// import { Link, useRouteMatch } from "react-router-dom";
 import Sonnet from "./Sonnet";
-import TypeSession from "./TypeSession";
+// import TypeSession from "./TypeSession";
 
 type Props = {
     sonnet: Sonnet

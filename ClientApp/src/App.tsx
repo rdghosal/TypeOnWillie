@@ -10,9 +10,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Switch>
-        <Route exact path="/">
-          <Landing />
-        </Route>
+        <Route exact path="/" render={props => <Landing {...props} />} />
         <Route path="/app">
           <Main />
         </Route>

@@ -4,6 +4,7 @@ USE [type_on_willie];
 PRINT('Created database [type_on_willie].');
 
 -- Create Sonnet table & bulk insert from CSV
+-- NOTE: Using default schema [dbo]
 CREATE TABLE [dbo].[Sonnets] (
     [SonnetId] INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
     [Title] VARCHAR(15) NOT NULL,
