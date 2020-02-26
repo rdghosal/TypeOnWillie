@@ -7,19 +7,29 @@ namespace TypeOnWillie.Models
 {
     public class Sonnet
     {
-        public int SonnetId { get; }
-        public string Number { get; }
-        public List<string> Text { get; }
-        public Sonnet(int sonnetId, string number, List<string> text)
-        {
-            SonnetId = sonnetId;
-            Number = number;
-            Text = text;
+        public int Id { get; set; }
 
+        public string Title { get; set; }
+
+        public int Length { get; set; }
+        
+        public List<string> Lines { get; set; }
+        
+        public Sonnet()
+        {
         }
+
+        public Sonnet(int id, string title, int length, List<string> lines)
+        {
+            Id = id;
+            Title = title;
+            Length = length;
+            Lines = lines;
+        }
+        
         public string GetFirstLine()
         {
-            return Text[0];
+            return Lines[0];
         }
     }
 }

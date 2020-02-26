@@ -12,6 +12,7 @@ namespace TypeOnWillie.Services
     public class SonnetService
     {
         private readonly string[] _fileNames;
+        private List<Sonnet> _sonnets;
 
         public SonnetService(string path)
         {
@@ -20,31 +21,47 @@ namespace TypeOnWillie.Services
 
         public List<Sonnet> GetSonnets()
         {
-            List<Sonnet> sonnets = new List<Sonnet>();
-            foreach (string fileName in _fileNames)
+            if (_sonnets == null)
             {
-                using (StreamReader sr = File.OpenText(fileName))
+                List<Sonnet> sonnets = new List<Sonnet>();
+                foreach (string fileName in _fileNames)
                 {
-                    // Parse filename
-                    string baseName = Path.GetFileNameWithoutExtension(fileName);
-                    int sonnetId = Int32.Parse(baseName.Split("_")[0]);
-                    string sonnetTitle = baseName.Split("_")[1];
-
-                    // Load file
-                    List<string> sonnetContent = new List<string>();
-                    string line = "";
-                    while ((line = sr.ReadLine()) != null)
+                    using (StreamReader sr = File.OpenText(fileName))
                     {
-                        sonnetContent.Add(line);
-                    }
+                        // Parse filename
+                        string baseName = Path.GetFileNameWithoutExtension(fileName);
+                        int sonnetId = Int32.Parse(baseName.Split("_")[0]);
+                        string sonnetTitle = baseName.Split("_")[1];
 
-                    // Instantiate Sonnet and add to list
-                    Sonnet sonnet = new Sonnet(sonnetId, sonnetTitle, sonnetContent);
-                    sonnets.Add(sonnet);
+                        int sonnetLength = 0;
+                        List<string> sonnetContent = new List<string>();
+
+                        // Load file
+                        string line = ""; 
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            sonnetLength += line.Split().Length;
+                            sonnetContent.Add(line);
+                        }
+
+                        // Instantiate Sonnet and add to list
+                        Sonnet sonnet = new Sonnet 
+                        { 
+                            Id = sonnetId, 
+                            Title = sonnetTitle, 
+                            Length=sonnetLength, 
+                            Lines=sonnetContent 
+                        };
+
+                        sonnets.Add(sonnet);
+                    }
                 }
+
+                // Cache sonnets
+                _sonnets = sonnets;
             }
 
-            return sonnets;
+            return _sonnets;
         }
     }
 }
