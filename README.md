@@ -1,7 +1,7 @@
 Type On, Willie!
 ===
 ```
-Last updated: 3 March 2020
+Last updated: 26 February 2020
 ```
 ## I. Summary
 *Type On, Willie!* is a single-page web application (SPA) that allows users to shadow up to 154 model texts (Shakespeare Sonnets) in order to improve their typing speed and accuracy. 
@@ -11,7 +11,7 @@ Last updated: 3 March 2020
 - ASP.NET 
 - MSSQL
 - React (TypeScript)
-- BeatifulSoup (to [scrape data à la Python](https://github.com/rdghosal/ShakeScraper.py))
+- BeautifulSoup (to [scrape data à la Python](https://github.com/rdghosal/TypeOnWillie/blob/master/Scripts/shake_scraper.py))
 ### B. Testing
 1. Unit Testing
 - NUnit
