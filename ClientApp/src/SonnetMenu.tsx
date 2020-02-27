@@ -9,13 +9,15 @@ const SonnetMenu : React.FC = () : JSX.Element => {
     useEffect(() => {
         if (sonnetCollection === null) {
             fetchSonnects()
-                .then(data => setSonnetCollection(data));
+                .then(data => {
+                    setSonnetCollection(data)
+                });
         }
     }, [sonnetCollection]);
 
     async function fetchSonnects(): Promise<Array<Sonnet>> {
-        let res = await fetch("sonnetmenu");
-        return await res.json();
+        let res = await fetch("api/sonnetmenu");
+        return res.json();
     }
 
     return (

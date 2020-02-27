@@ -12,14 +12,14 @@ export default class Sonnet {
     }
 
     // L1-14 of sonnet
-    private readonly _text : string[];
-    public get text() : string[] {
-        return this._text;
+    private readonly _lines : string[];
+    public get lines() : string[] {
+        return this._lines;
     }
     
-    public constructor(sonnetId: number, sonnetNumber: string, sonnetText: string) {
+    public constructor(sonnetId: number, sonnetNumber: string, sonnetLines: string[]) {
         this._id = sonnetId;
         this._title = sonnetNumber;
-        this._text = sonnetText.split("|"); // Delimiters used in database
+        this._lines = sonnetLines;
     }
 }
