@@ -11,7 +11,7 @@ namespace TypeOnWillie.Models
 
         public string Title { get; set; }
 
-        public int Length { get; set; }
+        public int WordCount { get; set; }
         
         public List<string> Lines { get; set; }
         
@@ -19,11 +19,11 @@ namespace TypeOnWillie.Models
         {
         }
 
-        public Sonnet(int id, string title, int length, List<string> lines)
+        public Sonnet(int id, string title, int wordCount, List<string> lines)
         {
             Id = id;
             Title = title;
-            Length = length;
+            WordCount = wordCount;
             Lines = lines;
         }
         

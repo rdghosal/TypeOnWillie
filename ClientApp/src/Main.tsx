@@ -27,7 +27,7 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
         <Fragment>
             <MainContextProvider>
                 <Navbar />
-                { params["sonnet"] ? <TypeSession /> : <SonnetMenu /> }
+                {params["sonnet"] ? <TypeSession sonnetId={ params["sonnet"] } /> : <SonnetMenu /> }
             </MainContextProvider>
         </Fragment>
     );

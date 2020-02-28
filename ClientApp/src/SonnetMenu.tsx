@@ -7,6 +7,7 @@ const SonnetMenu : React.FC = () : JSX.Element => {
     const [ sonnetCollection, setSonnetCollection ] = useState<Array<Sonnet> | null>(null);
 
     useEffect(() => {
+        // Fetch sonnet data on page load
         if (sonnetCollection === null) {
             fetchSonnects()
                 .then(data => {
@@ -14,11 +15,6 @@ const SonnetMenu : React.FC = () : JSX.Element => {
                 });
         }
     }, [sonnetCollection]);
-
-    async function fetchSonnects(): Promise<Array<Sonnet>> {
-        let res = await fetch("api/sonnetmenu");
-        return res.json();
-    }
 
     return (
         <Fragment>
@@ -28,3 +24,9 @@ const SonnetMenu : React.FC = () : JSX.Element => {
 }
 
 export default SonnetMenu;
+
+
+async function fetchSonnects(): Promise<Array<Sonnet>> {
+    let res = await fetch("api/sonnetmenu");
+    return res.json();
+}

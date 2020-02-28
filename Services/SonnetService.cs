@@ -33,14 +33,14 @@ namespace TypeOnWillie.Services
                         int sonnetId = Int32.Parse(baseName.Split("_")[0]);
                         string sonnetTitle = baseName.Split("_")[1];
 
-                        int sonnetLength = 0;
+                        int sonnetWordCount = 0;
                         List<string> sonnetContent = new List<string>();
 
                         // Load file
                         string line = ""; 
                         while ((line = sr.ReadLine()) != null)
                         {
-                            sonnetLength += line.Split().Length;
+                            sonnetWordCount += line.Split().Length;
                             sonnetContent.Add(line);
                         }
 
@@ -49,7 +49,7 @@ namespace TypeOnWillie.Services
                         { 
                             Id = sonnetId, 
                             Title = sonnetTitle, 
-                            Length=sonnetLength, 
+                            WordCount=sonnetWordCount, 
                             Lines=sonnetContent 
                         };
 
@@ -62,6 +62,22 @@ namespace TypeOnWillie.Services
             }
 
             return _sonnets;
+        }
+
+        public Sonnet GetSonnetById(int? id)
+        {
+            List<Sonnet> sonnets = (_sonnets != null) ? _sonnets : GetSonnets();
+
+            foreach (Sonnet sonnet in sonnets)
+            {
+                if (id == sonnet.Id)
+                {
+                    return sonnet;
+                }
+            }
+
+            // If sonnet was not found
+            return null;
         }
     }
 }

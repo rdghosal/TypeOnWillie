@@ -15,7 +15,7 @@ IF NOT EXISTS (
     BEGIN
         CREATE TABLE [dbo].[Sonnets] (
             [Id] INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-            [Length] INT NOT NULL,
+            [WordCount] INT NOT NULL,
             [FileName] NVARCHAR(MAX) NOT NULL
         );
 

@@ -16,10 +16,17 @@ export default class Sonnet {
     public get lines() : string[] {
         return this._lines;
     }
+
+    // Number of words
+    private readonly _wordCount : number;
+    public get wordCount() : number {
+        return this._wordCount;
+    }
     
-    public constructor(sonnetId: number, sonnetNumber: string, sonnetLines: string[]) {
+    public constructor(sonnetId: number, sonnetNumber: string, sonnetLines: string[], sonnetWordCount: number) {
         this._id = sonnetId;
         this._title = sonnetNumber;
         this._lines = sonnetLines;
+        this._wordCount = sonnetWordCount;
     }
 }

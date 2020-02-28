@@ -24,8 +24,19 @@ namespace TypeOnWillie.Controllers
 
         // GET: api/<controller>
         [HttpGet]
-        public ActionResult Get()
+        public ActionResult Get(int? id)
         {
+            // Get particular sonnet by sonnet id
+            if (id.HasValue)
+            {
+                if (id < 1 || id > 154)
+                {
+                    return NotFound();
+                }
+                return Ok(_service.GetSonnetById(id));
+            }
+
+            // If no id, return all sonnets
             return Ok(_service.GetSonnets());
         }
     }
