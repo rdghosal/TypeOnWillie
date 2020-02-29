@@ -1,6 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
 import { MainContext } from "./Main";
-
+import SessionTimer from "./SessionTimer";
+import SessionScore from "./SessionScore";
+import { LoadingMessage } from "./LoadingMessage";
+import CurrentModelText from "./CurrentModelText";
 
 type TypeSessionProps = {
     sonnetId: string | string[];
@@ -28,15 +31,13 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     
     // Cache for user progress
     const [ currentLine, setCurrentLine ] = useState<Array<string>>(new Array<string>());
-    const [ currentWordCount, incrementCount ] = useState<number>(0);
     const [ currentProgress, pushProgress ] = useState<Array<string>>(new Array<string>()); 
-    const [ correctWords, incrementCorrectWords ] = useState<number>(0);
     const [ incorrectWords, pushIncorrect ] = useState<Array<WordSet>>(new Array<WordSet>());
-
+    const [ correctWordCount, incrementCorrectWords ] = useState<number>(0);
+    
     // To track session
     const [ isFinished, toggleSessionStatus ] = useState<boolean>(false);
-    const [ intervalId, setIntervalId ] = useState<any>();
-    const [ wordCount, incrementWordCount ] = useState<number>(0);
+    const [ currentWordCount, incrementCount ] = useState<number>(0);
 
     useEffect(() => {
         // Fetch sonnet if no context data
@@ -46,15 +47,6 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
                 .then(data => setSonnet(data));
         }
     });
-
-    useEffect(() => {
-        if (!intervalId && currentSonnet && !isFinished) {
-            const id = setInterval(() => incrementTime(), 1000);
-            setIntervalId(id);
-        } else if (isFinished) {
-            clearInterval(intervalId);
-        }
-    }, [currentSonnet, isFinished]);
     
     useEffect(() => {
         // End session if all words have been typed
@@ -70,13 +62,6 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
         setWordArray(currentSonnet.lines[lineIndex].split(" "));
     }, [lineIndex, currentSonnet]);
 
-    useEffect(() => {
-        const scoreEl = document.querySelector(".typesession__score");
-        if (scoreEl) {
-            const correctRatio = Math.ceil(correctWords / currentWordCount * 100);
-            scoreEl.innerHTML = (correctRatio).toString();
-        }
-    }, [currentWordCount]);
 
     function handleInput() {
         const input = (document.getElementById("session-input") as HTMLInputElement);
@@ -105,8 +90,6 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
             setWord(wordIndex => wordIndex += 1);
         }
 
-        incrementWordCount(wordCount => wordCount++);
-
         // Clear input field
         input.value = "";
     }
@@ -114,19 +97,10 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     function evalInput(typedWord:string, modelWord:string) {
         // Adds to score if typed and model word are identical
         typedWord = typedWord.replace(" ", ""); // Strip space from rear of input
-        if (typedWord == modelWord) {
-            incrementCorrectWords(correctWords => correctWords += 1);
+        if (typedWord === modelWord) {
+            incrementCorrectWords(correctWordCount => correctWordCount += 1);
         } else {
             pushIncorrect(incorrectWords => [...incorrectWords, new WordSet(modelWord, typedWord)]);
-        }
-
-    }
-
-    function incrementTime() {
-        const timer = document.querySelector(".typesession__timer");
-        if (timer) {
-            let currentTime = timer.innerHTML;
-            timer.innerHTML = (parseInt(currentTime) + 1).toString();
         }
     }
 
@@ -136,39 +110,32 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
                 currentSonnet
                     ? <>
                         <h2>{ currentSonnet.title }</h2>
-                        <div className="typesession__timer">
-                            0
-                        </div>
-                        <div className="typesession__score">
-                            0
-                        </div>
-                        <div className="typesession__current-lineIndex">
-                            { wordArray[wordIndex] }
-                        </div>
+                        <SessionTimer isFinished={isFinished} />
+                        <SessionScore 
+                            currentWordCount={currentWordCount} 
+                            remainingWords={currentSonnet.wordCount - currentWordCount} 
+                            correctWordCount={correctWordCount} />
+                        { wordArray && <CurrentModelText wordArray={wordArray} wordIndex={wordIndex} /> }
                         <input type="text" id="session-input" onKeyUp={ e => (e.keyCode === 32) ? handleInput() : null }/>
+                        <div className="typesession__model-text">
+                            { 
+                                currentSonnet 
+                                    ? currentSonnet.lines.map((line:string, i:number) => (i > lineIndex) && <p key={i}>{line}</p>) 
+                                    : <p>Loading...</p> 
+                            }
+                        </div>
+                        <div className="typesession__progress--sonnet">
+                            { currentProgress.map((line:string, i:number) => <p key={i}>{line}</p>) }
+                            <p>{ currentLine.join(" ") }</p>
+                        </div>
+                        <div className="typesession__incorrect-list">
+                            <ul>
+                                { incorrectWords.map((wordSet:WordSet, i:number) => <li key={i}>{wordSet.modelWord} | {wordSet.typedWord}</li>)}
+                            </ul>
+                        </div>
                       </>
-                    : <div>Loading...</div>
+                    : <LoadingMessage insertText={"your session"} />
             }
-            <div className="typesession__model-text">
-                { 
-                    currentSonnet 
-                        ? currentSonnet.lines.map((line:string, i:number) => <p key={i}>{line}</p>) 
-                        : <p>Loading...</p> 
-                }
-            </div>
-            <div className="typesession__progress">
-                <div className="typesession__progress--line">
-                    { currentLine.join(" ") }
-                </div>
-                <div className="typesession__progress--sonnet">
-                    { currentProgress.map((line:string, i:number) => <p key={i}>{line}</p>) }
-                </div>
-                <div className="typesession__incorrect-list">
-                    <ul>
-                        { incorrectWords.map((wordSet:WordSet, i:number) => <li key={i}>{wordSet.modelWord} | {wordSet.typedWord}</li>)}
-                    </ul>
-                </div>
-            </div>
         </div>
     ) 
 } 
