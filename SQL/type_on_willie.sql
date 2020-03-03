@@ -45,7 +45,7 @@ IF NOT EXISTS (
             [Username] VARCHAR(20) NOT NULL,
             [Hash] VARCHAR(255) NOT NULL,
             [Age] INT,
-			[Country] VARCHAR(255),
+			[Nationality] VARCHAR(255),
 			[HighestEducation] VARCHAR(15)
         );
         PRINT('Created table [dbo].[Users]');
@@ -54,7 +54,7 @@ IF NOT EXISTS (
 -- Create Scores table
 IF NOT EXISTS (
     SELECT * FROM sys.tables
-    WHERE [name] LIKE 'UserSessions'
+    WHERE [name] LIKE 'TypeSessions'
 )
     BEGIN
         CREATE TABLE [dbo].[TypeSessions] (
@@ -70,7 +70,7 @@ IF NOT EXISTS (
             CONSTRAINT FK_Scores_Sonnets FOREIGN KEY (SonnetId)
             REFERENCES [dbo].[Sonnets] (Id)
         );
-        PRINT('Created table [dbo].[UserSessions]');
+        PRINT('Created table [dbo].[TypeSessions]');
     END
 
 -- Success

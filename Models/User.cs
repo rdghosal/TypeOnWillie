@@ -10,9 +10,15 @@ namespace TypeOnWillie.Models
     {
         public SqlGuid Id { get; }
 
-        public string Username { get; }
+        public string Username { get; set; }
 
         public string Hash { get; set; }
+
+        public int Age { get; set; }
+
+        public string Nationality { get; set; }
+
+        public string HighestEducation { get; set; }
 
         public User()
         {

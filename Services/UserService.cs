@@ -22,7 +22,14 @@ namespace TypeOnWillie.Services
         {
             // Serialize userDto to User after hashing password
             string hashed = _passwordHasher.HashPassword(userDto, userDto.Password);
-            return _dao.InsertUser(new User(userDto.Username, hashed));
+            return _dao.InsertUser(new User
+            {
+                Username = userDto.Username,
+                Hash = hashed,
+                Age = userDto.Age,
+                Nationality = userDto.Nationality,
+                HighestEducation = userDto.HighestEducation,
+            });
         }
 
         public User VerifyUser(UserDto userDto)

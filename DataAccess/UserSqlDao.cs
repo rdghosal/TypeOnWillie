@@ -36,7 +36,13 @@ namespace TypeOnWillie.DataAccess
                     return -1;
                 } 
                 // Add to Users table
-                return _sqlConnection.Execute(UserCommand.INSERT, new { username = user.Username, hash = user.Hash });
+                return _sqlConnection.Execute(UserCommand.INSERT, new { 
+                    username = user.Username, 
+                    hash = user.Hash,
+                    age = user.Age,
+                    nationality = user.Nationality,
+                    highestEducation = user.HighestEducation
+                });
             }
         }
     }
