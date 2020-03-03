@@ -20,11 +20,11 @@ namespace TypeOnWillie.Services
         }
         public int AddUser(UserDto userDto)
         {
-            // Check if username exists; if not, add to database
-            if (_dao.SelectUser(userDto) != null) return -1;
+            // Serialize userDto to User after hashing password
             string hashed = _passwordHasher.HashPassword(userDto, userDto.Password);
             return _dao.InsertUser(new User(userDto.Username, hashed));
         }
+
         public int VerifyUser(UserDto userDto)
         {
             // Get user and verify password
@@ -33,7 +33,10 @@ namespace TypeOnWillie.Services
             {
                 return -1;
             }
-            else if (_passwordHasher.VerifyHashedPassword(userDto, userDto.Password, user.Hash) == PasswordVerificationResult.Failed)
+            else if (_passwordHasher.VerifyHashedPassword(
+                        userDto, 
+                        userDto.Password, 
+                        user.Hash) == PasswordVerificationResult.Failed)
             {
                 return -2;
             }

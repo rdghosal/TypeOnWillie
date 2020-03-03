@@ -22,16 +22,16 @@ namespace TypeOnWillie.Controllers
 
         // POST: api/Register
         [HttpPost]
-        public ActionResult Post([FromBody] UserDto userDto)
+        public ActionResult Post(UserDto userDto)
         {
-            try
+            int result = _service.AddUser(userDto);
+            if (result == 1) 
             {
-                return CreatedAtRoute(nameof(_service.AddUser), userDto); // Status code 201
+                // Status code 201
+                return CreatedAtAction(nameof(_service.AddUser), userDto);
             }
-            catch
-            {
-                return BadRequest(); // Status code 400
-            }
+            // Status code 400
+            return BadRequest(); 
         }
     }
 }

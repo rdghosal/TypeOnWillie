@@ -17,11 +17,6 @@ namespace TypeOnWillie.DataAccess
         {
         }
 
-        // TODO: move
-        //public string GetConnectionString()
-        //{
-        //    return Environment.GetEnvironmentVariable(_connectionName.ToUpper());
-        //}
         public User SelectUser(UserDto userDto)
         {
             using (_sqlConnection)
@@ -30,11 +25,18 @@ namespace TypeOnWillie.DataAccess
                 return _sqlConnection.Query<User>(UserCommand.SELECT, new { username = userDto.Username }).FirstOrDefault();
             }
         }
+
         public int InsertUser(User user)
         {
             using (_sqlConnection)
             {
-                return _sqlConnection.Execute(UserCommand.INSERT, new { username = user.Username });
+                // Check if username was taken
+                if (_sqlConnection.Query<User>(UserCommand.SELECT, new { username = user.Username }) != null) 
+                {
+                    return -1;
+                } 
+                // Add to Users table
+                return _sqlConnection.Execute(UserCommand.INSERT, new { username = user.Username, hash = user.Hash });
             }
         }
     }

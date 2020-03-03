@@ -31,7 +31,7 @@ namespace TypeOnWillie.DataAccess
             using (_sqlConnection)
             {
                 _sqlConnection.Open();
-                return _sqlConnection.Query<Score>(ScoreCommand.INSERT, new { userId = userDto.UserId });
+                return _sqlConnection.Query<Score>(ScoreCommand.INSERT, new { userId = userDto.Id });
             }
         }
     }

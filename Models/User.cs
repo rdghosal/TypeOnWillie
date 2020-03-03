@@ -7,13 +7,21 @@ namespace TypeOnWillie.Models
 {
     public class User
     {
-        public int UserId { get; }
+        public int Id { get; }
+
         public string Username { get; }
+
         public string Hash { get; set; }
+
+        public User()
+        {
+        }
+
         public User (string username)
         {
             Username = username;
         }
+        
         public User(string username, string hash)
         {
             Username = username;

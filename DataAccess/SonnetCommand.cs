@@ -7,6 +7,6 @@ namespace TypeOnWillie.DataAccess
 {
     public static class SonnetCommand
     {
-        public const string SELECT_ALL = @"SELECT * FROM [type_on_willie].[Sonnets];";
+        public const string SELECT_ALL = @"SELECT * FROM [type_on_willie].[dbo].[Sonnets];";
     }
 }

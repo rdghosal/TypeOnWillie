@@ -40,8 +40,8 @@ IF NOT EXISTS (
 )
     BEGIN
         CREATE TABLE [dbo].[Users] (
-            [Id] INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-            [DateTime] DATETIME NOT NULL,
+            [Id] INT NOT NULL IDENTITY(1,1) PRIMARY KEY, -- TODO: Change to UNIQUEIDENTIFIER
+            [DateTime] DATETIME NOT NULL DEFAULT GETDATE(),
             [Username] VARCHAR(15) NOT NULL,
             [Hash] VARCHAR(255) NOT NULL
         );
@@ -55,10 +55,10 @@ IF NOT EXISTS (
 )
     BEGIN
         CREATE TABLE [dbo].[Scores] (
-            [ScoreId] INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+            [ScoreId] INT NOT NULL IDENTITY(1,1) PRIMARY KEY, -- TODO: Change to UNIQUEIDENTIFIER
             [UserId] INT NOT NULL,
             [SonnetId] INT NOT NULL,
-            [DateTime] DATETIME NOT NULL,
+            [DateTime] DATETIME NOT NULL DEFAULT GETDATE(),
             [SuccessRate] FLOAT NOT NULL,
             [Misspellings] VARCHAR(MAX),
             CONSTRAINT FK_Scores_Users FOREIGN KEY (UserId)

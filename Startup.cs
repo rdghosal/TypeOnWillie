@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TypeOnWillie.DataAccess;
+using TypeOnWillie.Models;
 using TypeOnWillie.Services;
 
 namespace TypeOnWillie
@@ -25,12 +26,12 @@ namespace TypeOnWillie
         public void ConfigureServices(IServiceCollection services)
         {
             // For dependency injection at Controller and Service layers
-            services.AddTransient(typeof(PasswordHasher<>));
-            services.AddTransient<UserService>();
+            services.AddTransient<PasswordHasher<UserDto>>();
             services.AddTransient<UserProfileService>();
-            services.AddSingleton(serviceProvider => new SonnetService(Configuration["SonnetPath"]));
-            services.AddSingleton(new SqlConnection(Configuration["mssql"]));
-            services.AddSingleton(typeof(SqlDao));
+            services.AddScoped<UserService>();
+            services.AddScoped(typeof(SqlDao));
+            services.AddScoped(serviceProvider => new SqlConnection(Configuration.GetConnectionString("mssql")));
+            services.AddSingleton(new SonnetService(Configuration["SonnetPath"]));
 
             services.AddControllersWithViews();
 
