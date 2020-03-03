@@ -25,23 +25,17 @@ namespace TypeOnWillie.Services
             return _dao.InsertUser(new User(userDto.Username, hashed));
         }
 
-        public int VerifyUser(UserDto userDto)
+        public User VerifyUser(UserDto userDto)
         {
             // Get user and verify password
             User user = _dao.SelectUser(userDto);
-            if (user == null)
+            if (user == null || _passwordHasher.VerifyHashedPassword(userDto, userDto.Password, user.Hash) 
+                == PasswordVerificationResult.Failed)
             {
-                return -1;
-            }
-            else if (_passwordHasher.VerifyHashedPassword(
-                        userDto, 
-                        userDto.Password, 
-                        user.Hash) == PasswordVerificationResult.Failed)
-            {
-                return -2;
+                return null;
             }
             // Verified
-            return 0;
+            return user;
         }
     }
 }

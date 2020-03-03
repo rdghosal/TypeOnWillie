@@ -12,20 +12,20 @@ namespace TypeOnWillie.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ScoreController : ControllerBase
+    public class TypeSessionController : ControllerBase
     {
-        private readonly ScoreService _service;
+        private readonly TypeSessionService _service;
 
-        public ScoreController(ScoreService scoreService)
+        public TypeSessionController(TypeSessionService typeSessionService)
         {
-            _service = scoreService;
+            _service = typeSessionService;
         }
 
         // POST: api/Score
         [HttpPost]
-        public ActionResult Post([FromBody] Score score)
+        public ActionResult Post(TypeSession typeSession)
         {
-            return Ok(_service.AddScore(score));
+            return Ok(_service.AddTypeSession(typeSession));
         }
     }
 }

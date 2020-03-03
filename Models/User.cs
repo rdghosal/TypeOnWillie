@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ namespace TypeOnWillie.Models
 {
     public class User
     {
-        public int Id { get; }
+        public SqlGuid Id { get; }
 
         public string Username { get; }
 

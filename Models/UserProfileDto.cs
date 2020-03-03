@@ -8,6 +8,6 @@ namespace TypeOnWillie.Models
     public class UserProfileDto
     {
         public UserDto UserData { get; set; }
-        public IEnumerable<Score> Scores { get; set; }
+        public IEnumerable<TypeSession> TypeSessions { get; set; }
     }
 }

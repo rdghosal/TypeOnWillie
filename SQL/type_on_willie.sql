@@ -40,10 +40,13 @@ IF NOT EXISTS (
 )
     BEGIN
         CREATE TABLE [dbo].[Users] (
-            [Id] INT NOT NULL IDENTITY(1,1) PRIMARY KEY, -- TODO: Change to UNIQUEIDENTIFIER
+            [Id] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY,
             [DateTime] DATETIME NOT NULL DEFAULT GETDATE(),
-            [Username] VARCHAR(15) NOT NULL,
-            [Hash] VARCHAR(255) NOT NULL
+            [Username] VARCHAR(20) NOT NULL,
+            [Hash] VARCHAR(255) NOT NULL,
+            [Age] INT,
+			[Country] VARCHAR(255),
+			[HighestEducation] VARCHAR(15)
         );
         PRINT('Created table [dbo].[Users]');
     END
@@ -51,22 +54,23 @@ IF NOT EXISTS (
 -- Create Scores table
 IF NOT EXISTS (
     SELECT * FROM sys.tables
-    WHERE [name] LIKE 'Scores'
+    WHERE [name] LIKE 'UserSessions'
 )
     BEGIN
-        CREATE TABLE [dbo].[Scores] (
-            [ScoreId] INT NOT NULL IDENTITY(1,1) PRIMARY KEY, -- TODO: Change to UNIQUEIDENTIFIER
-            [UserId] INT NOT NULL,
+        CREATE TABLE [dbo].[TypeSessions] (
+            [Id] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY,
+            [UserId] UNIQUEIDENTIFIER NOT NULL,
             [SonnetId] INT NOT NULL,
             [DateTime] DATETIME NOT NULL DEFAULT GETDATE(),
-            [SuccessRate] FLOAT NOT NULL,
-            [Misspellings] VARCHAR(MAX),
+            [SecondsElapsed] INT NOT NULL,
+            [PercentCorrect] INT NOT NULL,
+            [MisspelledWords] NVARCHAR(MAX),
             CONSTRAINT FK_Scores_Users FOREIGN KEY (UserId)
             REFERENCES [dbo].[Users] (Id),
             CONSTRAINT FK_Scores_Sonnets FOREIGN KEY (SonnetId)
             REFERENCES [dbo].[Sonnets] (Id)
         );
-        PRINT('Created table [dbo].[Scores]');
+        PRINT('Created table [dbo].[UserSessions]');
     END
 
 -- Success

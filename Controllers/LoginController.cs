@@ -21,16 +21,13 @@ namespace TypeOnWillie.Controllers
         }
         // POST: api/Login
         [HttpPost]
-        public ActionResult Post([FromBody] UserDto userDto)
+        public ActionResult Post(UserDto userDto)
         {
-            if (_service.VerifyUser(userDto) == -1)
-            {
-                // Status code 400
-                return BadRequest();
-            }
+            User user = _service.VerifyUser(userDto);
+            if (user == null) return BadRequest(userDto);
 
-            // Status code 200
-            return Ok();
+            // Send new dto to dispose password and hash
+            return Ok(new UserDto { Username = userDto.Username, Id = user.Id }); 
         }
     }
 }

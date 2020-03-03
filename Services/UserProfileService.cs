@@ -9,18 +9,18 @@ namespace TypeOnWillie.Services
 {
     public class UserProfileService
     {
-        private readonly ScoreSqlDao _dao;
+        private readonly TypeSessionSqlDao _dao;
 
-        public UserProfileService(ScoreSqlDao scoreSqlDao)
+        public UserProfileService(TypeSessionSqlDao typeSessionSqlDao)
         {
-            _dao = scoreSqlDao;
+            _dao = typeSessionSqlDao;
         }
 
         public UserProfileDto GetUserProfile(UserDto userDto)
         {
             // Convert to List for access in view
-            List<Score> scores = _dao.SelectScores(userDto).ToList();
-            return new UserProfileDto { UserData = userDto, Scores = scores };
+            List<TypeSession> typeSessions = _dao.SelectTypeSessions(userDto).ToList();
+            return new UserProfileDto { UserData = userDto, TypeSessions = typeSessions };
         }
     }
 }
