@@ -31,7 +31,7 @@ namespace TypeOnWillie.DataAccess
             using (_sqlConnection)
             {
                 // Check if username was taken
-                if (_sqlConnection.Query<User>(UserCommand.SELECT, new { username = user.Username }) != null) 
+                if (_sqlConnection.Query<User>(UserCommand.SELECT, new { username = user.Username }).FirstOrDefault() != null) 
                 {
                     return -1;
                 } 

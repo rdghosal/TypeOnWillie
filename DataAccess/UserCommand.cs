@@ -7,7 +7,7 @@ namespace TypeOnWillie.DataAccess
 {
     public static class UserCommand
     {
-        public const string SELECT = @"SELECT UserId FROM [type_on_willie].[dbo].[Users] 
+        public const string SELECT = @"SELECT Id FROM [type_on_willie].[dbo].[Users] 
                                        WHERE Username LIKE @username;";
         public const string INSERT = @"INSERT INTO [type_on_willie].[dbo].[Users] (Username, Hash)
                                        VALUES (@username, @hash);";
