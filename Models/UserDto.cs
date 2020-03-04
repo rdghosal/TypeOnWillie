@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,7 +8,7 @@ namespace TypeOnWillie.Models
 {
     public class UserDto
     {
-        public SqlGuid Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Username { get; set; }
 

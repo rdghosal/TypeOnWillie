@@ -30,7 +30,6 @@ namespace TypeOnWillie
             services.AddTransient<UserProfileService>();
             services.AddScoped<UserService>();
             services.AddScoped<UserSqlDao>();
-            // services.AddScoped(typeof(SqlDao));
             services.AddScoped(serviceProvider => new SqlConnection(Configuration.GetConnectionString("mssql")));
             services.AddSingleton(new SonnetService(Configuration["SonnetPath"]));
 

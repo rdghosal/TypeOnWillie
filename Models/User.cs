@@ -8,7 +8,7 @@ namespace TypeOnWillie.Models
 {
     public class User
     {
-        public SqlGuid Id { get; }
+        public Guid Id { get; set; }
 
         public string Username { get; set; }
 
