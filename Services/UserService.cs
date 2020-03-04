@@ -36,7 +36,7 @@ namespace TypeOnWillie.Services
         {
             // Get user and verify password
             User user = _dao.SelectUser(userDto);
-            if (user == null || _passwordHasher.VerifyHashedPassword(userDto, userDto.Password, user.Hash) 
+            if (user == null || _passwordHasher.VerifyHashedPassword(userDto, user.Hash, userDto.Password)
                 == PasswordVerificationResult.Failed)
             {
                 return null;
