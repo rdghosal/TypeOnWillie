@@ -8,12 +8,11 @@ type CurrentModelTextProps = {
 
 const CurrentModelText = ({ wordArray, wordIndex } : CurrentModelTextProps) => {
 
-    const [ wordString, appendWord ] = useState<string>();
+    const [ wordString, appendWord ] = useState<string | undefined>();
 
     useEffect(() => {
         // Load next line
-        if (wordIndex < 0) return;
-        appendWord(wordArray[wordIndex - 1]);
+        if (wordIndex == 0) appendWord(wordArray[wordIndex - 1]);
     }, [wordArray]);
 
     useEffect(() => {

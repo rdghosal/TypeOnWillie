@@ -4,6 +4,8 @@ import SessionTimer from "./SessionTimer";
 import SessionScore from "./SessionScore";
 import { LoadingMessage } from "./LoadingMessage";
 import CurrentModelText from "./CurrentModelText";
+import TypeHint from "./TypeHint";
+import Sonnet from "./Sonnet";
 
 type TypeSessionProps = {
     sonnetId: string | string[];
@@ -36,32 +38,41 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     const [ correctWordCount, incrementCorrectWords ] = useState<number>(0);
     
     // To track session
+    const [ isStarted, toggleStart ] = useState<boolean>(false);
     const [ isFinished, toggleSessionStatus ] = useState<boolean>(false);
     const [ currentWordCount, incrementCount ] = useState<number>(0);
 
     useEffect(() => {
-        // Fetch sonnet if no context data
+        // Fetch data if not in context
         if (!currentSonnet) {
-            fetch(`api/sonnetmenu?id=${sonnetId}`)
-                .then(res => res.json())
-                .then(data => setSonnet(data));
+            return fetchSonnetById();
         }
-    });
-    
+    }, [currentSonnet]);
+
     useEffect(() => {
         // End session if all words have been typed
         if (!currentSonnet) return;
-        if (currentWordCount === currentSonnet.length) {
-            toggleSessionStatus(true);
+        if (currentWordCount > currentSonnet.wordCount - 1) {
+            const inputEl = (document.getElementById("session-input") as HTMLInputElement);
+            inputEl.disabled = true;
+            return toggleSessionStatus(true); // TODO test
         }
     }, [currentWordCount]);
 
     useEffect(() => {
-        // Split current line into an array of words
-        if (!currentSonnet || currentWordCount === currentSonnet.wordCount) return; // TODO test
-        setWordArray(currentSonnet.lines[lineIndex].split(" "));
-    }, [lineIndex, currentSonnet]);
+        // Split current line and store as array
+        if (!currentSonnet || isFinished) return;
+        if (lineIndex <= Sonnet.MAX_LINES - 1) {
+            setWordArray(currentSonnet.lines[lineIndex].split(" "));
+        }
+    }, [lineIndex, currentSonnet, currentWordCount]);
 
+    function fetchSonnetById() {
+        // Fetch sonnet data by sonnetId props and save to state
+        fetch(`api/sonnetmenu?id=${sonnetId}`)
+            .then(res => res.json())
+            .then(data => setSonnet(data));
+    }
 
     function handleInput() {
         const input = (document.getElementById("session-input") as HTMLInputElement);
@@ -96,12 +107,17 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
 
     function evalInput(typedWord:string, modelWord:string) {
         // Adds to score if typed and model word are identical
-        typedWord = typedWord.replace(" ", ""); // Strip space from rear of input
+        typedWord = typedWord.replace(/\s*$/, ""); // Strip space from rear of input
         if (typedWord === modelWord) {
             incrementCorrectWords(correctWordCount => correctWordCount += 1);
         } else {
             pushIncorrect(incorrectWords => [...incorrectWords, new WordSet(modelWord, typedWord)]);
         }
+    }
+
+    function handleKeyUp(e : React.KeyboardEvent<HTMLInputElement>) {
+        const targetKey = (wordIndex === wordArray.length - 1) ? 13 : 32;
+        if (e.keyCode === targetKey) return handleInput(); 
     }
 
     return (
@@ -110,19 +126,19 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
                 currentSonnet
                     ? <>
                         <h2>{ currentSonnet.title }</h2>
-                        <SessionTimer isFinished={isFinished} />
+                        <SessionTimer 
+                            currentWordCount={currentWordCount}
+                            isStarted={isStarted} 
+                            isFinished={isFinished} />
                         <SessionScore 
                             currentWordCount={currentWordCount} 
                             remainingWords={currentSonnet.wordCount - currentWordCount} 
                             correctWordCount={correctWordCount} />
-                        { wordArray && <CurrentModelText wordArray={wordArray} wordIndex={wordIndex} /> }
-                        <input type="text" id="session-input" onKeyUp={ e => (e.keyCode === 32) ? handleInput() : null }/>
+                        { !isFinished && <CurrentModelText wordArray={wordArray} wordIndex={wordIndex} /> }
+                        <input type="text" id="session-input" onKeyUp={ handleKeyUp } onClick={() => toggleStart(true)}/>
+                        <TypeHint endOfLine={ wordIndex === wordArray.length - 1 }/>
                         <div className="typesession__model-text">
-                            { 
-                                currentSonnet 
-                                    ? currentSonnet.lines.map((line:string, i:number) => (i > lineIndex) && <p key={i}>{line}</p>) 
-                                    : <p>Loading...</p> 
-                            }
+                            { currentSonnet.lines.map((line:string, i:number) => (i > lineIndex) && <p key={i}>{line}</p>) }
                         </div>
                         <div className="typesession__progress--sonnet">
                             { currentProgress.map((line:string, i:number) => <p key={i}>{line}</p>) }

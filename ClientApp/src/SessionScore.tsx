@@ -11,8 +11,10 @@ const SessionScore = ({ currentWordCount, remainingWords, correctWordCount } : S
     useEffect(() => {
         const scoreEl = document.querySelector("#correctRatio");
         if (scoreEl) {
-            const correctRatio = currentWordCount === 0 ? 0 : Math.ceil(correctWordCount / currentWordCount * 100);
-            scoreEl.innerHTML = (correctRatio).toString();
+            const correctRatio = currentWordCount === 0 
+                ? 0 
+                : Math.ceil(correctWordCount / currentWordCount * 100);
+            scoreEl.innerHTML = correctRatio.toString();
         }
     }, [currentWordCount]);
     

@@ -1,4 +1,8 @@
 export default class Sonnet {
+
+    // Max sonnet lines
+    static MAX_LINES: number = 14;
+
     // SonnetId
     private readonly _id : number;
     public get id() : number {
