@@ -14,7 +14,7 @@ const MisspelledWordList = ({ misspelledWords, lineIndex } : MisspelledWordListP
         // Cache misspelled words as list for mapping to li els
         const temp = misspelledList;
         const currLineList = misspelledWords[lineIndex];
-        let newList = (temp) ? [...temp, currLineList[currLineList.length - 1] ] : misspelledWords[lineIndex];
+        let newList = (temp && currLineList) ? [...temp, currLineList[currLineList.length - 1] ] : misspelledWords[lineIndex];
         concatMisspelled(newList);
     }, [lineIndex, misspelledWords]);
 

@@ -40,7 +40,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     // Cache for user progress
     const [ currentLine, setCurrentLine ] = useState<Array<string>>(new Array<string>());
     const [ currentProgress, pushProgress ] = useState<Array<string>>(new Array<string>()); 
-    const [ incorrectWords, pushIncorrect ] = useState<MisspelledWordMap>({});
+    const [ misspelledWords, pushMisspelled ] = useState<MisspelledWordMap>({});
     const [ correctWordCount, incrementCorrectWords ] = useState<number>(0);
     
     // To track session
@@ -118,11 +118,11 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
             incrementCorrectWords(correctWordCount => correctWordCount += 1);
         } else {
             const currentWords = new WordSet(modelWord, typedWord, wordIndex);
-            pushIncorrect(incorrectWords => {
-                const temp = incorrectWords[lineIndex];
+            pushMisspelled(misspelledWords => {
+                const temp = misspelledWords[lineIndex];
                 let newWords = (temp) ? [...temp, currentWords] : [ currentWords ];
                 return {
-                    ...incorrectWords,
+                    ...misspelledWords,
                     [lineIndex] : newWords
                 }
             });
@@ -139,7 +139,6 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
             {
                 currentSonnet
                     ? <>
-                        { console.log(incorrectWords)}
                         <h2>{ currentSonnet.title }</h2>
                         <SessionTimer 
                             currentWordCount={currentWordCount}
@@ -162,7 +161,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
                             <p>{ currentLine.join(" ") }</p>
                         </div>
                         <MisspelledWordList 
-                            misspelledWords={ incorrectWords } lineIndex={lineIndex} />
+                            misspelledWords={ misspelledWords } lineIndex={lineIndex} />
                       </>
                     : <LoadingMessage insertText={"your session"} />
             }
