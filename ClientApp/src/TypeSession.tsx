@@ -6,23 +6,29 @@ import { LoadingMessage } from "./LoadingMessage";
 import CurrentModelText from "./CurrentModelText";
 import TypeHint from "./TypeHint";
 import Sonnet from "./Sonnet";
+import MisspelledWordList from "./MisspelledWordList";
 
 type TypeSessionProps = {
     sonnetId: string | string[];
 }
 
-class WordSet {
+export class WordSet {
     readonly modelWord: string;
     readonly typedWord: string;
+    readonly index: number;
 
-    constructor(model: string, typed:string) {
+    constructor(model: string, typed:string, index: number) {
         this.modelWord = model;
         this.typedWord = typed;        
+        this.index = index;
     }
 }
 
-const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
+export interface MisspelledWordMap {
+    [key: number] : Array<WordSet>
+}
 
+export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     // Current Sonnet in session
     const { currentSonnet, setSonnet } = useContext(MainContext);
 
@@ -34,12 +40,12 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     // Cache for user progress
     const [ currentLine, setCurrentLine ] = useState<Array<string>>(new Array<string>());
     const [ currentProgress, pushProgress ] = useState<Array<string>>(new Array<string>()); 
-    const [ incorrectWords, pushIncorrect ] = useState<Array<WordSet>>(new Array<WordSet>());
+    const [ incorrectWords, pushIncorrect ] = useState<MisspelledWordMap>({});
     const [ correctWordCount, incrementCorrectWords ] = useState<number>(0);
     
     // To track session
     const [ isStarted, toggleStart ] = useState<boolean>(false);
-    const [ isFinished, toggleSessionStatus ] = useState<boolean>(false);
+    const [ isFinished, toggleFinish ] = useState<boolean>(false);
     const [ currentWordCount, incrementCount ] = useState<number>(0);
 
     useEffect(() => {
@@ -55,7 +61,7 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
         if (currentWordCount > currentSonnet.wordCount - 1) {
             const inputEl = (document.getElementById("session-input") as HTMLInputElement);
             inputEl.disabled = true;
-            return toggleSessionStatus(true); // TODO test
+            return toggleFinish(true); // TODO test
         }
     }, [currentWordCount]);
 
@@ -107,11 +113,19 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
 
     function evalInput(typedWord:string, modelWord:string) {
         // Adds to score if typed and model word are identical
-        typedWord = typedWord.replace(/\s*$/, ""); // Strip space from rear of input
+        typedWord = typedWord.replace(/\s*$/, ""); // Strip all space from rear of input only
         if (typedWord === modelWord) {
             incrementCorrectWords(correctWordCount => correctWordCount += 1);
         } else {
-            pushIncorrect(incorrectWords => [...incorrectWords, new WordSet(modelWord, typedWord)]);
+            const currentWords = new WordSet(modelWord, typedWord, wordIndex);
+            pushIncorrect(incorrectWords => {
+                const temp = incorrectWords[lineIndex];
+                let newWords = (temp) ? [...temp, currentWords] : [ currentWords ];
+                return {
+                    ...incorrectWords,
+                    [lineIndex] : newWords
+                }
+            });
         }
     }
 
@@ -125,6 +139,7 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
             {
                 currentSonnet
                     ? <>
+                        { console.log(incorrectWords)}
                         <h2>{ currentSonnet.title }</h2>
                         <SessionTimer 
                             currentWordCount={currentWordCount}
@@ -134,8 +149,10 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
                             currentWordCount={currentWordCount} 
                             remainingWords={currentSonnet.wordCount - currentWordCount} 
                             correctWordCount={correctWordCount} />
-                        { !isFinished && <CurrentModelText wordArray={wordArray} wordIndex={wordIndex} /> }
-                        <input type="text" id="session-input" onKeyUp={ handleKeyUp } onClick={() => toggleStart(true)}/>
+                        { !isFinished && 
+                            <CurrentModelText wordArray={wordArray} wordIndex={wordIndex} /> }
+                        <input type="text" id="session-input" 
+                            onKeyUp={ handleKeyUp } onClick={() => toggleStart(true)}/>
                         <TypeHint endOfLine={ wordIndex === wordArray.length - 1 }/>
                         <div className="typesession__model-text">
                             { currentSonnet.lines.map((line:string, i:number) => (i > lineIndex) && <p key={i}>{line}</p>) }
@@ -144,16 +161,11 @@ const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
                             { currentProgress.map((line:string, i:number) => <p key={i}>{line}</p>) }
                             <p>{ currentLine.join(" ") }</p>
                         </div>
-                        <div className="typesession__incorrect-list">
-                            <ul>
-                                { incorrectWords.map((wordSet:WordSet, i:number) => <li key={i}>{wordSet.modelWord} | {wordSet.typedWord}</li>)}
-                            </ul>
-                        </div>
+                        <MisspelledWordList 
+                            misspelledWords={ incorrectWords } lineIndex={lineIndex} />
                       </>
                     : <LoadingMessage insertText={"your session"} />
             }
         </div>
     ) 
 } 
-
-export default TypeSession;

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
 import { Main } from './Main';
 import Landing from './Landing';
-import TypeSession from './TypeSession';
+import { TypeSession } from './TypeSession';
 
 
 const App: React.FC = () => {
