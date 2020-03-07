@@ -4,6 +4,8 @@ import './App.css';
 import { Main } from './Main';
 import Landing from './Landing';
 import { TypeSession } from './TypeSession';
+import Login from './Login';
+import Register from './Register';
 
 
 const App: React.FC = () => {
@@ -12,6 +14,8 @@ const App: React.FC = () => {
           <Switch>
               <Route exact path="/" render={ props => <Landing {...props} /> } />
               <Route path="/app" component={Main} />
+              <Route path="/login" component={Login} />
+              <Route path="/register" component={Register} />
           </Switch>
       </Router>
   );
