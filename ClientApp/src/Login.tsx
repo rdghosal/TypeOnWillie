@@ -1,5 +1,5 @@
 import React, { FormEvent, useContext } from 'react'
-import { RouteComponentProps, withRouter } from 'react-router';
+import { RouteComponentProps } from 'react-router';
 import { AppContext } from './App';
 
 
@@ -52,16 +52,24 @@ const Login = (props : RouteComponentProps) => {
     
     return (
         <div className="login container" id="login">
+            <h2 className="form__title">Login</h2>
             <form onSubmit={ handleSubmit }>
-                <input type="text" name="username" id="username"/>
-                <input type="password" name="password" id="password"/>
-                <button type="submit">Login</button>
-                <button type="button"
+                <div className="form-group">
+                    <label htmlFor="username">Username</label>
+                    <input type="text" className="form-control" placeholder="Username" name="username" id="username"/>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="password">Password should have 8-12 characters with one of each:<br/>
+                                              Lowercase, uppercase, number, special character</label>
+                    <input type="password" className="form-control" name="password" id="password" placeholder="password"/>
+                </div>
+                <button className="btn btn-primary" type="submit">Login</button>
+                <button className="btn btn-secondary" type="button"
                     onClick={() => props.history.push("/register") }>Sign Up</button>
-                <button type="button" onClick={ handleGuest }>Continue as Guest</button>
+                <button className="btn btn-warning" type="button" onClick={ handleGuest }>Continue as Guest</button>
             </form>
         </div>
     );
 }
 
-export default withRouter(Login);
+export default Login;

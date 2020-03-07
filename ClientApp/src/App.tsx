@@ -32,7 +32,7 @@ export const App: React.FC = () => {
           <Switch>
               <Route exact path="/" render={ props => <Landing {...props} /> } />
               <Route path="/app" render={props => <AppContextProvider><Main {...props}/></AppContextProvider>} />
-              <Route path="/login" render={props => <AppContextProvider><Login /></AppContextProvider>} />
+              <Route path="/login" render={props => <AppContextProvider><Login {...props} /></AppContextProvider>} />
               <Route path="/register" render={props => <AppContextProvider><Register {...props}/></AppContextProvider>} />
           </Switch>
       </Router>
