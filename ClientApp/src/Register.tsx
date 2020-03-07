@@ -1,10 +1,10 @@
 import React, { FormEvent, useContext } from 'react'
 import { RouteComponentProps } from 'react-router';
-import { MainContext } from './Main';
+import { AppContext } from './App';
 
 const Register = (props : RouteComponentProps) => {
 
-    const { setUser } = useContext(MainContext);
+    const { setUser } = useContext(AppContext);
 
     const handleSubmit = (e : FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -72,7 +72,7 @@ const Register = (props : RouteComponentProps) => {
                 <input type="password" name="password" id="password"/>
                 <button type="submit">Register</button>
                 <button type="button"
-                    onClick={() => props.history.push("/login") }>Log In</button>
+                    onClick={() => props.history.push("/login") }>Back to Log In</button>
             </form>
         </div>
     )

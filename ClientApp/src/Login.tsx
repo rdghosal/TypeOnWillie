@@ -1,11 +1,11 @@
 import React, { FormEvent, useContext } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router';
-import { MainContext } from './Main';
+import { AppContext } from './App';
 
 
 const Login = (props : RouteComponentProps) => {
 
-    const { setUser } = useContext(MainContext);
+    const { user, setUser } = useContext(AppContext);
 
     const handleSubmit = (e : FormEvent<HTMLFormElement>) => { 
         e.preventDefault(); // Prevent submision
@@ -39,6 +39,16 @@ const Login = (props : RouteComponentProps) => {
 
         return isValid;
     }
+
+    const handleGuest = () =>  {
+        // Set user as guest
+        const guest = {
+            id: "guest"
+        };
+        sessionStorage.setItem("user", JSON.stringify(guest));
+        setUser(guest);
+        props.history.push("/app");
+    }
     
     return (
         <div className="login container" id="login">
@@ -48,6 +58,7 @@ const Login = (props : RouteComponentProps) => {
                 <button type="submit">Login</button>
                 <button type="button"
                     onClick={() => props.history.push("/register") }>Sign Up</button>
+                <button type="button" onClick={ handleGuest }>Continue as Guest</button>
             </form>
         </div>
     );

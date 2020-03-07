@@ -1,24 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
 import { Main } from './Main';
 import Landing from './Landing';
-import { TypeSession } from './TypeSession';
 import Login from './Login';
 import Register from './Register';
 
 
-const App: React.FC = () => {
+export interface User {
+    id: string;
+    username?: string;
+    age?: number;
+    highestEducation?: string;
+    nationality?: string;
+}
+
+export const AppContext = React.createContext<any>(undefined);
+
+const AppContextProvider : React.FC = (props) => {
+    const [ user, setUser ] = useState<User|null>(); // Cache user data
+    return (
+        <AppContext.Provider value={{ user, setUser }}>
+            { props.children }
+        </AppContext.Provider>
+    );
+}
+
+export const App: React.FC = () => {
   return (
       <Router>
           <Switch>
               <Route exact path="/" render={ props => <Landing {...props} /> } />
-              <Route path="/app" component={Main} />
-              <Route path="/login" component={Login} />
-              <Route path="/register" component={Register} />
+              <Route path="/app" render={props => <AppContextProvider><Main {...props}/></AppContextProvider>} />
+              <Route path="/login" render={props => <AppContextProvider><Login /></AppContextProvider>} />
+              <Route path="/register" render={props => <AppContextProvider><Register {...props}/></AppContextProvider>} />
           </Switch>
       </Router>
   );
 }
 
-export default App;
