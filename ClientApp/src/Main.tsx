@@ -5,6 +5,7 @@ import queryString from "query-string";
 import { RouteComponentProps } from "react-router";
 import { TypeSession } from "./TypeSession";
 import Sonnet from "./Sonnet";
+import Login from "./Login";
 
 
 export interface User {
@@ -16,11 +17,6 @@ export interface User {
 }
 
 export const MainContext = React.createContext<any>(undefined);
-
-export const MainContextProvider: React.FC = (props) => {
-    
-}
-
 
 export const Main: React.FC<RouteComponentProps> = (props) => {
 
@@ -43,8 +39,9 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
 
     return (
         <Fragment>
-            <MainContext.Provider value={{ currentSonnet, setSonnet }}>
+            <MainContext.Provider value={{ currentSonnet, setSonnet, user, setUser }}>
                 <Navbar />
+                { !user ? <Login /> : null }
                 { params["sonnet"] ? <TypeSession sonnetId={ params["sonnet"] } /> : <SonnetMenu /> }
             </MainContext.Provider>
         </Fragment>
