@@ -48,6 +48,9 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     const [ isFinished, toggleFinish ] = useState<boolean>(false);
     const [ currentWordCount, incrementCount ] = useState<number>(0);
 
+    // Track whether using touch keyboard
+    const [ isTouchScreen, toggleInputType ] = useState<boolean>(false);
+
     useEffect(() => {
         // Fetch data if not in context
         if (!currentSonnet) {
@@ -151,7 +154,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
                         { !isFinished && 
                             <CurrentModelText wordArray={wordArray} wordIndex={wordIndex} /> }
                         <input type="text" id="session-input" 
-                            onKeyUp={ handleKeyUp } onClick={() => toggleStart(true)}/>
+                            onKeyUp={ handleKeyUp } onClick={() => toggleStart(true)} onTouchStart={() => toggleInputType(true)}/>
                         <TypeHint endOfLine={ wordIndex === wordArray.length - 1 }/>
                         <div className="typesession__model-text">
                             { currentSonnet.lines.map((line:string, i:number) => (i > lineIndex) && <p key={i}>{line}</p>) }

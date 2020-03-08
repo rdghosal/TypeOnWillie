@@ -28,10 +28,10 @@ namespace TypeOnWillie.Controllers
             if (result == 1) 
             {
                 // Status code 201
-                return CreatedAtAction(nameof(_service.AddUser), userDto);
+                return CreatedAtAction(nameof(_service.AddUser), userDto);  
             }
             // Status code 400
-            return BadRequest(); 
+            return BadRequest(result); 
         }
     }
 }
