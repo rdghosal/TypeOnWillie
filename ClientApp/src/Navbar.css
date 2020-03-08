@@ -23,3 +23,7 @@
 .nav-links__link {
     margin: 0 2rem;
 }
+
+.fake-link {
+    cursor: pointer;
+}

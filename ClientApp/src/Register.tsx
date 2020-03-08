@@ -1,6 +1,7 @@
-import React, { FormEvent, useContext } from 'react'
+import React, { FormEvent, useContext, Fragment } from 'react'
 import { RouteComponentProps } from 'react-router';
 import { AppContext } from './App';
+import Navbar from './Navbar';
 
 const Register = (props : RouteComponentProps) => {
 
@@ -66,46 +67,49 @@ const Register = (props : RouteComponentProps) => {
     }
 
     return (
-        <div className="login container" id="register">
-            <h2 className="form__title">Registration</h2>
-            <form onSubmit={ handleSubmit }>
-                <h3 className="form__subtitle">Required</h3>
-                <div className="form-group">
-                    <label htmlFor="username">Your username</label>
-                    <input type="text" className="form-control" placeholder="Username" name="username" id="username"/>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password of 8-12 characters with one of each:<br/>
-                                              Lowercase letter, uppercase letter, number, special character</label>
-                    <input type="password" className="form-control" name="password" id="password" placeholder="Password"/>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="confirmation">Your password once more</label>
-                    <input type="password" className="form-control" name="confirmation" id="confirmation" placeholder="Password Again"/>
-                </div>
-                <hr/>
-                <h3 className="form__subtitle">Optional</h3>
-                <div className="form-group">
-                    <label htmlFor="confirmation">Your age</label>
-                    <input type="text" className="form-control" name="age" id="age" placeholder="Age"/>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="nationality">Your nationality</label>
-                    <input type="text" className="form-control" name="nationality" id="nationality" placeholder="Nationality"/>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="highestEducation">Your highest education</label>
-                    <select name="highestEducation" className="form-control" id="highestEducation">
-                        <option value="highSchool">High school</option>
-                        <option value="college">College / university</option>
-                        <option value="graduateSchool">Graduate school (Masters/PhD)</option>
-                    </select>
-                </div>
-                <button  className="btn btn-primary" type="submit">Register</button>
-                <button className="btn btn-secondary" type="button"
-                    onClick={() => props.history.push("/login") }>Back to Log In</button>
-            </form>
-        </div>
+        <Fragment>
+            <Navbar />
+            <div className="login container">
+                <h2 className="form__title">Registration</h2>
+                <form onSubmit={ handleSubmit } id="register">
+                    <h3 className="form__subtitle">Required</h3>
+                    <div className="form-group">
+                        <label htmlFor="username">Your username</label>
+                        <input type="text" className="form-control" placeholder="Username" name="username" id="username"/>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="password">Password of 8-12 characters with one of each:<br/>
+                                                Lowercase letter, uppercase letter, number, special character</label>
+                        <input type="password" className="form-control" name="password" id="password" placeholder="Password"/>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="confirmation">Your password once more</label>
+                        <input type="password" className="form-control" name="confirmation" id="confirmation" placeholder="Password (again)"/>
+                    </div>
+                    <hr/>
+                    <h3 className="form__subtitle">Optional</h3>
+                    <div className="form-group">
+                        <label htmlFor="confirmation">Your age</label>
+                        <input type="text" className="form-control" name="age" id="age" placeholder="Age"/>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="nationality">Your nationality</label>
+                        <input type="text" className="form-control" name="nationality" id="nationality" placeholder="Nationality"/>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="highestEducation">Your highest education</label>
+                        <select name="highestEducation" className="form-control" id="highestEducation">
+                            <option value="highSchool">High school</option>
+                            <option value="college">College / university</option>
+                            <option value="graduateSchool">Graduate school (Masters/PhD)</option>
+                        </select>
+                    </div>
+                    <button  className="btn btn-primary" type="submit">Register</button>
+                    <button className="btn btn-secondary" type="button"
+                        onClick={() => props.history.push("/login") }>Back to Log In</button>
+                </form>
+            </div>
+        </Fragment>
     )
 }
 

@@ -33,7 +33,7 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
         <Fragment>
             <MainContext.Provider value={{ currentSonnet, setSonnet, user, setUser }}>
                 <Navbar />
-                { params["sonnet"] ? <TypeSession sonnetId={ params["sonnet"] } /> : <SonnetMenu /> }
+                { params["sonnet"] && user ? <TypeSession sonnetId={ params["sonnet"] } /> : <SonnetMenu /> }
             </MainContext.Provider>
         </Fragment>
     );
