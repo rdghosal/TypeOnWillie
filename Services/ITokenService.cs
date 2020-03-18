@@ -9,5 +9,7 @@ namespace TypeOnWillie.Services
     public interface ITokenService
     {
         public string GenerateToken(UserDto userDto);
+
+        public string GenerateRefreshToken();
     }
 }
