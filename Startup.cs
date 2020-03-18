@@ -10,6 +10,10 @@ using Microsoft.Extensions.Hosting;
 using TypeOnWillie.DataAccess;
 using TypeOnWillie.Models;
 using TypeOnWillie.Services;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using System;
 
 namespace TypeOnWillie
 {
@@ -28,6 +32,7 @@ namespace TypeOnWillie
             // For dependency injection at Controller and Service layers
             services.AddTransient<PasswordHasher<UserDto>>();
             services.AddTransient<UserProfileService>();
+            services.AddTransient<ITokenService, JwtTokenService>(serviceProvider => new JwtTokenService(Configuration["JwtSecret"]));
             services.AddScoped<UserService>();
             services.AddScoped<UserSqlDao>();
             services.AddScoped(serviceProvider => new SqlConnection(Configuration.GetConnectionString("mssql")));
@@ -40,6 +45,26 @@ namespace TypeOnWillie
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "JwtBearer";
+                options.DefaultChallengeScheme = "JwtBearer";
+
+            })
+                .AddJwtBearer("JwtBearer", jwtBearerOptions =>
+                {
+                    jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecret"])),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.FromMinutes(5)
+                    };
+
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
