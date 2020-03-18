@@ -51,7 +51,7 @@ IF NOT EXISTS (
         PRINT('Created table [dbo].[Users]');
     END
 
--- Create Scores table
+-- Create TypeSessions table
 IF NOT EXISTS (
     SELECT * FROM sys.tables
     WHERE [name] LIKE 'TypeSessions'
@@ -65,12 +65,31 @@ IF NOT EXISTS (
             [SecondsElapsed] INT NOT NULL,
             [PercentCorrect] INT NOT NULL,
             [MisspelledWords] NVARCHAR(MAX),
-            CONSTRAINT FK_Scores_Users FOREIGN KEY (UserId)
+            CONSTRAINT FK_Sessions_Users FOREIGN KEY (UserId)
             REFERENCES [dbo].[Users] (Id),
-            CONSTRAINT FK_Scores_Sonnets FOREIGN KEY (SonnetId)
+            CONSTRAINT FK_Sessions_Sonnets FOREIGN KEY (SonnetId)
             REFERENCES [dbo].[Sonnets] (Id)
         );
         PRINT('Created table [dbo].[TypeSessions]');
+    END
+
+-- Create RefreshTokens table
+IF NOT EXISTS (
+    SELECT * FROM sys.tables
+    WHERE [name] LIKE 'RefreshTokens'
+)
+    BEGIN
+        CREATE TABLE [dbo].[RefreshTokens] (
+            [Id] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY,
+            [UserId] UNIQUEIDENTIFIER NOT NULL,
+            [Expires] DATETIME NOT NULL DEFAULT GETDATE(),
+            [Token] VARCHAR(255) NOT NULL,
+            [Valid] VARCHAR(1) NOT NULL DEFAULT 'Y', -- For blacklisting
+            CONSTRAINT FK_Tokens_Users FOREIGN KEY (UserId)
+            REFERENCES [dbo].[Users] (Id),
+            CONSTRAINT CHK_Valid CHECK (Valid IN ('Y', 'N'))
+        );
+        PRINT ('Created table [dbo].[RefreshTokens]');
     END
 
 -- Success

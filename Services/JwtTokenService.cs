@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using TypeOnWillie.DataAccess;
 using TypeOnWillie.Models;
 
 namespace TypeOnWillie.Services
@@ -14,19 +15,21 @@ namespace TypeOnWillie.Services
     public class JwtTokenService : ITokenService
     {
         private readonly string _secret;
+        private readonly AuthSqlDao _dao;
 
-        public JwtTokenService(string secret)
+        public JwtTokenService(string secret, AuthSqlDao dao)
         {
             _secret = secret;
+            _dao = dao;
         }
 
-        public string GenerateToken(UserDto userDto)
+        public string GenerateToken(User user)
         {
             // Payload
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, userDto.Username),
-                new Claim(ClaimTypes.NameIdentifier, userDto.Id.ToString()), // Check Type 
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // Check Type 
                 new Claim(JwtRegisteredClaimNames.Nbf,
                     new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString()),
                 new Claim(JwtRegisteredClaimNames.Exp,
@@ -45,23 +48,24 @@ namespace TypeOnWillie.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public dynamic GenerateRefreshToken(int size=32)
+        public string GenerateRefreshToken(User user, int size=32)
         {
             // Generate random base64 string
-            string randomString;
+            string token;
             byte[] randomNumber = new byte[size];
             using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(randomNumber);
-                randomString = Convert.ToBase64String(randomNumber);
+                token = Convert.ToBase64String(randomNumber);
             }
 
-            // Add expiration to refreshToken
-            return new
-            {
-                Refresh_Token = randomString,
-                Expiration = DateTimeOffset.Now.AddDays(5).ToUnixTimeSeconds().ToString()
-            };
+            AddRefreshToken(user, token);
+            return token;
+        }
+
+        private int AddRefreshToken(User user, string refreshToken)
+        {
+            return _dao.InsertRefreshToken(user, refreshToken);
         }
     }
 }

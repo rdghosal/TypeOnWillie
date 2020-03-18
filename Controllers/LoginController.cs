@@ -31,8 +31,19 @@ namespace TypeOnWillie.Controllers
             User user = _service.VerifyUser(userDto);
             if (user == null) return BadRequest(userDto);
 
-            // Send new dto to dispose password and hash
-            return Ok(new { Access_Token = _tokenService.GenerateToken(userDto), Refresh_Token = _tokenService.GenerateRefreshToken() });
+            string accessToken = _tokenService.GenerateToken(user);
+            string refreshToken = _tokenService.GenerateRefreshToken(user);
+
+            HttpContext.Response.Cookies.Append(
+                "refreshToken",
+                refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = DateTimeOffset.Now.AddDays(5)
+                });
+
+            return Ok(new { accessToken });
             // return Ok(new UserDto { Username = userDto.Username, Id = user.Id }); 
         }
     }

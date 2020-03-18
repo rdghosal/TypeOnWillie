@@ -8,8 +8,8 @@ namespace TypeOnWillie.Services
 {
     public interface ITokenService
     {
-        public string GenerateToken(UserDto userDto);
+        public string GenerateToken(User user);
 
-        public string GenerateRefreshToken();
+        public string GenerateRefreshToken(User user, int size=32);
     }
 }
