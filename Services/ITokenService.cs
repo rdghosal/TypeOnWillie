@@ -11,5 +11,7 @@ namespace TypeOnWillie.Services
         public string GenerateToken(User user);
 
         public string GenerateRefreshToken(User user, int size=32);
+
+        public dynamic VerifyRefreshToken(string refreshToken);
     }
 }

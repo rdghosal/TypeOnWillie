@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,12 +15,12 @@ namespace TypeOnWillie.Services
 {
     public class JwtTokenService : ITokenService
     {
-        private readonly string _secret;
+        private readonly IConfiguration _config;
         private readonly AuthSqlDao _dao;
 
-        public JwtTokenService(string secret, AuthSqlDao dao)
+        public JwtTokenService(IConfiguration config, AuthSqlDao dao)
         {
-            _secret = secret;
+            _config = config;
             _dao = dao;
         }
 
@@ -40,7 +41,7 @@ namespace TypeOnWillie.Services
             JwtSecurityToken token = new JwtSecurityToken(
                 new JwtHeader(
                     new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret)),
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSecret"])),
                         SecurityAlgorithms.HmacSha256)),
                 new JwtPayload(claims));
 
@@ -63,9 +64,15 @@ namespace TypeOnWillie.Services
             return token;
         }
 
+        public dynamic VerifyRefreshToken(string refreshToken)
+        {
+            return _dao.SelectRefreshToken(refreshToken);
+        }
+
         private int AddRefreshToken(User user, string refreshToken)
         {
             return _dao.InsertRefreshToken(user, refreshToken);
         }
+
     }
 }

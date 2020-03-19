@@ -32,9 +32,10 @@ namespace TypeOnWillie
             // For dependency injection at Controller and Service layers
             services.AddTransient<PasswordHasher<UserDto>>();
             services.AddTransient<UserProfileService>();
-            services.AddTransient<ITokenService, JwtTokenService>(serviceProvider => new JwtTokenService(Configuration["JwtSecret"]));
+            services.AddTransient<ITokenService, JwtTokenService>();
             services.AddScoped<UserService>();
             services.AddScoped<UserSqlDao>();
+            services.AddScoped<AuthSqlDao>();
             services.AddScoped(serviceProvider => new SqlConnection(Configuration.GetConnectionString("mssql")));
             services.AddSingleton(new SonnetService(Configuration["SonnetPath"]));
 
