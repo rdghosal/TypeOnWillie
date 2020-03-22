@@ -74,7 +74,7 @@ const Register = (props : RouteComponentProps) => {
                     return isValid;
                 } else {
                     // Cache new user data
-                    return props.history.push("/login");
+                    return props.history.push("/login?newUser=1");
                 }
             }).catch(err => {
                 alert("A network connection error occurred.\nPlease try again.");

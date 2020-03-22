@@ -1,14 +1,22 @@
-import React, { FormEvent, useContext, Fragment } from 'react'
+import React, { FormEvent, useContext, Fragment, useState, useEffect } from 'react'
+import queryString from "query-string";
 import { RouteComponentProps } from 'react-router';
 import { AppContext } from './App';
 import Navbar from './Navbar';
+import { TokenHandler, UserCredentials } from './AuthUtils';
 
 
 const Login = (props : RouteComponentProps) => {
 
-    const { user, setUser } = useContext(AppContext);
+    const { user, setUser, token, setToken } = useContext(AppContext);
+    const [ newUser, toggleUserStatus ] = useState<boolean>(false);
 
-    const handleSubmit = (e : FormEvent<HTMLFormElement>) => { 
+    useEffect(() => {
+        const params = queryString.parse(props.location.search);
+        if (params["newUser"] == "1") return toggleUserStatus(true);
+    }, []);
+
+    const handleSubmit = async (e : FormEvent<HTMLFormElement>) => { 
         e.preventDefault(); // Prevent submision
 
         let isValid = false;
@@ -23,23 +31,15 @@ const Login = (props : RouteComponentProps) => {
             return false;
         }
 
-        const jsonData =  JSON.stringify({ username, password });
-        fetch("/api/login", {
-            headers: { "Content-Type" : "application/json" },
-            method: "POST",
-            body: jsonData
-        }).then(response => {
-            if (response.ok) {
-                isValid = true;
-                return response.json();
-            }
-        }).then(data => {
-            sessionStorage.setItem("user", JSON.stringify(data)); 
-            setUser(data);
-            return props.history.push("/app");
-        }).catch(err => {
-            alert("Invalid username and/or password");
-        });
+        // Save token and username/id to memory
+        const token = await TokenHandler.getToken({ username, password } as UserCredentials);
+        setToken(token);
+
+        const userData = TokenHandler.parseClaims(token);
+        setUser(userData)
+
+        // Enter application
+        return props.history.push("/app");
     }
 
     const handleGuest = () =>  {
@@ -47,7 +47,7 @@ const Login = (props : RouteComponentProps) => {
         const guest = {
             id: "guest"
         };
-        sessionStorage.setItem("user", JSON.stringify(guest));
+        // sessionStorage.setItem("user", JSON.stringify(guest));
         setUser(guest);
         props.history.push("/app");
     }
@@ -56,6 +56,11 @@ const Login = (props : RouteComponentProps) => {
         <Fragment>
             <Navbar />
             <div className="login container">
+                { 
+                    newUser 
+                        ? <div className="login__new-user-msg">Let's login to your new account!</div> 
+                        : null 
+                }
                 <h2 className="form__title">Login</h2>
                 <form onSubmit={ handleSubmit } id="login">
                     <div className="form-group">

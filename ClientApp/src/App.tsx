@@ -5,22 +5,17 @@ import { Main } from './Main';
 import Landing from './Landing';
 import Login from './Login';
 import Register from './Register';
+import { User } from './AuthUtils';
 
 
-export interface User {
-    id: string;
-    username?: string;
-    age?: number;
-    highestEducation?: string;
-    nationality?: string;
-}
 
 export const AppContext = React.createContext<any>(undefined);
 
 const AppContextProvider : React.FC = (props) => {
     const [ user, setUser ] = useState<User|null>(); // Cache user data
+    const [ accessToken, setToken ] = useState<string|null>(); // Cache user data
     return (
-        <AppContext.Provider value={{ user, setUser }}>
+        <AppContext.Provider value={{ user, setUser, accessToken, setToken }}>
             { props.children }
         </AppContext.Provider>
     );

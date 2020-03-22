@@ -9,10 +9,18 @@ const SonnetMenu : React.FC = () : JSX.Element => {
     useEffect(() => {
         // Fetch sonnet data on page load
         if (sonnetCollection === null) {
-            fetchSonnects()
-                .then(data => {
-                    setSonnetCollection(data)
-                });
+            // Retrieve sonnets from cache or fetch
+            const cache = localStorage.getItem("sonnets");
+            if (!cache) {
+                fetchSonnects()
+                    .then(data => {
+                        localStorage.setItem("sonnets", JSON.stringify(data));
+                        setSonnetCollection(data);
+                    });
+            }
+            else {
+                setSonnetCollection(JSON.parse(cache));
+            }
         }
     }, [sonnetCollection]);
 
@@ -28,5 +36,6 @@ export default SonnetMenu;
 
 async function fetchSonnects(): Promise<Array<Sonnet>> {
     let res = await fetch("api/sonnetmenu");
-    return res.json();
+    let sonnetCollection = await res.json() as Array<Sonnet>;
+    return sonnetCollection.sort((a, b) => a.id - b.id); // Sort collection by id asc
 }

@@ -17,17 +17,17 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
     const { user, setUser } = useContext(AppContext);
     const [currentSonnet, setSonnet] = useState<Sonnet|undefined>(undefined); // Track sonnet in session
 
-    useEffect(() => {
-        // Parse sessionStorage for User data.
-        // If absent, go to login
-        if (!user) {
-            const sessionData = sessionStorage.getItem("user");
-            if (!sessionData) {
-                return props.history.push("/login");
-            }
-            return setUser(JSON.parse(sessionData));
-        }
-    }, [user]);
+    // useEffect(() => {
+    //     // Parse sessionStorage for User data.
+    //     // If absent, go to login
+    //     if (!user) {
+    //         const sessionData = sessionStorage.getItem("user");
+    //         if (!sessionData) {
+    //             return props.history.push("/login");
+    //         }
+    //         return setUser(JSON.parse(sessionData));
+    //     }
+    // }, [user]);
 
     return (
         <Fragment>
