@@ -1,5 +1,6 @@
 import jwtDecode from 'jwt-decode';
 
+
 export interface ITokenPayload {
     iat: number,
     exp: number,
@@ -63,17 +64,16 @@ export class TokenHandler {
         return false;
     }
 
-    public static async refreshAccessToken() : Promise<string> {
+    public static async refreshAccessToken() {
         // Check whether refreshToken still valid
-        if (!document.cookie) return ""
-
         const response = await fetch("/api/token/refresh", {
             headers: { "Content-Type" : "application/json" },
             method: "POST"
-        });
+        })
+
+        const data = await response.json();
 
         // Cache new access token and return
-        const data = await response.json() as AuthResponse;
         return data.accessToken;
     }
 }

@@ -7,6 +7,7 @@ import { TypeSession } from "./TypeSession";
 import Sonnet from "./Sonnet";
 import Login from "./Login";
 import { AppContext } from "./App";
+import { TokenHandler } from "./AuthUtils";
 
 
 export const MainContext = React.createContext<any>(undefined);
@@ -14,20 +15,24 @@ export const MainContext = React.createContext<any>(undefined);
 export const Main: React.FC<RouteComponentProps> = (props) => {
 
     const params = queryString.parse(props.location.search);
-    const { user, setUser } = useContext(AppContext);
+    const { user, setUser, accessToken, setToken } = useContext(AppContext);
     const [currentSonnet, setSonnet] = useState<Sonnet|undefined>(undefined); // Track sonnet in session
 
-    // useEffect(() => {
-    //     // Parse sessionStorage for User data.
-    //     // If absent, go to login
-    //     if (!user) {
-    //         const sessionData = sessionStorage.getItem("user");
-    //         if (!sessionData) {
-    //             return props.history.push("/login");
-    //         }
-    //         return setUser(JSON.parse(sessionData));
-    //     }
-    // }, [user]);
+    useEffect(() => {
+        // Parse sessionStorage for User data.
+        // If absent, go to login
+        if (!accessToken) {
+            TokenHandler.refreshAccessToken()
+                .then(token => {
+                    console.log(token);
+                    setToken(token);
+                })
+                .catch(err => {
+                    console.log(err);
+                    return props.history.push("/login");
+                });
+        }
+    }, [accessToken]);
 
     return (
         <Fragment>

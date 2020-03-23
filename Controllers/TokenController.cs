@@ -30,9 +30,9 @@ namespace TypeOnWillie.Controllers
             var userData = _service.VerifyRefreshToken(refreshToken);
 
             if (userData == null) return Forbid(); // Invalid refreshToken
-            string accessToken = _service.GenerateToken(new User { Id = userData.Id, Username = userData.Username });
+            string accessToken = _service.GenerateToken(new User { Id = userData.UserId, Username = userData.Username });
 
-            return Ok(accessToken);
+            return Ok(new { accessToken });
         }
     }
 }

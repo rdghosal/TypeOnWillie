@@ -36,7 +36,7 @@ const Login = (props : RouteComponentProps) => {
         setToken(token);
 
         const userData = TokenHandler.parseClaims(token);
-        setUser(userData)
+        setUser(userData);
 
         // Enter application
         return props.history.push("/app");
