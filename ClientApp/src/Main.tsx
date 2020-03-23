@@ -7,7 +7,7 @@ import { TypeSession } from "./TypeSession";
 import Sonnet from "./Sonnet";
 import Login from "./Login";
 import { AppContext } from "./App";
-import { TokenHandler } from "./AuthUtils";
+import { TokenHandler, AuthErrorTypes } from "./AuthUtils";
 
 
 export const MainContext = React.createContext<any>(undefined);
@@ -24,12 +24,12 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
         if (!accessToken) {
             TokenHandler.refreshAccessToken()
                 .then(token => {
+                    if (token === AuthErrorTypes.EXPIRED || token === AuthErrorTypes.INVALID) {
+                        // TODO errors handle separately
+                        return props.history.push("/login");
+                    }
                     console.log(token);
                     setToken(token);
-                })
-                .catch(err => {
-                    console.log(err);
-                    return props.history.push("/login");
                 });
         }
     }, [accessToken]);

@@ -2,11 +2,12 @@ import React, { useContext, useState, useEffect } from "react";
 import "./Navbar.css";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { AppContext } from "./App";
+import { TokenHandler } from "./AuthUtils";
 
 const Navbar: React.FC<RouteComponentProps> = (props) => {
 
     const [ isLoggedIn, toggleLogIn ] = useState<boolean>(false);
-    const { user, setUser } = useContext(AppContext);
+    const { user, accessToken, setUser } = useContext(AppContext);
 
     useEffect(() => {
         if (user && user.id !== "guest") {
@@ -14,9 +15,22 @@ const Navbar: React.FC<RouteComponentProps> = (props) => {
         }
     }, [user]);
 
-    const handleLogOut = () => { 
-        // Remove user cache and return to landing
-        sessionStorage.removeItem("user");
+    const handleLogOut = async () => {
+        // Send refreshToken and accessToken to back-end for blacklisting
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+        if (!TokenHandler.isExpired(accessToken)) { // Blacklist accessToken too if valid
+            headers.append("Authorization", `Bearer ${accessToken}`);
+        }
+
+        const response = await fetch("/api/token/logout", {
+            headers: headers,
+            method: "POST"
+        });
+        
+        // Check for errors
+        if (!response.ok) return console.log(response.statusText);
+
         setUser(null);
         props.history.push("/");
     }

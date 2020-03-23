@@ -19,7 +19,6 @@ const Login = (props : RouteComponentProps) => {
     const handleSubmit = async (e : FormEvent<HTMLFormElement>) => { 
         e.preventDefault(); // Prevent submision
 
-        let isValid = false;
         const form = document.getElementById("login") as HTMLFormElement;
         const formData = new FormData(form);
         

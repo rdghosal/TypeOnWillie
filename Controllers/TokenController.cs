@@ -23,10 +23,12 @@ namespace TypeOnWillie.Controllers
         // POST: api/Token/Refresh
         [HttpPost]
         [Route("Refresh")]
-        public ActionResult Post()
+        public ActionResult Refresh()
         {
             // Verify refreshToken and return new accessToken
             string refreshToken = HttpContext.Request.Cookies["refreshToken"];
+
+            if (refreshToken == null) return BadRequest("Must login again");
             var userData = _service.VerifyRefreshToken(refreshToken);
 
             if (userData == null) return Forbid(); // Invalid refreshToken
@@ -34,5 +36,26 @@ namespace TypeOnWillie.Controllers
 
             return Ok(new { accessToken });
         }
+
+        // POST: api/token/logout
+        [HttpPost]
+        [Route("Logout")]
+        public ActionResult Logout()
+        {
+            if (HttpContext.Request.Cookies["refreshToken"] == null) 
+            {
+                return BadRequest();
+            }
+
+            string refreshToken = HttpContext.Request.Cookies["refreshToken"];
+            string accessToken = HttpContext.Request.Headers["Authorization"];
+            accessToken = accessToken.Split(" ")[1];
+
+            // Blacklist the token in database and cache
+            _service.BlacklistTokens(refreshToken, accessToken);
+
+            return Ok();
+        }
+
     }
 }

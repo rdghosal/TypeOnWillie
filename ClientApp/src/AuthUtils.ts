@@ -17,6 +17,11 @@ export interface AuthResponse {
     accessToken: string
 }
 
+export enum AuthErrorTypes {
+    INVALID,
+    EXPIRED
+}
+
 export interface User {
     id: string;
     username?: string;
@@ -69,11 +74,12 @@ export class TokenHandler {
         const response = await fetch("/api/token/refresh", {
             headers: { "Content-Type" : "application/json" },
             method: "POST"
-        })
+        });
 
-        const data = await response.json();
+        if (response.status === 400) return AuthErrorTypes.EXPIRED;
+        else if (response.status === 403) return AuthErrorTypes.INVALID;
 
-        // Cache new access token and return
+        const data = await response.json() as AuthResponse;
         return data.accessToken;
     }
 }

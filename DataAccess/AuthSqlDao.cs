@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dapper;
 using TypeOnWillie.Models;
 using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 
 namespace TypeOnWillie.DataAccess
 {
@@ -14,10 +15,12 @@ namespace TypeOnWillie.DataAccess
     {
 
         private readonly IConfiguration _config;
+        private readonly IDatabase _cache;
 
-        public AuthSqlDao(SqlConnection sqlConnection, IConfiguration config) : base(sqlConnection)
+        public AuthSqlDao(SqlConnection sqlConnection, IConfiguration config, IDatabase cache) : base(sqlConnection)
         {
             _config = config;
+            _cache = cache;
         }
 
         public dynamic SelectRefreshToken(string refreshToken)
@@ -45,6 +48,19 @@ namespace TypeOnWillie.DataAccess
                         token = refreshToken
                     });
             }
+        }
+
+        public void UpdateRefreshToken(string refreshToken)
+        {
+            using (SqlConnection sql = new SqlConnection(_config.GetConnectionString("mssql")))
+            {
+                sql.Execute(AuthCommand.UPDATE, new { token = refreshToken });
+            }
+        }
+
+        public async void AsyncCachedSetAdd(string setName, RedisValue value) 
+        {
+            await _cache.SetAddAsync(setName, value);
         }
 
     }

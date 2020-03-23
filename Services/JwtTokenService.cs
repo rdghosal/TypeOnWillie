@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -62,6 +64,16 @@ namespace TypeOnWillie.Services
 
             AddRefreshToken(user, token);
             return token;
+        }
+
+        public void BlacklistTokens(string refreshToken, string accessToken="") 
+        {
+            if (accessToken != "") 
+            {
+                _dao.AsyncCachedSetAdd("accessToken", accessToken);
+            }
+            _dao.AsyncCachedSetAdd("refreshToken", refreshToken);
+            _dao.UpdateRefreshToken(refreshToken);
         }
 
         public dynamic VerifyRefreshToken(string refreshToken)

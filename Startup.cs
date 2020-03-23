@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using System;
+using StackExchange.Redis;
 
 namespace TypeOnWillie
 {
@@ -29,6 +30,9 @@ namespace TypeOnWillie
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Get redis instance
+            var redisPool = ConnectionMultiplexer.Connect(Configuration.GetConnectionString("redis"));
+
             // For dependency injection at Controller and Service layers
             services.AddTransient<PasswordHasher<UserDto>>();
             services.AddTransient<UserProfileService>();
@@ -36,6 +40,7 @@ namespace TypeOnWillie
             services.AddScoped<UserService>();
             services.AddScoped<UserSqlDao>();
             services.AddScoped<AuthSqlDao>();
+            services.AddScoped<IDatabase>(sp => redisPool.GetDatabase());
             services.AddScoped(serviceProvider => new SqlConnection(Configuration.GetConnectionString("mssql")));
             services.AddSingleton(new SonnetService(Configuration["SonnetPath"]));
 
@@ -53,19 +58,20 @@ namespace TypeOnWillie
                 options.DefaultChallengeScheme = "JwtBearer";
 
             })
-                .AddJwtBearer("JwtBearer", jwtBearerOptions =>
+            .AddJwtBearer("JwtBearer", jwtBearerOptions =>
+            {
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
                 {
-                    jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecret"])),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.FromMinutes(5)
-                    };
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecret"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromMinutes(5)
+                };
 
-                });
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
