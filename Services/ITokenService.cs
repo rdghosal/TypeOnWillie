@@ -14,6 +14,6 @@ namespace TypeOnWillie.Services
 
         public void BlacklistTokens(string refreshToken, string accessToken="");
 
-        public dynamic VerifyRefreshToken(string refreshToken);
+        public Task<dynamic> VerifyRefreshToken(string refreshToken);
     }
 }

@@ -70,15 +70,15 @@ namespace TypeOnWillie.Services
         {
             if (accessToken != "") 
             {
-                _dao.AsyncCachedSetAdd("accessToken", accessToken);
+                _dao.AsyncCachedSetAdd("access_blacklist", accessToken);
             }
-            _dao.AsyncCachedSetAdd("refreshToken", refreshToken);
+            _dao.AsyncCachedSetAdd("refresh_blacklist", refreshToken);
             _dao.UpdateRefreshToken(refreshToken);
         }
 
-        public dynamic VerifyRefreshToken(string refreshToken)
+        public async Task<dynamic> VerifyRefreshToken(string refreshToken)
         {
-            return _dao.SelectRefreshToken(refreshToken);
+            return await _dao.AsyncSelectRefreshToken(refreshToken);
         }
 
         private int AddRefreshToken(User user, string refreshToken)

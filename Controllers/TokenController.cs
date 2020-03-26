@@ -23,16 +23,16 @@ namespace TypeOnWillie.Controllers
         // POST: api/Token/Refresh
         [HttpPost]
         [Route("Refresh")]
-        public ActionResult Refresh()
+        public async Task<IActionResult> AsyncRefresh()
         {
             // Verify refreshToken and return new accessToken
             string refreshToken = HttpContext.Request.Cookies["refreshToken"];
 
             if (refreshToken == null) return BadRequest("Must login again");
-            var userData = _service.VerifyRefreshToken(refreshToken);
+            var userData = await _service.VerifyRefreshToken(refreshToken);
 
             if (userData == null) return Forbid(); // Invalid refreshToken
-            string accessToken = _service.GenerateToken(new User { Id = userData.UserId, Username = userData.Username });
+            string accessToken = _service.GenerateToken(new User { Id = Guid.Parse(userData["UserId"]), Username = userData["Username"] });
 
             return Ok(new { accessToken });
         }
@@ -48,8 +48,8 @@ namespace TypeOnWillie.Controllers
             }
 
             string refreshToken = HttpContext.Request.Cookies["refreshToken"];
-            string accessToken = HttpContext.Request.Headers["Authorization"];
-            accessToken = accessToken.Split(" ")[1];
+            string bearer = HttpContext.Request.Headers["Authorization"];
+            string accessToken = (bearer == null) ? "" : bearer.Split(" ")[1];
 
             // Blacklist the token in database and cache
             _service.BlacklistTokens(refreshToken, accessToken);
