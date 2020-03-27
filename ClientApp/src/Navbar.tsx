@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import "./Navbar.css";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { AppContext } from "./App";
-import { TokenHandler } from "./AuthUtils";
+import { TokenHandler, User } from "./AuthUtils";
 
 const Navbar: React.FC<RouteComponentProps> = (props) => {
 
@@ -10,10 +10,14 @@ const Navbar: React.FC<RouteComponentProps> = (props) => {
     const { user, accessToken, setUser } = useContext(AppContext);
 
     useEffect(() => {
-        if (user && user.id !== "guest") {
+        if (accessToken) {
+            if (!user) {
+                const user : User = TokenHandler.parseClaims(accessToken);
+                setUser(user);
+            }
             toggleLogIn(true);
         }
-    }, [user]);
+    }, [user, accessToken]);
 
     const handleLogOut = async () => {
         // Send refreshToken and accessToken to back-end for blacklisting

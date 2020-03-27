@@ -27,6 +27,11 @@ namespace TypeOnWillie.DataAccess
 
         public async Task<dynamic> AsyncSelectRefreshToken(string refreshToken)
         {
+            if (_cache.SetContains("refresh_blacklist", refreshToken))
+            {
+                return null;
+            }
+
             // Use substring of token as key and query cache for user data
             string key = refreshToken.Substring(0, 10);
             bool exists = await _cache.HashExistsAsync(key, "UserId");
@@ -34,7 +39,7 @@ namespace TypeOnWillie.DataAccess
             if (!exists)
             {
                 // If no cache available, query db and set cache
-                SetRefreshCache(key, refreshToken);
+                SetRefreshCache(refreshToken);
             }
 
             // Fech user data from cache
@@ -52,17 +57,20 @@ namespace TypeOnWillie.DataAccess
 
         public int InsertRefreshToken(User user, string refreshToken)
         {
+            int numInserted;
             using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-
-                return conn.Execute(
+                 numInserted = conn.Execute(
                     AuthCommand.INSERT, 
                     new {
-                        userId = user.Id,
-                        expires = DateTime.Now.AddDays(5),
-                        token = refreshToken
+                        UserId = user.Id,
+                        Expires = DateTime.Now.AddDays(5),
+                        Token = refreshToken
                     });
             }
+
+            SetRefreshCache(refreshToken);
+            return numInserted;
         }
 
         public void UpdateRefreshToken(string refreshToken)
@@ -78,9 +86,11 @@ namespace TypeOnWillie.DataAccess
             await _cache.SetAddAsync(setName, value);
         }
 
-        private void SetRefreshCache(string key, string refreshToken)
+        private void SetRefreshCache(string refreshToken)
         {
             dynamic sqlResult;
+            string key = refreshToken.Substring(0, 10);
+
             IList<HashEntry> newCache = new List<HashEntry>();
 
             using (_sqlConnection)
@@ -90,13 +100,16 @@ namespace TypeOnWillie.DataAccess
                     .FirstOrDefault();
             }
             
+            // Iterate over each key of result object and add value to list for cache
             foreach (var kvp in (IDictionary<string, object>)sqlResult)
             {
+                if (kvp.Key == "Expires") continue;
                 newCache.Add(new HashEntry(kvp.Key, kvp.Value.ToString()));
             }
 
-            // Add to cache
+            // Add to cache with TTL set to remaining time left of token
             _cache.HashSet(key, newCache.ToArray<HashEntry>());
+            _cache.KeyExpire(key, ((DateTime)sqlResult.Expires).Subtract(DateTime.Now));
         }
     }
 }
