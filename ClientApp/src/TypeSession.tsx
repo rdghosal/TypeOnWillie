@@ -51,12 +51,23 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     // Track whether using touch keyboard
     const [ isTouchScreen, toggleInputType ] = useState<boolean>(false);
 
+    window.onbeforeunload = (e : BeforeUnloadEvent) => {
+        e.preventDefault();
+        console.log("WAIT!")
+    };
+
     useEffect(() => {
         // Fetch data if not in context
         if (!currentSonnet) {
             return fetchSonnetById();
         }
     }, [currentSonnet]);
+
+    useEffect(() => {
+        return () => {
+            if (!isFinished && isStarted) window.confirm("Are you sure?");
+        };
+    });
 
     useEffect(() => {
         // End session if all words have been typed

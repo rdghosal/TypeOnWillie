@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 type TypeHintProps = {
     endOfLine: boolean
@@ -14,4 +14,4 @@ const TypeHint = ({ endOfLine } : TypeHintProps) => {
     )
 }
 
-export default TypeHint
+export default TypeHint;

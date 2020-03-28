@@ -93,10 +93,10 @@ namespace TypeOnWillie.DataAccess
 
             IList<HashEntry> newCache = new List<HashEntry>();
 
-            using (_sqlConnection)
+            using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("mssql")))
             {
                 // TODO: Query all refreshTokens
-                sqlResult = _sqlConnection.Query(AuthCommand.SELECT, new { token = refreshToken })
+                sqlResult = conn.Query(AuthCommand.SELECT, new { token = refreshToken })
                     .FirstOrDefault();
             }
             
