@@ -63,12 +63,20 @@ IF NOT EXISTS (
             [SonnetId] INT NOT NULL,
             [DateTime] DATETIME NOT NULL DEFAULT GETDATE(),
             [SecondsElapsed] INT NOT NULL,
-            [PercentCorrect] INT NOT NULL,
+            [PercentCorrect] DECIMAL(4,3) NOT NULL,
+            [PercentFinished] DECIMAL(4,3) NOT NULL,
+            [NumberMisspelled] INT NOT NULL,
             [MisspelledWords] NVARCHAR(MAX),
+            [Quit] VARCHAR(1) NOT NULL DEFAULT 'N',
+            [TouchScreen] VARCHAR(1) NOT NULL DEFAULT 'N',
             CONSTRAINT FK_Sessions_Users FOREIGN KEY (UserId)
             REFERENCES [dbo].[Users] (Id),
             CONSTRAINT FK_Sessions_Sonnets FOREIGN KEY (SonnetId)
-            REFERENCES [dbo].[Sonnets] (Id)
+            REFERENCES [dbo].[Sonnets] (Id),
+            CONSTRAINT CHK_PercentCorrect CHECK (PercentCorrect BETWEEN 0 AND 1),
+            CONSTRAINT CHK_PercentFinished CHECK (PercentFinished BETWEEN 0 AND 1),
+            CONSTRAINT CHK_Quit CHECK (Quit IN ('Y', 'N')),
+            CONSTRAINT CHK_TouchScreen CHECK (TouchScreen IN ('Y', 'N'))
         );
         PRINT('Created table [dbo].[TypeSessions]');
     END

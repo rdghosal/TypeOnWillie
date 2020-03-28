@@ -17,8 +17,7 @@ const SonnetMenu : React.FC = () : JSX.Element => {
                         localStorage.setItem("sonnets", JSON.stringify(data));
                         setSonnetCollection(data);
                     });
-            }
-            else {
+            } else {
                 setSonnetCollection(JSON.parse(cache));
             }
         }
