@@ -16,8 +16,16 @@ namespace TypeOnWillie.Models
 
         public int SecondsElapsed { get; set; }
 
-        public int PercentCorrect { get; set; } 
+        public decimal PercentCorrect { get; set; } 
+
+        public decimal PercentFinished { get; set; } 
+
+        public string NumberMisspelled { get; set; }
 
         public string MisspelledWords { get; set; }
+
+        public string Quit { get; set; }
+
+        public string TouchScreen { get; set; }
     }
 }

@@ -23,6 +23,7 @@ namespace TypeOnWillie.Controllers
 
         // POST: api/Score
         [HttpPost]
+        [Route("LogSession")]
         public ActionResult Post(TypeSession typeSession)
         {
             return Ok(_service.AddTypeSession(typeSession));

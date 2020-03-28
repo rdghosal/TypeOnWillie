@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,29 +11,40 @@ namespace TypeOnWillie.DataAccess
 {
     public class TypeSessionSqlDao : SqlDao
     {
-        public TypeSessionSqlDao(SqlConnection sqlConnection) : base(sqlConnection)
+
+        private readonly IConfiguration _config;
+
+        public TypeSessionSqlDao(SqlConnection sqlConnection, IConfiguration config) : base(sqlConnection)
         {
+            _config = config;
         }
+
         public int InsertTypeSession(TypeSession typeSession)
         {
-            using (_sqlConnection)
+            using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
                 _sqlConnection.Open();
-                return _sqlConnection.Execute(TypeSessionCommand.SELECT_ALL, new {
+                return _sqlConnection.Execute(TypeSessionCommand.INSERT, new
+                {
                     userId = typeSession.UserId,
                     sonnetId = typeSession.SonnetId,
                     secondsElapsed = typeSession.SecondsElapsed,
                     percentCorrect = typeSession.PercentCorrect,
-                    misspelledWords = typeSession.MisspelledWords
+                    percentFinished = typeSession.PercentFinished,
+                    misspelledWords = typeSession.MisspelledWords,
+                    numberMisspelled = typeSession.NumberMisspelled,
+                    quit = typeSession.Quit,
+                    touchScreen = typeSession.TouchScreen
                 });
             }
         }
+
         public IEnumerable<TypeSession> SelectTypeSessions(UserDto userDto)
         {
             using (_sqlConnection)
             {
                 _sqlConnection.Open();
-                return _sqlConnection.Query<TypeSession>(TypeSessionCommand.INSERT, new { userId = userDto.Id });
+                return _sqlConnection.Query<TypeSession>(TypeSessionCommand.SELECT_ALL, new { userId = userDto.Id });
             }
         }
     }

@@ -99,7 +99,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
         const userId = user.id;
         const sonnetId = currentSonnet.id;
         const secondsElapsed = parseInt(document.getElementById("timer")!.innerHTML);
-        const numMisspelled = calcNumMisspelled(misspelledWords);
+        const numberMisspelled = calcNumMisspelled(misspelledWords);
         const misspelledString = stringifyMisspelledWords(misspelledWords);
         const percentCorrect = (correctWordCount / currentSonnet.wordCount).toFixed(3);
         const percentFinished = (currentWordCount / currentSonnet.wordCount).toFixed(3);
@@ -107,13 +107,14 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
         const quit = (quitSession) ? "Y" : "N";
         const touchScreen = (isTouchScreen) ? "Y" : "N";
 
-        const response = await fetch("/api/typesessions/quit", {
+        const response = await fetch("/api/typesession/LogSession", {
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 userId, 
                 sonnetId, 
                 secondsElapsed, 
-                numMisspelled, 
+                numberMisspelled, 
                 misspelledString,
                 percentCorrect, 
                 percentFinished,
