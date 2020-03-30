@@ -86,7 +86,6 @@ const Register = (props : RouteComponentProps) => {
 
     return (
         <Fragment>
-            <Navbar />
             <div className="register container">
                 <h2 className="form__title">Registration</h2>
                 <form onSubmit={ handleSubmit } id="register">

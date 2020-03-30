@@ -53,7 +53,6 @@ const Login = (props : RouteComponentProps) => {
     
     return (
         <Fragment>
-            <Navbar />
             <div className="login container">
                 { 
                     newUser 

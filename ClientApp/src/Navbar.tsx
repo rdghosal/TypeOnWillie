@@ -4,20 +4,24 @@ import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { AppContext } from "./App";
 import { TokenHandler, User } from "./AuthUtils";
 
-const Navbar: React.FC<RouteComponentProps> = (props) => {
+interface INavbarProps extends RouteComponentProps {
+    isLoggedIn: boolean,
+    toggleLogIn: React.Dispatch<React.SetStateAction<boolean>>
+};
 
-    const [ isLoggedIn, toggleLogIn ] = useState<boolean>(false);
+const Navbar: React.FC<INavbarProps> = (props) => {
+
     const { user, accessToken, setUser } = useContext(AppContext);
 
-    useEffect(() => {
-        if (accessToken) {
-            if (!user) {
-                const user : User = TokenHandler.parseClaims(accessToken);
-                setUser(user);
-            }
-            toggleLogIn(true);
-        }
-    }, [user, accessToken]);
+    //useEffect(() => {
+    //    if (accessToken) {
+    //        if (!user) {
+    //            const user : User = TokenHandler.parseClaims(accessToken);
+    //            setUser(user);
+    //        }
+    //        toggleLogIn(true);
+    //    }
+    //}, [user, accessToken]);
 
     const handleLogOut = async () => {
         // Send refreshToken and accessToken to back-end for blacklisting
@@ -36,6 +40,7 @@ const Navbar: React.FC<RouteComponentProps> = (props) => {
         if (!response.ok) return console.log(response.statusText);
 
         setUser(null);
+        props.toggleLogIn(false);
         props.history.push("/");
     }
 
@@ -55,7 +60,7 @@ const Navbar: React.FC<RouteComponentProps> = (props) => {
                     </li>
                     <li className="nav-item">
                         { 
-                            isLoggedIn 
+                            props.isLoggedIn 
                                 ? <p className="nav-link fake-link" onClick={ handleLogOut }>Log Out</p>
                                 : <p className="nav-link fake-link" onClick={() => props.history.push("/register")}>Sign Up</p>
                         }

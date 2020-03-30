@@ -7,7 +7,7 @@ import { TypeSession } from "./TypeSession";
 import Sonnet from "./Sonnet";
 import Login from "./Login";
 import { AppContext } from "./App";
-import { TokenHandler, AuthErrorTypes } from "./AuthUtils";
+import { TokenHandler, AuthErrorTypes, User } from "./AuthUtils";
 
 
 export const MainContext = React.createContext<any>(undefined);
@@ -17,6 +17,7 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
     const params = queryString.parse(props.location.search);
     const { user, setUser, accessToken, setToken } = useContext(AppContext);
     const [currentSonnet, setSonnet] = useState<Sonnet|undefined>(undefined); // Track sonnet in session
+    const [ isLoggedIn, toggleLogIn ] = useState<boolean>(false);
 
     useEffect(() => {
         // Parse sessionStorage for User data.
@@ -34,11 +35,18 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
         }
     }, [accessToken]);
 
+    useEffect(() => {
+        if (accessToken) {
+            if (!user) { setUser(TokenHandler.parseClaims(accessToken)) }
+            toggleLogIn(true);
+        }
+    }, [user, accessToken]);
+
     return (
         <Fragment>
             <MainContext.Provider value={{ currentSonnet, setSonnet, user, setUser }}>
-                <Navbar />
-                { params["sonnet"] && user ? <TypeSession sonnetId={ params["sonnet"] } /> : <SonnetMenu /> }
+                <Navbar isLoggedIn={isLoggedIn} toggleLogIn={toggleLogIn} />
+                {params["sonnet"] && user ? <TypeSession sonnetId={params["sonnet"]} userId={user.id} /> : <SonnetMenu /> }
             </MainContext.Provider>
         </Fragment>
     );

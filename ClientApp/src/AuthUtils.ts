@@ -1,11 +1,13 @@
 import jwtDecode from 'jwt-decode';
 
+const NAMEIDENTIFIER = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+const NAME = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name";
 
 export interface ITokenPayload {
     iat: number,
     exp: number,
-    sub: string,
-    name: string
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": string,
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": string
 }
 
 export interface UserCredentials {
@@ -54,10 +56,10 @@ export class TokenHandler {
     }
 
     public static parseClaims(token: string): User {
-        const claims = jwtDecode<ITokenPayload>(token);
+        const decoded = jwtDecode<ITokenPayload>(token);
         return { 
-            username: claims.name, 
-            id: claims.sub 
+            username: decoded[NAME], 
+            id: decoded[NAMEIDENTIFIER] 
         };
     }
 

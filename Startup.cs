@@ -38,8 +38,10 @@ namespace TypeOnWillie
             services.AddTransient<UserProfileService>();
             services.AddTransient<ITokenService, JwtTokenService>();
             services.AddScoped<UserService>();
+            services.AddScoped<TypeSessionService>();
             services.AddScoped<UserSqlDao>();
             services.AddScoped<AuthSqlDao>();
+            services.AddScoped<TypeSessionSqlDao>();
             services.AddScoped<IDatabase>(sp => redisPool.GetDatabase());
             services.AddScoped(serviceProvider => new SqlConnection(Configuration.GetConnectionString("mssql")));
             services.AddSingleton(new SonnetService(Configuration["SonnetPath"]));
@@ -88,6 +90,7 @@ namespace TypeOnWillie
                 app.UseHsts();
             }
 
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();

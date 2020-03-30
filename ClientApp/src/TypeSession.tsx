@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { MainContext } from "./Main";
 import SessionTimer from "./SessionTimer";
 import SessionScore from "./SessionScore";
@@ -10,6 +10,7 @@ import MisspelledWordList from "./MisspelledWordList";
 import { AppContext } from "./App";
 
 type TypeSessionProps = {
+    userId: string;
     sonnetId: string | string[];
 }
 
@@ -29,10 +30,27 @@ export interface MisspelledWordMap {
     [key: number] : Array<WordSet>
 }
 
-export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
+interface ISessionData {
+    userId: string,
+    sonnetId: number,
+    secondsElapsed: number,
+    numberMisspelled: number,
+    misspelledString: string,
+    percentCorrect: number,
+    percentFinished: number
+    quit: string,
+    touchScreen: string
+}
+
+interface ISessionState {
+    isFinished: boolean,
+    isStarted: boolean
+}
+
+export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) => {
+
     // Current Sonnet in session
     const { currentSonnet, setSonnet } = useContext(MainContext);
-    const { user } = useContext(AppContext);
 
    // Pointers to column (wordIndex) and row (lineIndex) of sonnet matrix
     const [ lineIndex, setLine ] = useState<number>(0);
@@ -53,6 +71,9 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     // Track whether using touch keyboard
     const [ isTouchScreen, toggleInputType ] = useState<boolean>(false);
 
+    const sessionState = useRef<ISessionState>();
+    const sessionData = useRef<ISessionData>();
+
     useEffect(() => {
         // Fetch data if not in context
         if (!currentSonnet) {
@@ -61,15 +82,45 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     }, [currentSonnet]);
 
     useEffect(() => {
-        return () => {
-            if (!isFinished && isStarted) {
-                const isQuit = window.confirm("Your session is unfinished!\nAre you sure you want to quit?");
-                if (isQuit) logSession(isFinished);
-            } else if (isFinished) {
-                logSession(isFinished);
-            }
-        };
-    });
+        console.log("fired")
+        return () => { handleDismount() }
+    }, []);
+
+    useEffect(() => {
+
+        if (!isStarted) return;
+
+        // Update ref with current session data
+        const data = {} as ISessionData;
+
+        data.userId = userId;
+        data.sonnetId = currentSonnet.id;
+        data.secondsElapsed = parseInt(document.getElementById("timer")!.innerHTML);
+        data.numberMisspelled = calcNumMisspelled(misspelledWords);
+        data.misspelledString = stringifyMisspelledWords(misspelledWords);
+        data.percentCorrect = parseFloat((correctWordCount / currentWordCount).toFixed(3));
+        data.percentFinished = parseFloat((currentWordCount / currentSonnet.wordCount).toFixed(3));
+        data.touchScreen = (isTouchScreen) ? "Y" : "N";
+
+        sessionData.current = data;
+
+        // Update state with current session state
+        const state = {} as ISessionState;
+
+        state.isFinished = isFinished;
+        state.isStarted = isStarted;
+
+        sessionState.current = state;
+
+    }, [isFinished,
+        isStarted,
+        misspelledWords,
+        userId,
+        currentSonnet,
+        correctWordCount,
+        currentWordCount,
+        misspelledWords,
+        isTouchScreen]);
 
     useEffect(() => {
         // End session if all words have been typed
@@ -89,6 +140,17 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
         }
     }, [lineIndex, currentSonnet, currentWordCount]);
 
+    function handleDismount() {
+        console.log("Cleanup!")
+        const state = sessionState.current;
+        if (!state!.isFinished && state!.isStarted) {
+            const isQuit = window.confirm("Your session is unfinished!\nAre you sure you want to quit?");
+            if (isQuit) logSession(isFinished);
+        } else if (state!.isFinished) {
+            logSession(isFinished);
+        }
+    }
+
     /** 
      * Sends current state to server upon session quit for logging
      * @param {boolean} quitSession Flag for whether exiting session before finish
@@ -96,31 +158,19 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     */
     async function logSession(quitSession : boolean) : Promise<void> {
         // Pull data of current state
-        const userId = user.id;
-        const sonnetId = currentSonnet.id;
-        const secondsElapsed = parseInt(document.getElementById("timer")!.innerHTML);
-        const numberMisspelled = calcNumMisspelled(misspelledWords);
-        const misspelledString = stringifyMisspelledWords(misspelledWords);
-        const percentCorrect = (correctWordCount / currentSonnet.wordCount).toFixed(3);
-        const percentFinished = (currentWordCount / currentSonnet.wordCount).toFixed(3);
 
-        const quit = (quitSession) ? "Y" : "N";
-        const touchScreen = (isTouchScreen) ? "Y" : "N";
+        const data = sessionData.current;
+        const state = sessionState.current;
 
-        const response = await fetch("/api/typesession/LogSession", {
+        console.log("DATA:", { data });
+        console.log("STATE:", { state });
+
+        data!.quit = (state!.isFinished) ? "N" : "Y";
+
+        const response = await fetch("api/typesession/LogSession", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId, 
-                sonnetId, 
-                secondsElapsed, 
-                numberMisspelled, 
-                misspelledString,
-                percentCorrect, 
-                percentFinished,
-                quit,
-                touchScreen 
-            })
+            body: JSON.stringify(data)
         });
 
         if (!response.ok) console.log(response.statusText);
@@ -133,7 +183,8 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
     */
     function calcNumMisspelled(misspelledWordMap : MisspelledWordMap) : number {
         const m = new Array();
-        return m.concat(Object.values(misspelledWordMap)).length;
+        const t = m.concat(Object.values(misspelledWordMap));
+        return t.length;
     }
 
     /**
@@ -142,9 +193,18 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId }) => {
      * @returns {String} String delimited by | of words misspelled
      */
     function stringifyMisspelledWords(misspelledWordMap : MisspelledWordMap) : string {
-        const temp = new Array();
-        temp.concat(Object.values(misspelledWordMap));
-        return temp.join("|");
+        let temp = new Array();
+        temp = temp.concat(Object.values(misspelledWordMap));
+        
+        let modelWords = new Array<string>(temp.length);
+        for (let i = 0; i < temp.length; i++) {
+            const mw = temp[i].modelWord;
+            console.log("MODEL WORD", mw);
+            modelWords[i] = mw;
+        }
+
+        console.log(modelWords)
+        return modelWords.join("|");
     }
     
     function fetchSonnetById() {
