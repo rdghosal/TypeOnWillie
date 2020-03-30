@@ -8,6 +8,9 @@ import TypeHint from "./TypeHint";
 import Sonnet from "./Sonnet";
 import MisspelledWordList from "./MisspelledWordList";
 import { AppContext } from "./App";
+import { Prompt } from "react-router";
+
+const DELIM = "|";
 
 type TypeSessionProps = {
     userId: string;
@@ -15,9 +18,9 @@ type TypeSessionProps = {
 }
 
 export class WordSet {
-    readonly modelWord: string;
-    readonly typedWord: string;
-    readonly index: number;
+    public modelWord: string;
+    public typedWord: string;
+    public index: number;
 
     constructor(model: string, typed:string, index: number) {
         this.modelWord = model;
@@ -35,7 +38,7 @@ interface ISessionData {
     sonnetId: number,
     secondsElapsed: number,
     numberMisspelled: number,
-    misspelledString: string,
+    misspelledWords: string,
     percentCorrect: number,
     percentFinished: number
     quit: string,
@@ -87,17 +90,24 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
     }, []);
 
     useEffect(() => {
+        /**
+         * Update ref to be used at component unmount
+         */
 
+        // Return if session yet started
         if (!isStarted) return;
 
         // Update ref with current session data
         const data = {} as ISessionData;
 
+        // Transfrom MisspelledWordMap into string
+        const misspelledWordString = stringifyMisspelledWords(misspelledWords);
+
         data.userId = userId;
         data.sonnetId = currentSonnet.id;
         data.secondsElapsed = parseInt(document.getElementById("timer")!.innerHTML);
-        data.numberMisspelled = calcNumMisspelled(misspelledWords);
-        data.misspelledString = stringifyMisspelledWords(misspelledWords);
+        data.numberMisspelled = calcNumMisspelled(misspelledWordString);
+        data.misspelledWords = misspelledWordString;
         data.percentCorrect = parseFloat((correctWordCount / currentWordCount).toFixed(3));
         data.percentFinished = parseFloat((currentWordCount / currentSonnet.wordCount).toFixed(3));
         data.touchScreen = (isTouchScreen) ? "Y" : "N";
@@ -143,10 +153,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
     function handleDismount() {
         console.log("Cleanup!")
         const state = sessionState.current;
-        if (!state!.isFinished && state!.isStarted) {
-            const isQuit = window.confirm("Your session is unfinished!\nAre you sure you want to quit?");
-            if (isQuit) logSession(isFinished);
-        } else if (state!.isFinished) {
+        if ((!state!.isFinished && state!.isStarted) || state!.isFinished) {
             logSession(isFinished);
         }
     }
@@ -178,33 +185,36 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
 
     /**
      * Calculates number of misspelled words after flattening cache Object
-     * @param   {MisspelledWordMap} misspelledWordMap Cache of words misspelled
+     * @param   {String} misspelledWordString Stringified cache of words misspelled delimited by "|"
      * @returns {Number} Total number of misspelled words              
     */
-    function calcNumMisspelled(misspelledWordMap : MisspelledWordMap) : number {
-        const m = new Array();
-        const t = m.concat(Object.values(misspelledWordMap));
-        return t.length;
+    function calcNumMisspelled(misspelledWordString : string) : number {
+        return misspelledWordString.split(DELIM).length;
     }
 
     /**
      * Converts MisspelledWordMap to a string
-     * @param misspelledWordMap 
+     * @param   {MisspelledWordMap} misspelledWordMap Hash table cache of WordSets, which encapsulate instances of misspelled words
      * @returns {String} String delimited by | of words misspelled
      */
-    function stringifyMisspelledWords(misspelledWordMap : MisspelledWordMap) : string {
-        let temp = new Array();
-        temp = temp.concat(Object.values(misspelledWordMap));
-        
-        let modelWords = new Array<string>(temp.length);
-        for (let i = 0; i < temp.length; i++) {
-            const mw = temp[i].modelWord;
-            console.log("MODEL WORD", mw);
-            modelWords[i] = mw;
-        }
+    function stringifyMisspelledWords(misspelledWordMap: MisspelledWordMap): string {
+        // Flatten hash table into two-dimensional array
+        const wordSetCollection: Array<WordSet[]> = Object.values(misspelledWordMap);
+        if (wordSetCollection.length < 1) return "";
 
-        console.log(modelWords)
-        return modelWords.join("|");
+        // Flatten further into one-dimensional array
+        const wordSetList = new Array<WordSet>();
+        wordSetCollection.forEach((wsl) => {
+            for (let i = 0; i < wsl.length; i++) {
+                wordSetList.push(wsl[i]);
+            }
+        });
+
+        // Extract only the modelWord from each WordSet
+        const modelWords = wordSetList.map(ws => ws.modelWord);
+
+        // Stringify with delimiter
+        return modelWords.join(DELIM);
     }
     
     function fetchSonnetById() {
@@ -271,6 +281,9 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
             {
                 currentSonnet
                     ? <>
+                        <Prompt
+                            when={!isFinished && isStarted}
+                            message={"Are you sure you want to quit and lose this session?"} />
                         <h2>{ currentSonnet.title }</h2>
                         <SessionTimer 
                             currentWordCount={currentWordCount}

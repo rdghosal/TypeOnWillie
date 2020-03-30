@@ -35,7 +35,6 @@ const MisspelledWordList = ({ misspelledWords, lineIndex } : MisspelledWordListP
 
     return (
         <div>
-            { console.log(misspelledWords) }
             <div className="typesession__incorrect-list">
                 <ul>
                     {
