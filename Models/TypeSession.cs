@@ -10,17 +10,17 @@ namespace TypeOnWillie.Models
     {
         public SqlGuid Id { get; set; }
 
-        public SqlGuid UserId { get; set; }
+        public string UserId { get; set; }
 
         public int SonnetId { get; set; }
 
         public int SecondsElapsed { get; set; }
 
-        public decimal PercentCorrect { get; set; } 
+        public int CorrectWordCount { get; set; } 
 
-        public decimal PercentFinished { get; set; } 
+        public int TypedWordCount { get; set; } 
 
-        public string NumberMisspelled { get; set; }
+        public int MisspelledWordCount { get; set; }
 
         public string MisspelledWords { get; set; }
 

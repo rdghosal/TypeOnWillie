@@ -30,10 +30,10 @@ namespace TypeOnWillie.DataAccess
                     userId = typeSession.UserId,
                     sonnetId = typeSession.SonnetId,
                     secondsElapsed = typeSession.SecondsElapsed,
-                    percentCorrect = typeSession.PercentCorrect,
-                    percentFinished = typeSession.PercentFinished,
+                    correctWordCount = typeSession.CorrectWordCount,
+                    typedWordCount = typeSession.TypedWordCount,
                     misspelledWords = typeSession.MisspelledWords,
-                    numberMisspelled = typeSession.NumberMisspelled,
+                    misspelledWordCount = typeSession.MisspelledWordCount,
                     quit = typeSession.Quit,
                     touchScreen = typeSession.TouchScreen
                 });

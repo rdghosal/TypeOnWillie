@@ -37,10 +37,10 @@ interface ISessionData {
     userId: string,
     sonnetId: number,
     secondsElapsed: number,
-    numberMisspelled: number,
+    misspelledWordCount: number,
     misspelledWords: string,
-    percentCorrect: number,
-    percentFinished: number
+    correctWordCount: number,
+    typedWordCount: number
     quit: string,
     touchScreen: string
 }
@@ -106,10 +106,10 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
         data.userId = userId;
         data.sonnetId = currentSonnet.id;
         data.secondsElapsed = parseInt(document.getElementById("timer")!.innerHTML);
-        data.numberMisspelled = calcNumMisspelled(misspelledWordString);
+        data.misspelledWordCount = calcNumMisspelled(misspelledWordString);
         data.misspelledWords = misspelledWordString;
-        data.percentCorrect = parseFloat((correctWordCount / currentWordCount).toFixed(3));
-        data.percentFinished = parseFloat((currentWordCount / currentSonnet.wordCount).toFixed(3));
+        data.correctWordCount = correctWordCount;
+        data.typedWordCount = currentWordCount;
         data.touchScreen = (isTouchScreen) ? "Y" : "N";
 
         sessionData.current = data;
@@ -153,6 +153,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
     function handleDismount() {
         console.log("Cleanup!")
         const state = sessionState.current;
+        if (!state) return;
         if ((!state!.isFinished && state!.isStarted) || state!.isFinished) {
             logSession(isFinished);
         }
@@ -173,6 +174,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
         console.log("STATE:", { state });
 
         data!.quit = (state!.isFinished) ? "N" : "Y";
+        console.log(JSON.stringify(data));
 
         const response = await fetch("api/typesession/LogSession", {
             method: "POST",

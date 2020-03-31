@@ -28,7 +28,7 @@ namespace TypeOnWillie.Controllers
         [Route("LogSession")]
         public ActionResult Post(TypeSession typeSession)
         {
-            return Ok(_service.AddTypeSession(typeSession));
+            return Ok( _service.AddTypeSession(typeSession));
         }
     }
 }

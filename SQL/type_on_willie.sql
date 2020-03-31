@@ -63,9 +63,9 @@ IF NOT EXISTS (
             [SonnetId] INT NOT NULL,
             [DateTime] DATETIME NOT NULL DEFAULT GETDATE(),
             [SecondsElapsed] INT NOT NULL,
-            [PercentCorrect] DECIMAL(4,3) NOT NULL,
-            [PercentFinished] DECIMAL(4,3) NOT NULL,
-            [NumberMisspelled] INT NOT NULL,
+            [CorrectWordCount] INT NOT NULL,
+            [TypedWordCount] INT NOT NULL,
+            [MisspelledWordCount] INT NOT NULL,
             [MisspelledWords] NVARCHAR(MAX),
             [Quit] VARCHAR(1) NOT NULL DEFAULT 'N',
             [TouchScreen] VARCHAR(1) NOT NULL DEFAULT 'N',
@@ -73,8 +73,6 @@ IF NOT EXISTS (
             REFERENCES [dbo].[Users] (Id),
             CONSTRAINT FK_Sessions_Sonnets FOREIGN KEY (SonnetId)
             REFERENCES [dbo].[Sonnets] (Id),
-            CONSTRAINT CHK_PercentCorrect CHECK (PercentCorrect BETWEEN 0 AND 1),
-            CONSTRAINT CHK_PercentFinished CHECK (PercentFinished BETWEEN 0 AND 1),
             CONSTRAINT CHK_Quit CHECK (Quit IN ('Y', 'N')),
             CONSTRAINT CHK_TouchScreen CHECK (TouchScreen IN ('Y', 'N'))
         );
