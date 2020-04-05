@@ -16,9 +16,10 @@ namespace TypeOnWillie.Services
             _dao = typeSessionSqlDao;
         }
 
-        public int AddTypeSession(TypeSession typeSession)
+        public void AddTypeSession(TypeSession typeSession)
         {
-            return _dao.InsertTypeSession(typeSession);
+            _dao.InsertTypeSession(typeSession);
+            _dao.InsertWordTuples(typeSession);
         }
     }
 }

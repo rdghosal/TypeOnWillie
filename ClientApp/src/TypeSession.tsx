@@ -17,20 +17,22 @@ type TypeSessionProps = {
     sonnetId: string | string[];
 }
 
-export class WordSet {
-    public modelWord: string;
-    public typedWord: string;
-    public index: number;
+export class WordTuple {
+    readonly modelWord: string;
+    readonly typedWord: string;
+    readonly index: number; // Starts from 0
+    readonly lineNumber: number; // Ranges from 1 - 14
 
-    constructor(model: string, typed:string, index: number) {
+    constructor(model: string, typed:string, index: number, lineNumber: number) {
         this.modelWord = model;
         this.typedWord = typed;        
         this.index = index;
+        this.lineNumber = lineNumber;
     }
 }
 
 export interface MisspelledWordMap {
-    [key: number] : Array<WordSet>
+    [key: number] : Array<WordTuple>
 }
 
 interface ISessionData {
@@ -38,7 +40,7 @@ interface ISessionData {
     sonnetId: number,
     secondsElapsed: number,
     misspelledWordCount: number,
-    misspelledWords: string,
+    misspelledWords: Array<WordTuple>,
     correctWordCount: number,
     typedWordCount: number
     quit: string,
@@ -101,13 +103,13 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
         const data = {} as ISessionData;
 
         // Transfrom MisspelledWordMap into string
-        const misspelledWordString = stringifyMisspelledWords(misspelledWords);
+        const _misspelledWords = flattenMisspelledWords(misspelledWords);
 
         data.userId = userId;
         data.sonnetId = currentSonnet.id;
         data.secondsElapsed = parseInt(document.getElementById("timer")!.innerHTML);
-        data.misspelledWordCount = calcNumMisspelled(misspelledWordString);
-        data.misspelledWords = misspelledWordString;
+        data.misspelledWordCount = _misspelledWords.length;
+        data.misspelledWords = _misspelledWords;
         data.correctWordCount = correctWordCount;
         data.typedWordCount = currentWordCount;
         data.touchScreen = (isTouchScreen) ? "Y" : "N";
@@ -199,24 +201,20 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
      * @param   {MisspelledWordMap} misspelledWordMap Hash table cache of WordSets, which encapsulate instances of misspelled words
      * @returns {String} String delimited by | of words misspelled
      */
-    function stringifyMisspelledWords(misspelledWordMap: MisspelledWordMap): string {
+    function flattenMisspelledWords(misspelledWordMap: MisspelledWordMap): Array<WordTuple> {
         // Flatten hash table into two-dimensional array
-        const wordSetCollection: Array<WordSet[]> = Object.values(misspelledWordMap);
-        if (wordSetCollection.length < 1) return "";
+        const wordTupleCollection: Array<WordTuple[]> = Object.values(misspelledWordMap);
+        if (wordTupleCollection.length < 1) return [];
 
         // Flatten further into one-dimensional array
-        const wordSetList = new Array<WordSet>();
-        wordSetCollection.forEach((wsl) => {
+        const wordTupleList = new Array<WordTuple>();
+        wordTupleCollection.forEach((wsl) => {
             for (let i = 0; i < wsl.length; i++) {
-                wordSetList.push(wsl[i]);
+                wordTupleList.push(wsl[i]);
             }
         });
 
-        // Extract only the modelWord from each WordSet
-        const modelWords = wordSetList.map(ws => ws.modelWord);
-
-        // Stringify with delimiter
-        return modelWords.join(DELIM);
+        return wordTupleList;
     }
     
     function fetchSonnetById() {
@@ -261,7 +259,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
         if (typedWord === modelWord) {
             incrementCorrectWords(correctWordCount => correctWordCount += 1);
         } else {
-            const currentWords = new WordSet(modelWord, typedWord, wordIndex);
+            const currentWords = new WordTuple(modelWord, typedWord, wordIndex, lineIndex + 1);
             pushMisspelled(misspelledWords => {
                 const temp = misspelledWords[lineIndex];
                 let newWords = (temp) ? [...temp, currentWords] : [ currentWords ];

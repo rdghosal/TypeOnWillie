@@ -22,7 +22,7 @@ namespace TypeOnWillie.Models
 
         public int MisspelledWordCount { get; set; }
 
-        public string MisspelledWords { get; set; }
+        public List<WordTuple> MisspelledWords { get; set; }
 
         public string Quit { get; set; }
 

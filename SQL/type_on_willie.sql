@@ -66,7 +66,6 @@ IF NOT EXISTS (
             [CorrectWordCount] INT NOT NULL,
             [TypedWordCount] INT NOT NULL,
             [MisspelledWordCount] INT NOT NULL,
-            [MisspelledWords] NVARCHAR(MAX),
             [Quit] VARCHAR(1) NOT NULL DEFAULT 'N',
             [TouchScreen] VARCHAR(1) NOT NULL DEFAULT 'N',
             CONSTRAINT FK_Sessions_Users FOREIGN KEY (UserId)
@@ -77,6 +76,25 @@ IF NOT EXISTS (
             CONSTRAINT CHK_TouchScreen CHECK (TouchScreen IN ('Y', 'N'))
         );
         PRINT('Created table [dbo].[TypeSessions]');
+    END
+
+IF NOT EXISTS (
+    SELECT * FROM sys.tables
+    WHERE [name] LIKE 'Misspellings'
+)
+    BEGIN
+        CREATE TABLE [dbo].[Misspellings] (
+            [Id] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY,
+            [TypeSessionId] UNIQUEIDENTIFIER NOT NULL,
+            [LineNumber] INT NOT NULL,
+            [Index] INT NOT NULL,
+            [ModelWord] VARCHAR(255) NOT NULL,
+            [TypedWord] VARCHAR(255) NOT NULL
+            CONSTRAINT FK_Misspellings_TypeSessions FOREIGN KEY (TypeSessionId)
+            REFERENCES [dbo].[TypeSessions] (Id)
+            CONSTRAINT CHK_LineNumber CHECK (LineNumber BETWEEN 1 AND 14)
+        );
+        PRINT ('Created table [dbo].[Misspellings]');
     END
 
 -- Create RefreshTokens table

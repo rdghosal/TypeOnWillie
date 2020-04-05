@@ -32,11 +32,38 @@ namespace TypeOnWillie.DataAccess
                     secondsElapsed = typeSession.SecondsElapsed,
                     correctWordCount = typeSession.CorrectWordCount,
                     typedWordCount = typeSession.TypedWordCount,
-                    misspelledWords = typeSession.MisspelledWords,
                     misspelledWordCount = typeSession.MisspelledWordCount,
                     quit = typeSession.Quit,
                     touchScreen = typeSession.TouchScreen
                 });
+            }
+        }
+
+        public void InsertWordTuples(TypeSession typeSession)
+        {
+            List<WordTuple> wordTuples = typeSession.MisspelledWords;
+            using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
+            {
+                _sqlConnection.Open();
+
+                // Iterate over each List of WordTuples and INSERT
+                foreach (WordTuple wt in wordTuples)
+                {
+                    // Find latest TypeSession.Id
+                    var result = _sqlConnection.Query<TypeSession>(TypeSessionCommand.SELECT, new { 
+                        userId = typeSession.UserId
+                    }).FirstOrDefault();
+
+                    _sqlConnection.Execute(MisspellingCommand.INSERT, new
+                    {
+                        typeSessionId = result.Id,
+                        lineNumber = wt.LineNumber,
+                        index = wt.LineNumber,
+                        modelWord = wt.ModelWord,
+                        typedWord = wt.TypedWord
+                    });
+                }
+
             }
         }
 

@@ -28,7 +28,15 @@ namespace TypeOnWillie.Controllers
         [Route("LogSession")]
         public ActionResult Post(TypeSession typeSession)
         {
-            return Ok( _service.AddTypeSession(typeSession));
+            try
+            {
+                _service.AddTypeSession(typeSession);
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest($"Invalid session data { typeSession }");
+            }
         }
     }
 }

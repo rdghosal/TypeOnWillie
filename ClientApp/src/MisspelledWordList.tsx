@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { MisspelledWordMap, WordSet } from './TypeSession'
+import { MisspelledWordMap, WordTuple } from './TypeSession'
 
 type MisspelledWordListProps = {
     misspelledWords : MisspelledWordMap,
@@ -8,7 +8,7 @@ type MisspelledWordListProps = {
 
 const MisspelledWordList = ({ misspelledWords, lineIndex } : MisspelledWordListProps) => {
 
-    const [ misspelledList, concatMisspelled ] = useState<Array<WordSet>>();
+    const [ misspelledList, concatMisspelled ] = useState<Array<WordTuple>>();
 
     useEffect(() => {
         // Cache misspelled words as list for mapping to li els
@@ -39,7 +39,7 @@ const MisspelledWordList = ({ misspelledWords, lineIndex } : MisspelledWordListP
                 <ul>
                     {
                         misspelledList
-                            ? misspelledList.map((wordSet: WordSet, i: number) => <li key={i}> {wordSet.modelWord} | {wordSet.typedWord} </li>)
+                            ? misspelledList.map((wordSet: WordTuple, i: number) => <li key={i}> {wordSet.modelWord} | {wordSet.typedWord} </li>)
                             : null
                     }
                 </ul>
