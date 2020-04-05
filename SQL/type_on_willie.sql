@@ -92,7 +92,7 @@ IF NOT EXISTS (
             [ModelWord] VARCHAR(255) NOT NULL,
             [TypedWord] VARCHAR(255) -- Allow empty string user input
             CONSTRAINT FK_Misspellings_TypeSessions FOREIGN KEY (TypeSessionId)
-            REFERENCES [dbo].[TypeSessions] (Id)
+            REFERENCES [dbo].[TypeSessions] (Id),
             CONSTRAINT CHK_LineNumber CHECK (LineNumber BETWEEN 1 AND 14)
         );
         PRINT ('Created table [dbo].[Misspellings]');
