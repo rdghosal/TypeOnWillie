@@ -8,7 +8,7 @@ namespace TypeOnWillie.Models
 {
     public class TypeSession
     {
-        public SqlGuid Id { get; set; }
+        public Guid Id { get; set; }
 
         public string DateTime { get; set; } 
 

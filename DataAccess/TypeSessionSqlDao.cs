@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using TypeOnWillie.Models;
@@ -27,7 +28,6 @@ namespace TypeOnWillie.DataAccess
                 _sqlConnection.Open();
                 return _sqlConnection.Execute(TypeSessionCommand.INSERT, new
                 {
-                    dateTime = Date.Parse(typeSession.DateTime),
                     userId = typeSession.UserId,
                     sonnetId = typeSession.SonnetId,
                     secondsElapsed = typeSession.SecondsElapsed,
@@ -47,19 +47,22 @@ namespace TypeOnWillie.DataAccess
             {
                 _sqlConnection.Open();
 
+                // Find latest TypeSession.Id
+                var result = _sqlConnection.Query<TypeSession>(TypeSessionCommand.SELECT, 
+                new 
+                { 
+                    userId = typeSession.UserId
+                }).FirstOrDefault();
+
                 // Iterate over each List of WordTuples and INSERT
                 foreach (WordTuple wt in wordTuples)
                 {
-                    // Find latest TypeSession.Id
-                    var result = _sqlConnection.Query<TypeSession>(TypeSessionCommand.SELECT, new { 
-                        userId = typeSession.UserId
-                    }).FirstOrDefault();
-
-                    _sqlConnection.Execute(MisspellingCommand.INSERT, new
+                    _sqlConnection.Execute(MisspellingCommand.INSERT, 
+                    new
                     {
                         typeSessionId = result.Id,
                         lineNumber = wt.LineNumber,
-                        index = wt.LineNumber,
+                        index = wt.Index,
                         modelWord = wt.ModelWord,
                         typedWord = wt.TypedWord
                     });

@@ -177,7 +177,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
         console.log("STATE:", { state });
 
         data!.quit = (state!.isFinished) ? "N" : "Y";
-        data!.dateTime = Date();
+        //data!.dateTime = new Date().toISOString();
 
         const response = await fetch("api/typesession/LogSession", {
             method: "POST",

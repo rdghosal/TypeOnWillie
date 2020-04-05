@@ -8,8 +8,8 @@ namespace TypeOnWillie.Models
 {
     public class WordTuple
     {
-        public SqlGuid Id { get; set; }
-        public SqlGuid TypeSessionId { get; set; }
+        public Guid Id { get; set; }
+        public Guid TypeSessionId { get; set; }
         public int LineNumber { get; set; }
         public int Index { get; set; }
         public string ModelWord { get; set; }
