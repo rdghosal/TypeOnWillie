@@ -7,8 +7,8 @@ namespace TypeOnWillie.DataAccess
 {
     public static class TypeSessionCommand
     {
-        public const string INSERT = @"INSERT INTO [type_on_willie].[dbo].[TypeSessions] (UserId, SonnetId, SecondsElapsed, CorrectWordCount, TypedWordCount, MisspelledWordCount, Quit, TouchScreen)
-                                       VALUES (@userId, @sonnetId, @secondsElapsed, @correctWordCount, @typedWordCount, @misspelledWordCount, @quit, @touchScreen);";
+        public const string INSERT = @"INSERT INTO [type_on_willie].[dbo].[TypeSessions] (DateTime, UserId, SonnetId, SecondsElapsed, CorrectWordCount, TypedWordCount, MisspelledWordCount, Quit, TouchScreen)
+                                       VALUES (@dateTime, @userId, @sonnetId, @secondsElapsed, @correctWordCount, @typedWordCount, @misspelledWordCount, @quit, @touchScreen);";
 
         public const string SELECT = @"SELECT Id
                                        FROM [type_on_willie].[dbo].[TypeSessions]

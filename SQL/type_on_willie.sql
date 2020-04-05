@@ -78,6 +78,7 @@ IF NOT EXISTS (
         PRINT('Created table [dbo].[TypeSessions]');
     END
 
+-- Create Misspellings table
 IF NOT EXISTS (
     SELECT * FROM sys.tables
     WHERE [name] LIKE 'Misspellings'
@@ -89,7 +90,7 @@ IF NOT EXISTS (
             [LineNumber] INT NOT NULL,
             [Index] INT NOT NULL,
             [ModelWord] VARCHAR(255) NOT NULL,
-            [TypedWord] VARCHAR(255) NOT NULL
+            [TypedWord] VARCHAR(255) -- Allow empty string user input
             CONSTRAINT FK_Misspellings_TypeSessions FOREIGN KEY (TypeSessionId)
             REFERENCES [dbo].[TypeSessions] (Id)
             CONSTRAINT CHK_LineNumber CHECK (LineNumber BETWEEN 1 AND 14)

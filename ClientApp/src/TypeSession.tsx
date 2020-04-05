@@ -36,6 +36,7 @@ export interface MisspelledWordMap {
 }
 
 interface ISessionData {
+    dateTime: string,
     userId: string,
     sonnetId: number,
     secondsElapsed: number,
@@ -176,7 +177,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
         console.log("STATE:", { state });
 
         data!.quit = (state!.isFinished) ? "N" : "Y";
-        console.log(JSON.stringify(data));
+        data!.dateTime = Date();
 
         const response = await fetch("api/typesession/LogSession", {
             method: "POST",

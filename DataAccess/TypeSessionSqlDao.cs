@@ -27,6 +27,7 @@ namespace TypeOnWillie.DataAccess
                 _sqlConnection.Open();
                 return _sqlConnection.Execute(TypeSessionCommand.INSERT, new
                 {
+                    dateTime = Date.Parse(typeSession.DateTime),
                     userId = typeSession.UserId,
                     sonnetId = typeSession.SonnetId,
                     secondsElapsed = typeSession.SecondsElapsed,

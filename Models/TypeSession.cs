@@ -10,6 +10,8 @@ namespace TypeOnWillie.Models
     {
         public SqlGuid Id { get; set; }
 
+        public string DateTime { get; set; } 
+
         public string UserId { get; set; }
 
         public int SonnetId { get; set; }
