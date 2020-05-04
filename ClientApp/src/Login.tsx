@@ -30,8 +30,13 @@ const Login = (props : RouteComponentProps) => {
             return false;
         }
 
+
+
         // Save token and username/id to memory
         const token = await TokenHandler.getToken({ username, password } as UserCredentials);
+        if (!token) {
+            return alert("Invalid username or password.\nPlease log in again.");
+        }
         setToken(token);
 
         const userData = TokenHandler.parseClaims(token);

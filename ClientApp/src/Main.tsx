@@ -17,35 +17,11 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
     const params = queryString.parse(props.location.search);
     const { user, setUser, accessToken, setToken } = useContext(AppContext);
     const [currentSonnet, setSonnet] = useState<Sonnet|undefined>(undefined); // Track sonnet in session
-    const [ isLoggedIn, toggleLogIn ] = useState<boolean>(false);
-
-    useEffect(() => {
-        // Parse sessionStorage for User data.
-        // If absent, go to login
-        if (!accessToken) {
-            TokenHandler.refreshAccessToken()
-                .then(token => {
-                    if (token === AuthErrorTypes.EXPIRED || token === AuthErrorTypes.INVALID) {
-                        // TODO errors handle separately
-                        return props.history.push("/login");
-                    }
-                    console.log(token);
-                    setToken(token);
-                });
-        }
-    }, [accessToken]);
-
-    useEffect(() => {
-        if (accessToken) {
-            if (!user) { setUser(TokenHandler.parseClaims(accessToken)) }
-            toggleLogIn(true);
-        }
-    }, [user, accessToken]);
 
     return (
         <Fragment>
             <MainContext.Provider value={{ currentSonnet, setSonnet, user, setUser }}>
-                <Navbar isLoggedIn={isLoggedIn} toggleLogIn={toggleLogIn} />
+                <Navbar isLogInPage={false} />
                 {params["sonnet"] && user ? <TypeSession sonnetId={params["sonnet"]} userId={user.id} /> : <SonnetMenu /> }
             </MainContext.Provider>
         </Fragment>

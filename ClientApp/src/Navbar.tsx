@@ -2,26 +2,39 @@ import React, { useContext, useState, useEffect } from "react";
 import "./Navbar.css";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import { AppContext } from "./App";
-import { TokenHandler, User } from "./AuthUtils";
+import { TokenHandler, User, AuthErrorTypes } from "./AuthUtils";
 
 interface INavbarProps extends RouteComponentProps {
-    isLoggedIn: boolean,
-    toggleLogIn: React.Dispatch<React.SetStateAction<boolean>>
+    isLogInPage?: boolean;
 };
 
 const Navbar: React.FC<INavbarProps> = (props) => {
 
-    const { user, accessToken, setUser } = useContext(AppContext);
+    const { user, accessToken, setUser, setToken } = useContext(AppContext);
+    const [ isLoggedIn, toggleLogIn ] = useState<boolean>(false);
 
-    //useEffect(() => {
-    //    if (accessToken) {
-    //        if (!user) {
-    //            const user : User = TokenHandler.parseClaims(accessToken);
-    //            setUser(user);
-    //        }
-    //        toggleLogIn(true);
-    //    }
-    //}, [user, accessToken]);
+    useEffect(() => {
+        // Parse sessionStorage for User data.
+        // If absent, go to login
+        if (!accessToken) {
+            TokenHandler.refreshAccessToken()
+                .then(token => {
+                    if (token === AuthErrorTypes.EXPIRED || token === AuthErrorTypes.INVALID) {
+                        // TODO errors handle separately
+                        return props.history.push("/login");
+                    }
+                    console.log(token);
+                    setToken(token);
+                });
+        }
+    }, [accessToken]);
+
+    useEffect(() => {
+        if (accessToken) {
+            if (!user) { setUser(TokenHandler.parseClaims(accessToken)) }
+            toggleLogIn(true);
+        }
+    }, [user, accessToken]);
 
     const handleLogOut = async () => {
         // Send refreshToken and accessToken to back-end for blacklisting
@@ -40,7 +53,7 @@ const Navbar: React.FC<INavbarProps> = (props) => {
         if (!response.ok) return console.log(response.statusText);
 
         setUser(null);
-        props.toggleLogIn(false);
+        toggleLogIn(false);
         props.history.push("/");
     }
 
@@ -50,23 +63,25 @@ const Navbar: React.FC<INavbarProps> = (props) => {
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarLinks" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
             </button>
-            <div className="collapse navbar-collapse" id="navbarLinks">
-                <ul className="navbar-nav ml-auto">
-                    <li className="nav-item">
-                        <Link className="react-link nav-link" to="/">Home</Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link className="react-link nav-link" to="/app">Sonnet Menu</Link>
-                    </li>
-                    <li className="nav-item">
-                        { 
-                            props.isLoggedIn 
-                                ? <p className="nav-link fake-link" onClick={ handleLogOut }>Log Out</p>
-                                : <p className="nav-link fake-link" onClick={() => props.history.push("/register")}>Sign Up</p>
-                        }
-                    </li>
-                </ul>
-            </div>
+            { isLoggedIn && 
+                <div className="collapse navbar-collapse" id="navbarLinks">
+                    <ul className="navbar-nav ml-auto">
+                        <li className="nav-item">
+                            <Link className="react-link nav-link" to="/">Home</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="react-link nav-link" to="/app">Sonnet Menu</Link>
+                        </li>
+                        <li className="nav-item">
+                            { 
+                                isLoggedIn 
+                                    ? <p className="nav-link fake-link" onClick={ handleLogOut }>Log Out</p>
+                                    : <p className="nav-link fake-link" onClick={() => props.history.push("/register")}>Sign Up</p>
+                            }
+                        </li>
+                    </ul>
+                </div>
+            }
         </nav>
     );
 }

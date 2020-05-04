@@ -6,6 +6,7 @@ import Landing from './Landing';
 import Login from './Login';
 import Register from './Register';
 import { User } from './AuthUtils';
+import Profile from './Profile';
 
 
 
@@ -29,6 +30,7 @@ export const App: React.FC = () => {
               <Route path="/app" render={props => <AppContextProvider><Main {...props}/></AppContextProvider>} />
               <Route path="/login" render={props => <AppContextProvider><Login {...props} /></AppContextProvider>} />
               <Route path="/register" render={props => <AppContextProvider><Register {...props}/></AppContextProvider>} />
+              <Route path="/profile" render={props => <AppContextProvider><Profile /></AppContextProvider>} />
           </Switch>
       </Router>
   );
