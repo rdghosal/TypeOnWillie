@@ -1,8 +1,9 @@
 ﻿-- Create database
-IF (db_id(N'type_on_willie') IS NULL) 
+IF (DB_ID(N'type_on_willie') IS NULL)
     BEGIN 
         CREATE DATABASE [type_on_willie];
         PRINT('Created database [type_on_willie].');
+        USE [type_on_willie];
     END
 USE [type_on_willie];
 

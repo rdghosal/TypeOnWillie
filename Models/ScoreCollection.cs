@@ -7,15 +7,36 @@ namespace TypeOnWillie.Models
 {
     public class ScoreCollection
     {
-        // TODO add TimeRange field?
+        private readonly RangeType _rangeType;
+        private readonly DateTime _dtStart;
+        private readonly DateTime _dtEnd = DateTime.Now;
 
-        // SecondElapsed
-        IEnumerable<int> AvgTimeSeries { get; set; } 
+        public ScoreCollection(DateTime dtStart)
+        {
+            _dtStart = dtStart;
+        }
+
+        public ScoreCollection(RangeType rangeType, DateTime dtStart)
+        {
+            _rangeType = rangeType;
+            _dtStart = dtStart;
+        }
+
+        public ScoreCollection(RangeType rangeType, DateTime dtStart, DateTime dtEnd)
+        {
+            _rangeType = rangeType;
+            _dtStart = dtStart;
+            _dtEnd = dtEnd;
+        }
 
         // (float)AVG(CorrectWordCount/TypedWordCount)
-        IEnumerable<float> AvgAccuracySeries { get; set; }
+        IEnumerable<AverageAccuracyTuple> AverageAccuracySeries { get; set; }
+        IEnumerable<AverageTimeTuple> AverageTimeSeries { get; set; }
+    }
 
-        // DateTime
-        IEnumerable<int> TimeSeries { get; set; }
+    public enum RangeType
+    {
+        YEAR,
+        MONTH
     }
 }
