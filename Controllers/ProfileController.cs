@@ -28,7 +28,7 @@ namespace TypeOnWillie.Controllers
         [HttpPost("{id}", Name = "GetProfile")]
         public ActionResult GetProfile(Guid id)
         {
-            UserProfileDto userProfileDto = _service.GetUserProfile(new UserDto { Id = id });
+            ProfileDto userProfileDto = _service.GetUserProfile(new UserDto { Id = id });
             if (userProfileDto == null) BadRequest();
             return Ok(userProfileDto);
         }

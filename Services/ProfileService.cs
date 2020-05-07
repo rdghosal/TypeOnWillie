@@ -11,23 +11,33 @@ namespace TypeOnWillie.Services
     {
         private readonly TypeSessionSqlDao _daoTypeSessions;
         private readonly MisspellingSqlDao _daoMisspellings;
+        private readonly UserSqlDao _daoUsers;
+        private readonly SonnetSqlDao _daoSonnets;
 
 
-        public ProfileService(TypeSessionSqlDao typeSessionSqlDao, MisspellingSqlDao misspellingSqlDao)
+        public ProfileService(TypeSessionSqlDao typeSessionSqlDao, MisspellingSqlDao misspellingSqlDao, UserSqlDao userSqlDao, SonnetSqlDao sonnetSqlDao)
         {
             _daoTypeSessions = typeSessionSqlDao;
             _daoMisspellings = misspellingSqlDao;
+            _daoUsers = userSqlDao;
+            _daoSonnets = sonnetSqlDao;
         }
 
-        public UserProfileDto GetUserProfile(UserDto userDto)
+        public ProfileDto GetUserProfile(UserDto userDto, RangeType rt, DateTime start, DateTime end)
         {
-            UserProfileDto userProfileDto = new UserProfileDto();
+            ProfileDto profileDto = new ProfileDto();
+
+            profileDto.User = _daoUsers.SelectUser(userDto);
+            profileDto.Scores = _daoTypeSessions.SelectScores(rt, start, end);
+            profileDto.TopMisspellings = _daoMisspellings.SelectMisspellings();
+
+            profileDto.FavoriteSonnet = _daoSonnets.SelectTopSonnet(userDto);
+            profileDto.BestAccuracy = _daoTypeSessions.SelectTopAccuracy(userDto);
+            profileDto.BestWpm = _daoTypeSessions.SelectTopWpm(userDto);
+            profileDto.BestTime = _daoTypeSessions.SelectTopTime(userDto);
 
             // Convert to List for access in view ?
-            dynamic resTypeSessions = _daoTypeSessions.SelectScores();
-            dynamic resMisspellings = _daoMisspellings.SelectMisspellings();
-
-            return userProfileDto;
+            return profileDto;
         }
     }
 }

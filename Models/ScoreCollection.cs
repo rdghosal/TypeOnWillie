@@ -30,8 +30,8 @@ namespace TypeOnWillie.Models
         }
 
         // (float)AVG(CorrectWordCount/TypedWordCount)
-        IEnumerable<AverageAccuracyTuple> AverageAccuracySeries { get; set; }
-        IEnumerable<AverageTimeTuple> AverageTimeSeries { get; set; }
+        IEnumerable<AverageAccuracy> AverageAccuracySet { get; set; }
+        IEnumerable<AverageWpm> AverageWpmSet { get; set; }
     }
 
     public enum RangeType

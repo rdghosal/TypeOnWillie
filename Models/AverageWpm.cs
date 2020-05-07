@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace TypeOnWillie.Models
 {
-    public class AverageAccuracyTuple : AverageScoreTuple
+    public class AverageWpm : AverageScore
     {
-        public double AverageAccuracy { get; set; } = 0.0;
+        public int Wpm { get; set; } = 0;
     }
 }
