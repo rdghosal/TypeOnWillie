@@ -9,9 +9,9 @@ namespace TypeOnWillie.Models
     {
         public User User { get; set; }
         public string FavoriteSonnet { get; set; }
-        public int BestAccuracy { get; set; }
-        public int BestWpm { get; set; }
-        public int BestTime { get; set; }
+        public int TopAccuracy { get; set; }
+        public int TopWpm { get; set; }
+        public int TopTime { get; set; }
         public ScoreCollection Scores { get; set; }
         public IEnumerable<WordTuple> TopMisspellings { get; set; }
     }

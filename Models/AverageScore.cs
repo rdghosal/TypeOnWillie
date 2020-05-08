@@ -9,6 +9,6 @@ namespace TypeOnWillie.Models
     {
         public DateTime Year { get; set; }
         public DateTime Month { get; set; }
-        public DateTime Week { get; set; }
+        public DateTime Day { get; set; }
     }
 }
