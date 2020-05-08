@@ -63,15 +63,21 @@ def save_sonnets(dirname):
     # Save each sonnet as separate text file
     # and reference to each in CSV
     with open(csv_path, "w", encoding="utf-8", newline="") as sonnet_csv:
-        fieldnames = ["id", "sonnet_length", "filename"]
+        fieldnames = ["id", "sonnet_length", "punctuation_freq", "cap_letter_freq", "filename"]
         writer = csv.DictWriter(fieldnames=fieldnames, f=sonnet_csv)
         for i, sonnet in enumerate(scrape_sonnets()):
-            sonnet_len = 0 # Track number of words in sonnet
             filename = "{0}_{1}.txt".format(i + 1, sonnet.title)
+
+            sonnet_len = 0 # Count for number of words
+            punctuation_cnt = 0 # Count for punctuation
+            cap_letter_cnt = 0 # Count for all capital letters
 
             # Write sonnet contents to text file         
             with open(os.path.join(sonnet_folder, filename), "w", encoding="utf-8") as f:
-                for line in sonnet.content: 
+                for line in sonnet.content:                    
+                    punctuation_cnt += len(re.findall(r"[-,.;:!?\"'\[\]]",line))
+                    cap_letter_cnt += len(re.findall(r"[A-Z]", line)) 
+
                     sonnet_len += len(line.split())
                     f.write(line)
 
@@ -79,7 +85,9 @@ def save_sonnets(dirname):
             writer.writerow({
                 fieldnames[0]: None, # To allow auto-incrementing in SQL
                 fieldnames[1]: sonnet_len,
-                fieldnames[2]: filename
+                fieldnames[2]: cap_letter_cnt,
+                fieldnames[3]: punctuation_cnt,
+                fieldnames[4]: filename
             })
 
     # Confirmation message
