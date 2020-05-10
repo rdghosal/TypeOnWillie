@@ -76,7 +76,7 @@ def save_sonnets(dirname):
             with open(os.path.join(sonnet_folder, filename), "w", encoding="utf-8") as f:
                 for line in sonnet.content:                    
                     punctuation_cnt += len(re.findall(r"[-,.;:!?\"'\[\]]",line))
-                    cap_letter_cnt += len(re.findall(r"[A-Z]", line)) 
+                    cap_letter_cnt += len(re.findall(r"\b\w*[A-Z]\w*\b", line)) 
 
                     sonnet_len += len(line.split())
                     f.write(line)
