@@ -48,10 +48,10 @@ def generate_misspellings(csv_writer, sonnet_id, session_id, num_lines, sonnet_m
         csv_writer.writerow({
             OUT_FIELDNAMES[0]: "",
             OUT_FIELDNAMES[1]: session_id,
-            OUT_FIELDNAMES[2]: line_idx,
+            OUT_FIELDNAMES[2]: line_idx + 1,
             OUT_FIELDNAMES[3]: word_idx,
             OUT_FIELDNAMES[4]: model_word,
-            OUT_FIELDNAMES[5]: f"TEST_{line_idx}-{word_idx}"
+            OUT_FIELDNAMES[5]: f"TEST_{line_idx+1}-{word_idx}"
         })
     
 
