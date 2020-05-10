@@ -1,3 +1,7 @@
+# GENERAL
+test_*
+Old
+
 # Docker
 .env
 docker-compose.yml
