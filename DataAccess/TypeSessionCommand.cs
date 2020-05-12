@@ -18,9 +18,12 @@ namespace TypeOnWillie.DataAccess
                                                          FROM [type_on_willie].[dbo].[TypeSessions]
                                                          WHERE UserId = @userId);";
 
-        public const string SELECT_ALL = @"SELECT [SecondsElapsed], [PercentCorrect], [MisspelledWords] 
-                                           FROM [type_on_willie].[dbo].[TypeSessions]
-                                           WHERE [UserId] = @userId;";
+        public const string SELECT_ALL_SONNETS = @"SELECT
+                                                    DISTINCT [SonnetId]
+                                                 FROM 
+                                                    [type_on_willie].[dbo].[TypeSessions]
+                                                 WHERE
+                                                    UserId = @userId;";
 
         public const string SELECT_SCORES_LASTYEAR = @"SELECT 
                                                         MONTH([DateTime]) AS 'Month', 
@@ -106,7 +109,7 @@ namespace TypeOnWillie.DataAccess
                                                                 ON ts.Id = m.TypeSessionId
                                                             WHERE 
                                                                 ts.UserId = '7800AC1E-28E6-4F6C-964E-AC24063E2EDF'
-                                                                AND m.ModelWord LIKE '%[,.?!;:''""$]%'
+                                                                AND m.ModelWord LIKE '%[,.:;!?-""''\[\]]%' ESCAPE '\'
                                                             GROUP BY ts.Id) T2
                                                         WHERE ts.SonnetId = s.Id) T3,	
                                                     (SELECT
