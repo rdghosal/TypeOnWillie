@@ -18,6 +18,7 @@ namespace TypeOnWillie.DataAccess
                                             , @index
                                             , @modelWord
                                             , @typedWord);";
+
         public const string SELECT_TOP10 = @"SELECT
                                                 TOP 10 [ModelWord]
                                             FROM [type_on_willie].[dbo].[Misspellings] m

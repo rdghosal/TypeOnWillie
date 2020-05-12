@@ -21,30 +21,33 @@ namespace TypeOnWillie.DataAccess
         public const string SELECT_ALL = @"SELECT [SecondsElapsed], [PercentCorrect], [MisspelledWords] 
                                            FROM [type_on_willie].[dbo].[TypeSessions]
                                            WHERE [UserId] = @userId;";
+
         public const string SELECT_SCORES_LASTYEAR = @"SELECT 
                                                         MONTH([DateTime]) AS 'Month', 
-                                                        AVG([TypedWordCount]/[SecondsElapsed] * 60) AS 'AverageWpm',
+                                                        AVG([TypedWordCount]*60 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
-                                                     WHERE ts.UserId = @userId,
-                                                        AND ts.Quit = 'N',
-                                                        AND ts.DateTime BETWEEN GETDATE() AND DATEADD(year, -1, GETDATE())
+                                                     WHERE ts.UserId = @userId
+                                                        AND ts.Quit = 'N'
+                                                        AND ts.DateTime BETWEEN DATEADD(year, -1, @endDate AND @endDate
                                                      GROUP BY MONTH([DateTime]);";
+
         public const string SELECT_SCORES_BYMONTH = @"SELECT
                                                         DAY([DateTime]) AS 'Day',
-                                                        AVG([TypedWordCount]/[SecondsElapsed] * 60.0) AS 'AverageWpm',
+                                                        AVG([TypedWordCount]*60 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
-                                                     WHERE ts.UserId = @userId,
-                                                        AND ts.Quit = 'N',
+                                                     WHERE ts.UserId = @userId
+                                                        AND ts.Quit = 'N'
                                                         AND MONTH(ts.DateTime) = @month
+                                                        AND YEAR(ts.DateTime) = @year
                                                      GROUP BY DAY([DateTime]);";
-        public const string SELECT_TOP_SCORES = @"SELECT
+
+        public const string SELECT_TOP_SCORES = @"SELECT DISTINCT
                                                     (SELECT [Id]
-                                                        , [FileName] 
                                                     FROM [type_on_willie].[dbo].[Sonnets] 
                                                     WHERE [Id] = 
-                                                        (SELECT [SonnetId]
+                                                        (SELECT TOP 1 [SonnetId]
                                                         FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                         WHERE ts.UserId = @userId
                                                         GROUP BY [SonnetId]
@@ -55,9 +58,9 @@ namespace TypeOnWillie.DataAccess
                                                                 (SELECT COUNT([SonnetId]) AS 'c'
                                                                 FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                                 WHERE ts.UserId = @userId
-                                                                GROUP BY [SonnetId]) T)))) AS 'FavoriteSonnet',
+                                                                GROUP BY [SonnetId]) T))) AS 'FavoriteSonnet',
                                                     (SELECT 
-                                                        MAX([TypedWordCount]/[SecondsElapsed] * 60)
+                                                        MAX([TypedWordCount]*60 / [SecondsElapsed])
                                                     FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                     WHERE ts.UserId = @userId
                                                         AND ts.Quit = 'N') AS 'TopWpm',
@@ -74,41 +77,54 @@ namespace TypeOnWillie.DataAccess
                                                 FROM [type_on_willie].[dbo].[TypeSessions];";
 
         public const string SELECT_USER_METRICS = @"SELECT 
-                                                        AVG([CorrectWordCount] * 1.0 / [TypedWordCount] * 1.0) AS 'AverageAccuracy'
-                                                        , AVG([TypedWordCount] / [SecondsElapsed] * 60.0) AS 'AverageWpm'
-                                                        , AVG([SecondsElapsed] * 1.0) AS 'AverageTime',
-                                                        , T1.Punctuation
-                                                        , T2.CapitalLetters
-                                                    FROM 
+                                                        T1.AverageAccuracy
+                                                        , T1.AverageWpm
+                                                        , T1.AverageTime
+                                                        , T3.Punctuation
+                                                        , T5.CapitalLetters
+                                                    FROM
                                                         (SELECT 
-                                                            AVG([PunctuationCount]-COUNT([TypeSessionId])/[PunctuationCount]) AS 'Punctuation',
-                                                        FROM 
+                                                            AVG([CorrectWordCount] * 1.0 / [TypedWordCount] * 1.0) AS 'AverageAccuracy',
+                                                            AVG([TypedWordCount] * 1.0 / [SecondsElapsed] * 60.0) AS 'AverageWpm',
+                                                            AVG([SecondsElapsed] * 1.0) AS 'AverageTime'
+                                                        FROM
                                                             [type_on_willie].[dbo].[TypeSessions] ts
-                                                        INNER JOIN
-                                                            [type_on_willie].[dbo].[Sonnets] s
-                                                            ON ts.SonnetId = s.Id
                                                         WHERE
-                                                            ts.UserId = @userId
-                                                            AND ts.Quit = 'N'
-                                                            AND ts.ModelWord LIKE '%[-,.;:!?\""\''\]\[]$%'
-                                                        GROUP BY
-                                                            ts.Id) T1,
-                                                        (SELECT
-                                                            AVG([CapitalLetterCount]-COUNT([TypeSessionId])/[CapitalLetterCount]) AS 'CapitalLetters',
-                                                        FROM 
-                                                            [type_on_willie].[dbo].[TypeSessions] ts
-                                                        INNER JOIN
-                                                            [type_on_willie].[dbo].[Sonnets] s
-                                                            ON ts.SonnetId = s.Id
-                                                        WHERE
-                                                            ts.UserId = @userId
-                                                            AND ts.Quit = 'N'
-                                                            AND ts.ModelWord LIKE '%[A-Z]%'
-                                                        GROUP BY
-                                                            ts.Id) T2,
-                                                        [type_on_willie].[dbo].[TypeSessions]
-                                                    WHERE 
-                                                        ts.User = @userId
-                                                        AND ts.Quit = 'N'";
+                                                            ts.UserId = '7800AC1E-28E6-4F6C-964E-AC24063E2EDF'
+                                                            AND ts.Quit = 'N') T1,
+                                                        (SELECT 
+                                                            AVG(([PunctuationCount] - ms_count) * 1.0 /[PunctuationCount] * 1.0) AS 'Punctuation'
+                                                        FROM
+                                                            [type_on_willie].[dbo].[TypeSessions] ts,
+                                                            [type_on_willie].[dbo].[Sonnets] s,
+                                                            (SELECT 
+                                                                COUNT(ts.SonnetId) AS 'ms_count'
+                                                            FROM
+                                                                [type_on_willie].[dbo].[TypeSessions] ts
+                                                            INNER JOIN
+                                                                [type_on_willie].[dbo].[Misspellings] m
+                                                                ON ts.Id = m.TypeSessionId
+                                                            WHERE 
+                                                                ts.UserId = '7800AC1E-28E6-4F6C-964E-AC24063E2EDF'
+                                                                AND m.ModelWord LIKE '%[,.?!;:''""$]%'
+                                                            GROUP BY ts.Id) T2
+                                                        WHERE ts.SonnetId = s.Id) T3,	
+                                                    (SELECT
+                                                        AVG(([CapitalLetterCount]-cap_count) * 1.0/[CapitalLetterCount]) AS 'CapitalLetters'
+                                                    FROM 
+                                                        [type_on_willie].[dbo].[TypeSessions] ts,
+                                                        [type_on_willie].[dbo].[Sonnets] s,
+                                                        (SELECT 
+                                                                COUNT(ts.Id) AS 'cap_count'
+                                                            FROM
+                                                                [type_on_willie].[dbo].[TypeSessions] ts
+                                                            INNER JOIN
+                                                                [type_on_willie].[dbo].[Misspellings] m
+                                                                ON ts.Id = m.TypeSessionId
+                                                            WHERE 
+                                                                ts.UserId = '7800AC1E-28E6-4F6C-964E-AC24063E2EDF'
+                                                                AND m.ModelWord COLLATE Latin1_General_Bin LIKE '%[A-Z]%'
+                                                            GROUP BY ts.Id) T4
+                                                    WHERE ts.SonnetId = s.Id) T5";
     }
 }
