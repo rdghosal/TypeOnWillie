@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -71,13 +72,47 @@ namespace TypeOnWillie.DataAccess
             }
         }
 
-        public IEnumerable<TypeSession> SelectTypeSessions(UserDto userDto)
+        public ProfileDto SelectProfile(ProfileParamsDto params_)
         {
-            using (_sqlConnection)
+            ProfileDto profile = new ProfileDto();
+
+            using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-                _sqlConnection.Open();
-                return _sqlConnection.Query<TypeSession>(TypeSessionCommand.SELECT_ALL, new { userId = userDto.Id });
+                profile.Metrics = _sqlConnection.Query<UserMetrics>(
+                    TypeSessionCommand.SELECT_USER_METRICS, 
+                    new { userId = params_.UserId }).FirstOrDefault();
+
+                profile.TopMisspellings = _sqlConnection.Query<string>(
+                    MisspellingCommand.SELECT_TOP10,
+                    new { userId = params_.UserId });
+
+                profile.Records = _sqlConnection.Query<RecordCollection>(
+                    TypeSessionCommand.SELECT_TOP_SCORES,
+                    new { userId = params_.UserId }).FirstOrDefault();
+
+                profile.Scores = SelectScores(params_);
+
+                return profile;
             }
         }
+        
+        private IEnumerable<ScoreCollection> SelectScores(ProfileParamsDto params_)
+        {
+            using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
+            {
+                if (params_.CurrentDate != null)
+                {
+                    return _sqlConnection.Query<ScoreCollection>(
+                        TypeSessionCommand.SELECT_SCORES_LASTYEAR,
+                        new { userId = params_.UserId, endDate = params_.CurrentDate });
+                }
+                else
+                {
+                    return _sqlConnection.Query<ScoreCollection>(
+                        TypeSessionCommand.SELECT_SCORES_BYMONTH,
+                        new { userId = params_.UserId, month = params_.Month, year = params_.Year });
+                }
+            }
+        } 
     }
 }

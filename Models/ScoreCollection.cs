@@ -7,31 +7,11 @@ namespace TypeOnWillie.Models
 {
     public class ScoreCollection
     {
-        private readonly RangeType _rangeType;
-        private readonly DateTime _dtStart;
-        private readonly DateTime _dtEnd = DateTime.Now;
+        public double AverageAccuracy { get; set; }
 
-        public ScoreCollection(DateTime dtStart)
-        {
-            _dtStart = dtStart;
-        }
+        public double AverageTime { get; set; }
 
-        public ScoreCollection(RangeType rangeType, DateTime dtStart)
-        {
-            _rangeType = rangeType;
-            _dtStart = dtStart;
-        }
-
-        public ScoreCollection(RangeType rangeType, DateTime dtStart, DateTime dtEnd)
-        {
-            _rangeType = rangeType;
-            _dtStart = dtStart;
-            _dtEnd = dtEnd;
-        }
-
-        // (float)AVG(CorrectWordCount/TypedWordCount)
-        IEnumerable<AverageAccuracy> AverageAccuracySet { get; set; }
-        IEnumerable<AverageWpm> AverageWpmSet { get; set; }
+        public int AverageWpm { get; set; }
     }
 
     public enum RangeType

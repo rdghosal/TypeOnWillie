@@ -23,21 +23,9 @@ namespace TypeOnWillie.Services
             _daoSonnets = sonnetSqlDao;
         }
 
-        public ProfileDto GetUserProfile(UserDto userDto, RangeType rt, DateTime start, DateTime end)
+        public ProfileDto GetUserProfile(ProfileParamsDto params_)
         {
-            ProfileDto profileDto = new ProfileDto();
-
-            profileDto.User = _daoUsers.SelectUser(userDto);
-            profileDto.Scores = _daoTypeSessions.SelectScores(rt, start, end);
-            profileDto.TopMisspellings = _daoMisspellings.SelectMisspellings();
-
-            profileDto.FavoriteSonnet = _daoSonnets.SelectTopSonnet(userDto);
-            profileDto.BestAccuracy = _daoTypeSessions.SelectTopAccuracy(userDto);
-            profileDto.BestWpm = _daoTypeSessions.SelectTopWpm(userDto);
-            profileDto.BestTime = _daoTypeSessions.SelectTopTime(userDto);
-
-            // Convert to List for access in view ?
-            return profileDto;
+            return _daoTypeSessions.SelectProfile(params_);
         }
     }
 }

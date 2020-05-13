@@ -27,6 +27,7 @@ namespace TypeOnWillie.DataAccess
 
         public const string SELECT_SCORES_LASTYEAR = @"SELECT 
                                                         MONTH([DateTime]) AS 'Month', 
+                                                        AVG([SecondsElapsed]) AS 'AverageTime',
                                                         AVG([TypedWordCount]*60 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
@@ -37,6 +38,7 @@ namespace TypeOnWillie.DataAccess
 
         public const string SELECT_SCORES_BYMONTH = @"SELECT
                                                         DAY([DateTime]) AS 'Day',
+                                                        AVG([SecondsElapsed]) AS 'AverageTime',
                                                         AVG([TypedWordCount]*60 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
