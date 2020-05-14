@@ -68,13 +68,27 @@ namespace TypeOnWillie.DataAccess
                         typedWord = wt.TypedWord
                     });
                 }
-
             }
         }
 
-        public ProfileDto SelectProfile(ProfileParamsDto params_)
+        public SysProfileDto SelectSysProfile(ProfileParamsDto params_)
         {
-            ProfileDto profile = new ProfileDto();
+            SysProfileDto sysProfile = new SysProfileDto();
+
+            using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
+            {
+                sysProfile.Metrics = _sqlConnection.Query<UserMetrics>(
+                    TypeSessionCommand.SELECT_ALL_METRICS).FirstOrDefault();
+
+                sysProfile.Scores = SelectSysScores(params_);
+            }
+
+            return sysProfile;
+        }
+
+        public UserProfileDto SelectProfile(ProfileParamsDto params_)
+        {
+            UserProfileDto profile = new UserProfileDto();
 
             using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
@@ -114,5 +128,24 @@ namespace TypeOnWillie.DataAccess
                 }
             }
         } 
+
+        private IEnumerable<ScoreCollection> SelectSysScores(ProfileParamsDto params_)
+        {
+            using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
+            {
+                if (params_.CurrentDate != null)
+                {
+                    return _sqlConnection.Query<ScoreCollection>(
+                        TypeSessionCommand.SELECT_SCORES_LASTYEAR_ALL,
+                        new { endDate = params_.CurrentDate });
+                }
+                else
+                {
+                    return _sqlConnection.Query<ScoreCollection>(
+                        TypeSessionCommand.SELECT_SCORES_BYMONTH_ALL,
+                        new { month = params_.Month, year = params_.Year });
+                }
+            }
+        }
     }
 }

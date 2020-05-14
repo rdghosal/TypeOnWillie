@@ -27,9 +27,22 @@ namespace TypeOnWillie.Controllers
         [Authorize]
         public ActionResult GetProfile(ProfileParamsDto params_)
         {
-            ProfileDto profileDto = _service.GetUserProfile(params_);
+            UserProfileDto profileDto = _service.GetUserProfile(params_);
+            SysProfileDto sysProfileDto = _service.GetSysProfile(params_);
+
+            dynamic response = new {
+                userData = profileDto,
+                overallData = sysProfileDto
+            };
+
             if (profileDto == null) BadRequest();
             return Ok(profileDto);
+        }
+        
+        public ActionResult GetSysProfile(ProfileParamsDto params_)
+        {
+            SysProfileDto sysProfile = _service.GetSysProfile(params_);
+            return Ok(sysProfile);
         }
 
     }

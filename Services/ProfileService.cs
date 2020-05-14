@@ -16,9 +16,14 @@ namespace TypeOnWillie.Services
             _daoTypeSessions = typeSessionSqlDao;
         }
 
-        public ProfileDto GetUserProfile(ProfileParamsDto params_)
+        public UserProfileDto GetUserProfile(ProfileParamsDto params_)
         {
             return _daoTypeSessions.SelectProfile(params_);
+        }
+
+        public SysProfileDto GetSysProfile(ProfileParamsDto params_)
+        {
+            return _daoTypeSessions.SelectSysProfile(params_);
         }
     }
 }
