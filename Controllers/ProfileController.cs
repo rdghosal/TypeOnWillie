@@ -39,6 +39,8 @@ namespace TypeOnWillie.Controllers
             return Ok(profileDto);
         }
         
+        [HttpPost]
+        [Route("Guest")]
         public ActionResult GetSysProfile(ProfileParamsDto params_)
         {
             SysProfileDto sysProfile = _service.GetSysProfile(params_);

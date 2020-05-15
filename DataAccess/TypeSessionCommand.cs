@@ -43,7 +43,7 @@ namespace TypeOnWillie.DataAccess
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                      WHERE ts.UserId = @userId
                                                         AND ts.Quit = 'N'
-                                                        AND ts.DateTime BETWEEN DATEADD(year, -1, @endDate AND @endDate
+                                                        AND ts.DateTime BETWEEN DATEADD(year, -1, @endDate) AND @endDate
                                                      GROUP BY MONTH([DateTime]);";
 
         public const string SELECT_SCORES_BYMONTH = @"SELECT
@@ -65,7 +65,7 @@ namespace TypeOnWillie.DataAccess
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                      WHERE ts.Quit = 'N'
-                                                        AND ts.DateTime BETWEEN DATEADD(year, -1, @endDate AND @endDate
+                                                        AND ts.DateTime BETWEEN DATEADD(year, -1, @endDate) AND @endDate
                                                      GROUP BY MONTH([DateTime]);";
 
         public const string SELECT_SCORES_BYMONTH_ALL = @"SELECT
