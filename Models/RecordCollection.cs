@@ -7,7 +7,7 @@ namespace TypeOnWillie.Models
 {
     public class RecordCollection
     {
-        public string FavoriteSonnet { get; set; }
+        public int FavoriteSonnet { get; set; }
         public int TopAccuracy { get; set; }
         public int TopWpm { get; set; }
         public int TopTime { get; set; }

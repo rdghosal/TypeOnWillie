@@ -6,15 +6,42 @@ import { AppContext } from './App';
 import { User } from "./AuthUtils"
 import { LoadingMessage } from './LoadingMessage';
 
-const Profile : React.FC = () => {
+export const Profile : React.FC = () => {
 
     const { user, accessToken, setUser } = useContext(AppContext);
-    const [ data, setData ] = useState<Array<Object>>([]);
-    useEffect(() => {
-        // fetch data
-    }, []);
+    const [ profileData, setProfile ] = useState<Profile | null>(null);
+    const [ scoreType, setScoreType ] = useState<ScoreType>(ScoreType.ACCURACY);
+    const [ dateType, setDateType ] = useState<DateType>(DateType.MONTH);
+    const [ progressLineData, setProgressLine ] = useState<Array<ScorePoint>|null>(null);
 
-    if (!user) {
+    useEffect(() => {
+        if(!user) {
+            return;
+        }
+
+        if (!profileData) {
+            fetch("/api/profile/", {
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ // TODO make params class
+                    userId : user.id, 
+                    currentDate : new Date().toISOString()
+                })
+
+            }).then(resp => {
+                if (!resp.ok) {
+                    return console.log("Failed to fetch profile!");
+                }
+
+                return resp.json();
+            }).then(data => {
+                setProfile(data);
+                setProgressLine(ScoreFactory(data.Scores,scoreType, dateType))
+            }); 
+        }
+
+    }, [user]);
+
+    if (!profileData || !user) {
         return (
             <>
             <Navbar />
@@ -22,6 +49,7 @@ const Profile : React.FC = () => {
             </>
         );
     }
+
     return (
             <>
                 <Navbar />
@@ -29,7 +57,7 @@ const Profile : React.FC = () => {
                     <div className="col-8 profile__greeting">Welcome back, {user.username}</div>
                     <div className="col-8 profile__global-stats"></div>
                     <div className="profile__user-stats container-fluid">
-                        <ProgressLine />
+                        { progressLineData && <ProgressLine data={progressLineData} />}
                         <SkillsGraph />
                     </div>
                 </div>
@@ -37,4 +65,87 @@ const Profile : React.FC = () => {
     );
 }
 
-export default Profile;
+type Profile = {
+    user: User,
+    scores: Array<ScoreCollection>,
+    metrics: UserMetrics,
+    records: RecordCollection,
+    topMisspellings: Array<string>
+};
+
+
+export type UserMetrics = {
+    punctuation : number,
+    capitalLetters : number,
+    averageAccuracy : number,
+    averageWpm : number, 
+    averageTime : number
+};
+
+export type RecordCollection = {
+
+    favoriteSonnet: number,
+    topTime: number,
+    topAccuracy: number, // make into tuple w/ date?
+    topWpm: number
+
+};
+
+export type ScoreCollection = {
+    averageAccuracy?: number,
+    averageWpm?: number,
+    averageTime?: number,
+    month?: Date,
+    day?: Date
+};
+
+export class ScorePoint {
+
+    private readonly _x : Date;
+    private readonly _y : number;
+
+    constructor(x: Date, y: number) {
+        this._x = x;
+        this._y = y;
+    }
+}
+
+export enum ScoreType {
+    ACCURACY,
+    WPM,
+    TIME
+};
+
+export enum DateType {
+    MONTH,
+    DAY
+};
+
+function ScoreFactory(scoreData: Array<ScoreCollection>, scoreType : ScoreType, dateType: DateType) : Array<ScorePoint> {
+
+    return scoreData.map(data => {
+        
+        let x : Date;
+        let y : number;
+
+        x = (dateType === DateType.MONTH) ? data.month! : data.day!;
+
+        switch (scoreType) {
+            case ScoreType.ACCURACY:
+                y = data.averageAccuracy!;
+                break;
+            case ScoreType.WPM:
+                y = data.averageWpm!;
+                break;
+            case ScoreType.TIME:
+                y = data.averageTime!;
+                break;
+            default:
+                break;
+        }
+
+        const p = new ScorePoint(x, y!);
+        return p;
+    });
+}
+
