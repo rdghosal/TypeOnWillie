@@ -13,6 +13,7 @@ export const Profile : React.FC = () => {
     const [ scoreType, setScoreType ] = useState<ScoreType>(ScoreType.ACCURACY);
     const [ dateType, setDateType ] = useState<DateType>(DateType.MONTH);
     const [ progressLineData, setProgressLine ] = useState<Array<ScorePoint>|null>(null);
+    const [ skillsGraphData, setSkillsGraph ] = useState<UserMetrics|null>(null);
 
     useEffect(() => {
         if(!user) {
@@ -34,8 +35,9 @@ export const Profile : React.FC = () => {
 
                 return resp.json();
             }).then(data => {
-                setProfile(data);
-                setProgressLine(ScoreFactory(data.Scores,scoreType, dateType))
+                setProfile(data.userData);
+                setProgressLine(ScoreFactory(data.userData.scores, scoreType, dateType));
+                setSkillsGraph(data.userData.metrics);
             }); 
         }
 
@@ -58,7 +60,17 @@ export const Profile : React.FC = () => {
                     <div className="col-8 profile__global-stats"></div>
                     <div className="profile__user-stats container-fluid">
                         { progressLineData && <ProgressLine data={progressLineData} />}
-                        <SkillsGraph />
+                        { skillsGraphData && <SkillsGraph data={skillsGraphData} /> }
+                    </div>
+                    <div className="profile__controls container-fluid">
+                        <select name="progressType">
+                            <option value={ScoreType.ACCURACY}>Accuracy</option>
+                            <option value={ScoreType.WPM}>WPM</option>
+                            <option value={ScoreType.TIME}>Time</option>
+                        </select>
+                        <div className="controls__date">
+                            <input type="radio" name="" id=""/>
+                        </div>
                     </div>
                 </div>
             </>
