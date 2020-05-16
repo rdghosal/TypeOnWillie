@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, ChangeEvent } from 'react';
 import ProgressLine from './ProgressLine';
 import SkillsGraph from './SkillsGraph';
 import Navbar from './Navbar';
@@ -12,8 +12,10 @@ export const Profile : React.FC = () => {
     const [ profileData, setProfile ] = useState<Profile | null>(null);
     const [ scoreType, setScoreType ] = useState<ScoreType>(ScoreType.ACCURACY);
     const [ dateType, setDateType ] = useState<DateType>(DateType.MONTH);
+    const [ selectMonth, setMonth ] = useState<number|null>(null);
+    const [ selectYear, setYear ] = useState<number|null>(null);
     const [ progressLineData, setProgressLine ] = useState<Array<ScorePoint>|null>(null);
-    const [ skillsGraphData, setSkillsGraph ] = useState<UserMetrics|null>(null);
+    const [ skillsGraphData, setSkillsGraph ] = useState<SkillsGraphData|null>(null);
 
     useEffect(() => {
         if(!user) {
@@ -21,11 +23,15 @@ export const Profile : React.FC = () => {
         }
 
         if (!profileData) {
-            fetch("/api/profile/", {
+            const url = (user.id === "guest") ? "/api/profile/guest" : "api/profile";
+
+            fetch(url, {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ // TODO make params class
                     userId : user.id, 
-                    currentDate : new Date().toISOString()
+                    month: (selectMonth) ? selectMonth : null,
+                    year: (selectMonth) ? selectYear : null,
+                    currentDate : (dateType === DateType.MONTH) ? new Date().toISOString(): null
                 })
 
             }).then(resp => {
@@ -36,12 +42,36 @@ export const Profile : React.FC = () => {
                 return resp.json();
             }).then(data => {
                 setProfile(data.userData);
-                setProgressLine(ScoreFactory(data.userData.scores, scoreType, dateType));
-                setSkillsGraph(data.userData.metrics);
+                setProgressLine(scoreFactory(data.userData.scores, scoreType, dateType));
+                setSkillsGraph(skillsDataFactory(data.userData.metrics));
             }); 
         }
 
-    }, [user]);
+    }, [user, scoreType, dateType]);
+
+    const handleRadioChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+        setDateType(parseInt(e.target.value));
+        
+    };
+
+    const handleSelect = (e: React.SyntheticEvent<HTMLSelectElement>) => {
+        setScoreType(parseInt(e.currentTarget.value));    
+    };
+
+    const handleDateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.id === "selMonth") {
+            return setMonth(parseInt(e.target.value));
+        }
+
+        let year = parseInt(e.target.value);
+        const currYear = new Date().getFullYear();
+
+        if (year < 2018 && year > currYear) {
+            year = currYear
+        }
+
+        return setYear(year);
+    };
 
     if (!profileData || !user) {
         return (
@@ -63,13 +93,25 @@ export const Profile : React.FC = () => {
                         { skillsGraphData && <SkillsGraph data={skillsGraphData} /> }
                     </div>
                     <div className="profile__controls container-fluid">
-                        <select name="progressType">
+                        <select name="progressType" onSelect={e => handleSelect(e)}>
                             <option value={ScoreType.ACCURACY}>Accuracy</option>
                             <option value={ScoreType.WPM}>WPM</option>
                             <option value={ScoreType.TIME}>Time</option>
                         </select>
                         <div className="controls__date">
-                            <input type="radio" name="" id=""/>
+                            <input type="radio" name="dateType" value={DateType.MONTH}
+                                onChange={e => handleRadioChange(e)}/>
+                            <input type="radio" name="dateType" value={DateType.DAY}
+                                onChange={e => handleRadioChange(e)}/>
+                                {
+                                    dateType === DateType.MONTH &&
+                                        <div className="container">
+                                            <input type="month" name="month" 
+                                                id="selMonth" onChange={e => handleDateInput(e)}/>
+                                            <input type="number" name="year" 
+                                                id="selYear" onChange={e => handleDateInput(e)}/> 
+                                        </div>
+                                }
                         </div>
                     </div>
                 </div>
@@ -84,7 +126,6 @@ type Profile = {
     records: RecordCollection,
     topMisspellings: Array<string>
 };
-
 
 export type UserMetrics = {
     punctuation : number,
@@ -111,6 +152,7 @@ export type ScoreCollection = {
     day?: Date
 };
 
+
 export class ScorePoint {
 
     private readonly _x : Date;
@@ -120,6 +162,15 @@ export class ScorePoint {
         this._x = x;
         this._y = y;
     }
+}
+
+export type SkillsGraphData = {
+    labels: Array<string>,
+    datasets: Array<SkillsGraphDataset>
+};
+
+export type SkillsGraphDataset = {
+    userData: Array<number>
 }
 
 export enum ScoreType {
@@ -133,7 +184,26 @@ export enum DateType {
     DAY
 };
 
-function ScoreFactory(scoreData: Array<ScoreCollection>, scoreType : ScoreType, dateType: DateType) : Array<ScorePoint> {
+function skillsDataFactory(userMetrics : UserMetrics) : SkillsGraphData {
+    
+    const skillsDataset = {
+        labels: ["Punctuation", "CapitalLetters", "AverageAccuracy", "AverageWpm", "AverageTime"],
+        datasets: [{
+            userData: [
+                userMetrics.punctuation,
+                userMetrics.capitalLetters,
+                userMetrics.averageAccuracy,
+                userMetrics.averageWpm,
+                userMetrics.averageTime
+            ]
+        }]
+    };
+
+    return skillsDataset;
+}
+
+
+function scoreFactory(scoreData: Array<ScoreCollection>, scoreType : ScoreType, dateType: DateType) : Array<ScorePoint> {
 
     return scoreData.map(data => {
         
@@ -160,4 +230,3 @@ function ScoreFactory(scoreData: Array<ScoreCollection>, scoreType : ScoreType, 
         return p;
     });
 }
-
