@@ -5,11 +5,12 @@ import Navbar from './Navbar';
 import { AppContext } from './App';
 import { User } from "./AuthUtils"
 import { LoadingMessage } from './LoadingMessage';
+import RecordsTable from './RecordsTable';
 
 export const Profile : React.FC = () => {
 
-    const { user, accessToken, setUser } = useContext(AppContext);
-    const [ profileData, setProfile ] = useState<Profile | null>(null);
+    const { user } = useContext(AppContext);
+    const [ profileData, setProfile ] = useState<Profile|null>(null);
     const [ scoreType, setScoreType ] = useState<ScoreType>(ScoreType.ACCURACY);
     const [ dateType, setDateType ] = useState<DateType>(DateType.MONTH);
     const [ selectMonth, setMonth ] = useState<number|null>(null);
@@ -89,6 +90,7 @@ export const Profile : React.FC = () => {
                     <div className="col-8 profile__greeting">Welcome back, {user.username}</div>
                     <div className="col-8 profile__global-stats"></div>
                     <div className="profile__user-stats container-fluid">
+                        <RecordsTable data={profileData.records} />
                         { progressLineData && <ProgressLine data={progressLineData} />}
                         { skillsGraphData && <SkillsGraph data={skillsGraphData} /> }
                     </div>
