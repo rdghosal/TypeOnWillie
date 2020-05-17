@@ -13,9 +13,9 @@ namespace TypeOnWillie.Models
 
         public int AverageWpm { get; set; }
         
-        public DateTime Month { get; set; }
+        public int Month { get; set; }
 
-        public DateTime Day { get; set; }
+        public int Day { get; set; }
     }
 
     public enum RangeType

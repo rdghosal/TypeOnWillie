@@ -127,7 +127,7 @@ namespace TypeOnWillie.DataAccess
                         new { userId = params_.UserId, month = params_.Month, year = params_.Year });
                 }
             }
-        } 
+        }
 
         private IEnumerable<ScoreCollection> SelectSysScores(ProfileParamsDto params_)
         {

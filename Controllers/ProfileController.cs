@@ -24,7 +24,6 @@ namespace TypeOnWillie.Controllers
         }
 
         // POST: api/Profile/5
-        [Authorize]
         public ActionResult GetProfile(ProfileParamsDto params_)
         {
             UserProfileDto profileDto = _service.GetUserProfile(params_);
@@ -36,7 +35,7 @@ namespace TypeOnWillie.Controllers
             };
 
             if (profileDto == null) BadRequest();
-            return Ok(profileDto);
+            return Ok(response);
         }
         
         [HttpPost]
