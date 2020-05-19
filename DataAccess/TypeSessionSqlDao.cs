@@ -92,8 +92,8 @@ namespace TypeOnWillie.DataAccess
 
             using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-                profile.Metrics = _sqlConnection.Query<UserMetrics>(
-                    TypeSessionCommand.SELECT_USER_METRICS, 
+                profile.Percentiles = _sqlConnection.Query<PercentileCollection>(
+                    TypeSessionCommand.SELECT_USER_PERCENTILES, 
                     new { userId = params_.UserId }).FirstOrDefault();
 
                 profile.TopMisspellings = _sqlConnection.Query<string>(

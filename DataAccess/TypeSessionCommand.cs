@@ -96,7 +96,7 @@ namespace TypeOnWillie.DataAccess
                                                                 WHERE ts.UserId = @userId
                                                                 GROUP BY [SonnetId]) T))) AS 'FavoriteSonnet',
                                                     (SELECT 
-                                                        MAX([TypedWordCount]*60 / [SecondsElapsed])
+                                                        MAX([TypedWordCount]*60.0 / [SecondsElapsed])
                                                     FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                     WHERE ts.UserId = @userId
                                                         AND ts.Quit = 'N') AS 'TopWpm',
@@ -111,6 +111,7 @@ namespace TypeOnWillie.DataAccess
                                                     WHERE ts.UserId = @userId
                                                         AND ts.Quit = 'N') AS 'TopTime'
                                                 FROM [type_on_willie].[dbo].[TypeSessions];";
+
 
         public const string SELECT_ALL_METRICS = @"SELECT 
                                                         T1.AverageAccuracy
@@ -208,5 +209,209 @@ namespace TypeOnWillie.DataAccess
                                                                 AND m.ModelWord COLLATE Latin1_General_Bin LIKE '%[A-Z]%'
                                                             GROUP BY ts.Id) T4
                                                     WHERE ts.SonnetId = s.Id) T5";
+
+		public const string SELECT_USER_PERCENTILES = @"SELECT 
+                                                        AccuracyPercentile
+                                                        , TimePercentile
+                                                        , WpmPercentile
+                                                        , CapitalLetterPercentile
+                                                        , PunctuationPercentile
+                                                    FROM 
+                                                        (SELECT 
+                                                            lt_cnt * 1.0 / a * 1.0 AS 'AccuracyPercentile'
+                                                        FROM 
+                                                            (SELECT 
+                                                                COUNT(lt) AS 'lt_cnt'
+                                                            FROM 
+                                                                (SELECT DISTINCT 
+                                                                    userid AS 'lt'
+                                                                FROM 
+                                                                    type_on_willie.dbo.TypeSessions ts
+                                                                WHERE 
+                                                                    quit = 'N'
+                                                                    AND UserID <> @userId
+                                                                GROUP BY 
+                                                                    UserID
+                                                                HAVING 
+                                                                    AVG(CorrectWordCount * 1.0 / TypedWordCount) < 
+                                                                        (SELECT 
+                                                                            AVG(CorrectWordCount * 1.0/TypedWordCount)
+                                                                        FROM 
+                                                                            type_on_willie.dbo.TypeSessions ts
+                                                                        WHERE 
+                                                                            userid = @userId
+                                                                        AND quit = 'N')) T) T2,
+                                                                (SELECT 
+                                                                    COUNT(DISTINCT userid) As 'a'
+                                                                FROM 
+                                                                    type_on_willie.dbo.TypeSessions ts
+                                                                WHERE 
+                                                                    quit = 'N') T3) A,
+                                                        (SELECT 
+                                                            lt_cnt * 1.0 / a * 1.0 AS 'TimePercentile'
+                                                        FROM 
+                                                            (SELECT 
+                                                                COUNT(lt) AS 'lt_cnt'
+                                                            FROM 
+                                                                (SELECT DISTINCT 
+                                                                    userid AS 'lt'
+                                                                FROM 
+                                                                    type_on_willie.dbo.TypeSessions ts
+                                                                WHERE 
+                                                                    quit = 'N'
+                                                                    AND UserID <> @userId
+                                                                GROUP BY 
+                                                                    UserID
+                                                                HAVING
+                                                                    AVG(SecondsElapsed * 1.0) < 
+                                                                        (SELECT 
+                                                                            AVG(SecondsElapsed * 1.0)
+                                                                        FROM 
+                                                                            type_on_willie.dbo.TypeSessions ts
+                                                                        WHERE 
+                                                                            userid = @userId
+                                                                        AND 
+                                                                            quit = 'N')) T) T2,
+                                                                (SELECT 
+                                                                    COUNT(DISTINCT userid) As 'a'
+                                                                FROM 
+                                                                    type_on_willie.dbo.TypeSessions ts
+                                                                WHERE 
+                                                                    quit = 'N') T3) B,
+                                                        (SELECT 
+                                                            lt_cnt * 1.0 / a * 1.0 AS 'WpmPercentile'
+                                                        FROM 
+                                                            (SELECT 
+                                                                COUNT(lt) AS 'lt_cnt' 
+                                                            FROM 
+                                                                (SELECT DISTINCT 
+                                                                    userid AS 'lt'
+                                                                FROM 
+                                                                    type_on_willie.dbo.TypeSessions ts
+                                                                WHERE 
+                                                                    quit = 'N'
+                                                                    AND UserID <> @userId
+                                                                GROUP 
+                                                                    BY UserID
+                                                                HAVING 
+                                                                    AVG(TypedWordCount/SecondsElapsed * 60.0) < 
+                                                                        (SELECT 
+                                                                            AVG(TypedWordCount/SecondsElapsed * 60.0)
+                                                                        FROM 
+                                                                            type_on_willie.dbo.TypeSessions ts
+                                                                        WHERE 
+                                                                            userid = @userId
+                                                                            AND quit = 'N')) T) T2,
+                                                                (SELECT 
+                                                                    COUNT(DISTINCT userid) As 'a'
+                                                                FROM 
+                                                                    type_on_willie.dbo.TypeSessions ts
+                                                                WHERE 
+                                                                    quit = 'N') T3) C,
+                                                    (SELECT 
+                                                            lt_cnt * 1.0 / a * 1.0 AS 'PunctuationPercentile'
+                                                        FROM 
+                                                            (SELECT 
+                                                                COUNT(lt) AS 'lt_cnt'
+                                                            FROM 
+                                                                (SELECT DISTINCT 
+                                                                    userid AS 'lt'
+                                                                FROM
+                                                                    [type_on_willie].[dbo].[TypeSessions] ts,
+                                                                    [type_on_willie].[dbo].[Sonnets] s,
+                                                                    (SELECT
+                                                                        COUNT(ts.SonnetId) AS 'ms_count'
+                                                                    FROM
+                                                                        [type_on_willie].[dbo].[TypeSessions] ts
+                                                                    INNER JOIN
+                                                                        [type_on_willie].[dbo].[Misspellings] m
+                                                                        ON ts.Id = m.TypeSessionId
+                                                                    WHERE
+                                                                        ts.UserId = @userId
+                                                                        AND m.ModelWord LIKE '%[,.:;!?-""''\[\]]%' ESCAPE '\'
+                                                                    GROUP BY ts.Id) T2
+                                                                WHERE ts.SonnetId = s.Id
+                                                                    AND ts.quit = 'N'
+                                                                    AND UserID <> @userId
+                                                                GROUP BY 
+                                                                    UserID
+                                                                HAVING
+                                                                    AVG(([PunctuationCount] - ms_count) * 1.0 /[PunctuationCount] * 1.0) >
+                                                                        (SELECT
+                                                                            AVG(([PunctuationCount] - ms_count) * 1.0 /[PunctuationCount] * 1.0) AS 'Punctuation'
+                                                                        FROM
+                                                                            [type_on_willie].[dbo].[TypeSessions] ts,
+                                                                            [type_on_willie].[dbo].[Sonnets] s,
+                                                                            (SELECT
+                                                                                COUNT(ts.SonnetId) AS 'ms_count'
+                                                                            FROM
+                                                                                [type_on_willie].[dbo].[TypeSessions] ts
+                                                                            INNER JOIN
+                                                                                [type_on_willie].[dbo].[Misspellings] m
+                                                                                ON ts.Id = m.TypeSessionId
+                                                                            WHERE
+                                                                                ts.UserId = @userId
+                                                                                AND m.ModelWord LIKE '%[,.:;!?-""''\[\]]%' ESCAPE '\'
+                                                                            GROUP BY ts.Id) T2
+                                                                        WHERE ts.SonnetId = s.Id)) T3) T4,
+                                                                (SELECT 
+                                                                    COUNT(DISTINCT userid) As 'a'
+                                                                FROM 
+                                                                    type_on_willie.dbo.TypeSessions ts
+                                                                WHERE 
+                                                                    quit = 'N') T5) D,
+                                                    (SELECT 
+                                                            lt_cnt * 1.0 / a * 1.0 AS 'CapitalLetterPercentile'
+                                                        FROM 
+                                                            (SELECT 
+                                                                COUNT(lt) AS 'lt_cnt'
+                                                            FROM 
+                                                                (SELECT DISTINCT 
+                                                                    userid AS 'lt'
+                                                                FROM
+                                                                    [type_on_willie].[dbo].[TypeSessions] ts,
+                                                                    [type_on_willie].[dbo].[Sonnets] s,
+                                                                    (SELECT
+                                                                        COUNT(ts.SonnetId) AS 'cap_count'
+                                                                    FROM
+                                                                        [type_on_willie].[dbo].[TypeSessions] ts
+                                                                    INNER JOIN
+                                                                        [type_on_willie].[dbo].[Misspellings] m
+                                                                        ON ts.Id = m.TypeSessionId
+                                                                    WHERE
+                                                                        ts.UserId = @userId
+                                                                        AND m.ModelWord COLLATE Latin1_General_Bin LIKE '%[A-Z]%'
+                                                                    GROUP BY ts.Id) T2
+                                                                WHERE ts.SonnetId = s.Id
+                                                                    AND ts.quit = 'N'
+                                                                    AND UserID <> @userId
+                                                                GROUP BY 
+                                                                    UserID
+                                                                HAVING
+                                                                    AVG(([PunctuationCount] - cap_count) * 1.0 /[PunctuationCount] * 1.0) >
+                                                                        (SELECT
+                                                                            AVG(([PunctuationCount] - ms_count) * 1.0 /[PunctuationCount] * 1.0)
+                                                                        FROM
+                                                                            [type_on_willie].[dbo].[TypeSessions] ts,
+                                                                            [type_on_willie].[dbo].[Sonnets] s,
+                                                                            (SELECT
+                                                                                COUNT(ts.SonnetId) AS 'ms_count'
+                                                                            FROM
+                                                                                [type_on_willie].[dbo].[TypeSessions] ts
+                                                                            INNER JOIN
+                                                                                [type_on_willie].[dbo].[Misspellings] m
+                                                                                ON ts.Id = m.TypeSessionId
+                                                                            WHERE
+                                                                                ts.UserId = @userId
+                                                                                AND m.ModelWord COLLATE Latin1_General_Bin LIKE '%[A-Z]%'
+                                                                            GROUP BY ts.Id) T2
+                                                                        WHERE ts.SonnetId = s.Id)) T3) T4,
+                                                                (SELECT 
+                                                                    COUNT(DISTINCT userid) As 'a'
+                                                                FROM 
+                                                                    type_on_willie.dbo.TypeSessions ts
+                                                                WHERE 
+                                                                    quit = 'N') T5) E;";
+
+        }
     }
-}

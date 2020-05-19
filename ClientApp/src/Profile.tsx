@@ -44,10 +44,10 @@ export const Profile: React.FC = () => {
                 return resp.json();
             }).then(data => {
                 console.log(data)
-                setProfile(data.userData);
-                console.log(scoreFactory(data.userData.scores, scoreType!, dateType!))
-                setProgressLine(scoreFactory(data.userData.scores, scoreType!, dateType!));
-                setSkillsGraph(skillsDataFactory(data.userData.metrics, data.overallData.metrics));
+                setProfile(data);
+                console.log(scoreFactory(data.scores, scoreType!, dateType!))
+                setProgressLine(scoreFactory(data.scores, scoreType!, dateType!));
+                setSkillsGraph(skillsDataFactory(data.percentiles));
             });
         }
 
@@ -134,6 +134,7 @@ type Profile = {
     user: User,
     scores: Array<ScoreCollection>,
     metrics: UserMetrics,
+    percentiles: Array<PercentileCollection>,
     records: RecordCollection,
     topMisspellings: Array<string>
 };
@@ -145,6 +146,14 @@ export type UserMetrics = {
     averageWpm : number, 
     averageTime : number
 };
+
+export type PercentileCollection = {
+    punctuationPercentile: number,
+    capitalLetterPercentile: number,
+    accuracyPercentile: number,
+    wpmPercentile: number,
+    timePercentile: number
+}
 
 export type RecordCollection = {
 
@@ -263,28 +272,19 @@ export enum DateType {
     DAY
 };
 
-function skillsDataFactory(userMetrics : UserMetrics, overallMetrics: UserMetrics) : SkillsGraphData {
+function skillsDataFactory(percentiles : PercentileCollection) : SkillsGraphData {
     
     const skillsDataset = {
-        labels: ["Punctuation", "CapitalLetters", "AverageAccuracy", "AverageWpm", "AverageTime"],
+        labels: ["Punctuation", "CapitalLetters", "Accuracy", "Wpm", "Time"],
         datasets: [{
             data: [
-                userMetrics.punctuation,
-                userMetrics.capitalLetters,
-                userMetrics.averageAccuracy,
-                userMetrics.averageWpm,
-                userMetrics.averageTime
+                percentiles.punctuationPercentile,
+                percentiles.capitalLetterPercentile,
+                percentiles.accuracyPercentile,
+                percentiles.wpmPercentile,
+                percentiles.timePercentile
             ],
             label: "User"
-        },{
-            data: [
-                overallMetrics.punctuation,
-                overallMetrics.capitalLetters,
-                overallMetrics.averageAccuracy,
-                overallMetrics.averageWpm,
-                overallMetrics.averageTime
-            ],
-            label: "Worldwide"
         }]
     };
 

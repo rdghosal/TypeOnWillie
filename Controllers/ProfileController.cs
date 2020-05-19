@@ -27,15 +27,15 @@ namespace TypeOnWillie.Controllers
         public ActionResult GetProfile(ProfileParamsDto params_)
         {
             UserProfileDto profileDto = _service.GetUserProfile(params_);
-            SysProfileDto sysProfileDto = _service.GetSysProfile(params_);
+            //SysProfileDto sysProfileDto = _service.GetSysProfile(params_);
 
-            dynamic response = new {
-                userData = profileDto,
-                overallData = sysProfileDto
-            };
+            //dynamic response = new {
+            //    userData = profileDto,
+            //    overallData = sysProfileDto
+            //};
 
             if (profileDto == null) BadRequest();
-            return Ok(response);
+            return Ok(profileDto);
         }
         
         [HttpPost]
