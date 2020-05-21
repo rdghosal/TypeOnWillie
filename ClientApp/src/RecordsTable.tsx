@@ -12,18 +12,22 @@ const RecordsTable : React.FC<RecordsTableProps> = (props) => {
             <table className="table table-dark">
                 <thead>
                     <tr>
-                        <th>Favorite Sonnet</th>
                         <th>Best Accuracy</th>
+                        <th>Worst Accuracy</th>
                         <th>Best WPM</th>
+                        <th>Worst WPM</th>
                         <th>Best Time</th>
+                        <th>Worst Time</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{props.data.favoriteSonnet}</td>
-                        <td>{props.data.topAccuracy}</td>
-                        <td>{props.data.topWpm}</td>
-                        <td>{props.data.topTime}</td>
+                        <td>{props.data.bestAccuracy} (Sonnet {props.data.bestAccuracySonnet})</td>
+                        <td>{props.data.worstAccuracy} (Sonnet {props.data.worstAccuracySonnet})</td>
+                        <td>{props.data.bestWpm} (Sonnet {props.data.bestWpmSonnet})</td>
+                        <td>{props.data.worstWpm} (Sonnet {props.data.worstWpmSonnet})</td>
+                        <td>{props.data.bestTime} (Sonnet {props.data.bestTimeSonnet})</td>
+                        <td>{props.data.worstTime} (Sonnet {props.data.worstTimeSonnet})</td>
                     </tr>
                 </tbody>
             </table>

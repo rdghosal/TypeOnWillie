@@ -23,7 +23,6 @@ export const Profile: React.FC = () => {
             return;
         }
 
-        if (!profileData) {
             const url = (user.id === "guest") ? "/api/profile/guest" : "api/profile";
 
             fetch(url, {
@@ -49,14 +48,25 @@ export const Profile: React.FC = () => {
                 setProgressLine(scoreFactory(data.scores, scoreType!, dateType!));
                 setSkillsGraph(skillsDataFactory(data.percentiles));
             });
-        }
 
-    }, [user, scoreType, dateType]);
+    }, [user, scoreType, dateType, selectMonth, selectYear]);
 
     useEffect(() => {
         if (!profileData) return;
         setProgressLine(scoreFactory(profileData.scores, scoreType!, dateType!));
     }, [scoreType]);
+
+    useEffect(() => {
+        if (!profileData) {
+            return;
+        }
+
+        let isDisabled = false;
+        if (dateType === DateType.MONTH) {
+            isDisabled = true;
+        } 
+        (document.getElementById("selMonth") as HTMLInputElement).disabled = isDisabled;
+    }, [dateType]);
 
     const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setDateType(parseInt(e.target.value));
@@ -69,18 +79,19 @@ export const Profile: React.FC = () => {
     };
 
     const handleDateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.id === "selMonth") {
-            return setMonth(parseInt(e.target.value));
-        }
+        // TODO: setDate
+        console.log(e.target.value)        
 
         let year = parseInt(e.target.value);
         const currYear = new Date().getFullYear();
+        
 
         if (year < 2018 && year > currYear) {
             year = currYear
         }
 
-        return setYear(year);
+        setMonth(parseInt(e.target.value));
+        setYear(year);
     };
 
     if (!profileData || !user) {
@@ -114,15 +125,10 @@ export const Profile: React.FC = () => {
                             onChange={e => handleRadioChange(e)} />
                         <input type="radio" name="dateType" value={DateType.DAY}
                             onChange={e => handleRadioChange(e)} />
-                        {
-                            dateType === DateType.MONTH &&
                             <div className="container">
                                 <input type="month" name="month"
                                     id="selMonth" onChange={e => handleDateInput(e)} />
-                                <input type="number" name="year"
-                                    id="selYear" onChange={e => handleDateInput(e)} />
                             </div>
-                        }
                     </div>
                 </div>
             </div>
@@ -156,12 +162,20 @@ export type PercentileCollection = {
 }
 
 export type RecordCollection = {
+    bestAccuracySonnet: number,
+    worstAccuracySonnet: number,
+    bestAccuracy: number, // make into tuple w/ date?
+    worstAccuracy: number, // make into tuple w/ date?
 
-    favoriteSonnet: number,
-    topTime: number,
-    topAccuracy: number, // make into tuple w/ date?
-    topWpm: number
+    bestTimeSonnet: number,
+    worstTimeSonnet: number,
+    bestTime: number,
+    worstTime: number,
 
+    bestWpmSonnet: number, // make into tuple w/ date?
+    worstWpmSonnet: number, // make into tuple w/ date?
+    bestWpm: number
+    worstWpm: number
 };
 
 export type ScoreCollection = {

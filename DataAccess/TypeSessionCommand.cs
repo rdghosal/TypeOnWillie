@@ -43,13 +43,13 @@ namespace TypeOnWillie.DataAccess
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                      WHERE ts.UserId = @userId
                                                         AND ts.Quit = 'N'
-                                                        AND ts.DateTime BETWEEN DATEADD(year, -1, @endDate) AND @endDate
+                                                        AND ts.DateTime BETWEEN DATEADD(year, -2, @endDate) AND @endDate
                                                      GROUP BY MONTH([DateTime]);";
 
         public const string SELECT_SCORES_BYMONTH = @"SELECT
                                                         DAY([DateTime]) AS 'Day',
                                                         AVG([SecondsElapsed]) AS 'AverageTime',
-                                                        AVG([TypedWordCount]*60 / [SecondsElapsed]) AS 'AverageWpm',
+                                                        AVG([TypedWordCount]*60.0 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                      WHERE ts.UserId = @userId
@@ -61,7 +61,7 @@ namespace TypeOnWillie.DataAccess
         public const string SELECT_SCORES_LASTYEAR_ALL = @"SELECT 
                                                         MONTH([DateTime]) AS 'Month', 
                                                         AVG([SecondsElapsed]) AS 'AverageTime',
-                                                        AVG([TypedWordCount]*60 / [SecondsElapsed]) AS 'AverageWpm',
+                                                        AVG([TypedWordCount]*60.0 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                      WHERE ts.Quit = 'N'
@@ -71,7 +71,7 @@ namespace TypeOnWillie.DataAccess
         public const string SELECT_SCORES_BYMONTH_ALL = @"SELECT
                                                         DAY([DateTime]) AS 'Day',
                                                         AVG([SecondsElapsed]) AS 'AverageTime',
-                                                        AVG([TypedWordCount]*60 / [SecondsElapsed]) AS 'AverageWpm',
+                                                        AVG([TypedWordCount]*60.0 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                      WHERE ts.Quit = 'N'
@@ -79,38 +79,104 @@ namespace TypeOnWillie.DataAccess
                                                         AND YEAR(ts.DateTime) = @year
                                                      GROUP BY DAY([DateTime]);";
 
-        public const string SELECT_TOP_SCORES = @"SELECT DISTINCT
-                                                    (SELECT [Id]
-                                                    FROM [type_on_willie].[dbo].[Sonnets] 
-                                                    WHERE [Id] = 
-                                                        (SELECT TOP 1 [SonnetId]
+        public const string SELECT_USER_RECORDS = @"SELECT DISTINCT
+                                                        (SELECT TOP 1 
+                                                            SonnetId
+                                                        FROM 
+                                                            [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE
+                                                            ts.UserId = @userId
+                                                            AND ts.Quit = 'N'
+                                                        GROUP BY 
+                                                            [SonnetId]
+                                                        ORDER BY 
+                                                            AVG([CorrectWordCount] * 1.0/[TypedWordCount]) DESC) AS 'BestAccuracySonnet',
+                                                        (SELECT TOP 1 
+                                                            SonnetId
+                                                        FROM 
+                                                            [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE
+                                                            ts.UserId = @userId
+                                                            AND ts.Quit = 'N'
+                                                        GROUP BY 
+                                                            [SonnetId]
+                                                        ORDER BY 
+                                                            AVG([CorrectWordCount] * 1.0/[TypedWordCount]) ASC) AS 'WorstAccuracySonnet',
+                                                        (SELECT TOP 1 
+                                                            SonnetId
+                                                        FROM 
+                                                            [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE
+                                                            ts.UserId = @userId
+                                                            AND ts.Quit = 'N'
+                                                        GROUP BY 
+                                                            [SonnetId]
+                                                        ORDER BY 
+                                                            AVG(SecondsElapsed * 1.0) ASC) AS 'BestTimeSonnet',
+                                                        (SELECT TOP 1 
+                                                            SonnetId
+                                                        FROM 
+                                                            [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE
+                                                            ts.UserId = @userId
+                                                            AND ts.Quit = 'N'
+                                                        GROUP BY 
+                                                            [SonnetId]
+                                                        ORDER BY 
+                                                            AVG(SecondsElapsed * 1.0) DESC) AS 'WorstTimeSonnet',
+                                                        (SELECT TOP 1 
+                                                            SonnetId
+                                                        FROM 
+                                                            [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE
+                                                            ts.UserId = @userId
+                                                            AND ts.Quit = 'N'
+                                                        GROUP BY 
+                                                            [SonnetId]
+                                                        ORDER BY 
+                                                            AVG([TypedWordCount]/[SecondsElapsed] * 60.0) ASC) AS 'BestWpmSonnet',
+                                                        (SELECT TOP 1
+                                                            SonnetId
+                                                        FROM 
+                                                            [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE
+                                                            ts.UserId = @userId
+                                                            AND ts.Quit = 'N'
+                                                        GROUP BY 
+                                                            [SonnetId]
+                                                        ORDER BY 
+                                                            AVG([TypedWordCount]/[SecondsElapsed] * 60.0) DESC) AS 'WorstWpmSonnet',
+                                                        (SELECT 
+                                                            MAX([TypedWordCount]*60.0 / [SecondsElapsed])
                                                         FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                         WHERE ts.UserId = @userId
-                                                        GROUP BY [SonnetId]
-                                                        HAVING COUNT([SonnetId]) = 
-                                                            (SELECT 
-                                                                MAX(c)
-                                                            FROM 
-                                                                (SELECT COUNT([SonnetId]) AS 'c'
-                                                                FROM [type_on_willie].[dbo].[TypeSessions] ts
-                                                                WHERE ts.UserId = @userId
-                                                                GROUP BY [SonnetId]) T))) AS 'FavoriteSonnet',
-                                                    (SELECT 
-                                                        MAX([TypedWordCount]*60.0 / [SecondsElapsed])
-                                                    FROM [type_on_willie].[dbo].[TypeSessions] ts
-                                                    WHERE ts.UserId = @userId
-                                                        AND ts.Quit = 'N') AS 'TopWpm',
-                                                    (SELECT
-                                                        MAX([CorrectWordCount]*1.0 / [TypedWordCount]*1.0)
-                                                    FROM [type_on_willie].[dbo].[TypeSessions] ts
-                                                    WHERE ts.UserId = @userId
-                                                        AND ts.Quit = 'N') AS 'TopAccuracy',
-                                                    (SELECT
-                                                        MIN([SecondsElapsed])
-                                                    FROM [type_on_willie].[dbo].[TypeSessions] ts
-                                                    WHERE ts.UserId = @userId
-                                                        AND ts.Quit = 'N') AS 'TopTime'
-                                                FROM [type_on_willie].[dbo].[TypeSessions];";
+                                                            AND ts.Quit = 'N') AS 'BestWpm',
+                                                        (SELECT 
+                                                            MIN([TypedWordCount]*60.0 / [SecondsElapsed])
+                                                        FROM [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE ts.UserId = @userId
+                                                            AND ts.Quit = 'N') AS 'WorstWpm',
+                                                        (SELECT
+                                                            MAX([CorrectWordCount]*1.0 / [TypedWordCount]*1.0)
+                                                        FROM [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE ts.UserId = @userId
+                                                            AND ts.Quit = 'N') AS 'BestAccuracy',
+                                                        (SELECT
+                                                            MIN([CorrectWordCount]*1.0 / [TypedWordCount]*1.0)
+                                                        FROM [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE ts.UserId = @userId
+                                                            AND ts.Quit = 'N') AS 'WorstAccuracy',
+                                                        (SELECT
+                                                            MIN([SecondsElapsed])
+                                                        FROM [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE ts.UserId = @userId
+                                                            AND ts.Quit = 'N') AS 'BestTime',
+                                                        (SELECT
+                                                            MAX([SecondsElapsed])
+                                                        FROM [type_on_willie].[dbo].[TypeSessions] ts
+                                                        WHERE ts.UserId = @userId
+                                                            AND ts.Quit = 'N') AS 'WorstTime'
+                                                    FROM [type_on_willie].[dbo].[TypeSessions];";
 
 
         public const string SELECT_ALL_METRICS = @"SELECT 

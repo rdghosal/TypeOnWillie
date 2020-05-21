@@ -101,7 +101,7 @@ namespace TypeOnWillie.DataAccess
                     new { userId = params_.UserId });
 
                 profile.Records = _sqlConnection.Query<RecordCollection>(
-                    TypeSessionCommand.SELECT_TOP_SCORES,
+                    TypeSessionCommand.SELECT_USER_RECORDS,
                     new { userId = params_.UserId }).FirstOrDefault();
 
                 profile.Scores = SelectScores(params_);
