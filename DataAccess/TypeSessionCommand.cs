@@ -37,6 +37,7 @@ namespace TypeOnWillie.DataAccess
 
         public const string SELECT_SCORES_LASTYEAR = @"SELECT 
                                                         MONTH([DateTime]) AS 'Month', 
+                                                        YEAR([DateTime]) AS 'Year', 
                                                         AVG([SecondsElapsed]) AS 'AverageTime',
                                                         AVG([TypedWordCount]*60 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
@@ -44,10 +45,13 @@ namespace TypeOnWillie.DataAccess
                                                      WHERE ts.UserId = @userId
                                                         AND ts.Quit = 'N'
                                                         AND ts.DateTime BETWEEN DATEADD(year, -2, @endDate) AND @endDate
-                                                     GROUP BY MONTH([DateTime]);";
+                                                     GROUP BY YEAR([DateTime]), MONTH([DateTime])
+                                                     ORDER BY YEAR([DateTime]), MONTH([DateTime]);";
 
         public const string SELECT_SCORES_BYMONTH = @"SELECT
                                                         DAY([DateTime]) AS 'Day',
+                                                        MONTH([DateTime]) AS 'Month',
+                                                        YEAR([DateTime]) AS 'Year',
                                                         AVG([SecondsElapsed]) AS 'AverageTime',
                                                         AVG([TypedWordCount]*60.0 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
@@ -56,20 +60,25 @@ namespace TypeOnWillie.DataAccess
                                                         AND ts.Quit = 'N'
                                                         AND MONTH(ts.DateTime) = MONTH(@endDate)
                                                         AND YEAR(ts.DateTime) = YEAR(@endDate)
-                                                     GROUP BY DAY([DateTime]);";
+                                                     GROUP BY YEAR([DateTime]), MONTH([DateTime]), DAY([DateTime])
+                                                     ORDER BY YEAR([DateTime]), MONTH([DateTime]), DAY([DateTime]);";
 
         public const string SELECT_SCORES_LASTYEAR_ALL = @"SELECT 
                                                         MONTH([DateTime]) AS 'Month', 
+                                                        YEAR([DateTime]) AS 'Year', 
                                                         AVG([SecondsElapsed]) AS 'AverageTime',
                                                         AVG([TypedWordCount]*60.0 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                      WHERE ts.Quit = 'N'
                                                         AND ts.DateTime BETWEEN DATEADD(year, -1, @endDate) AND @endDate
-                                                     GROUP BY MONTH([DateTime]);";
+                                                     GROUP BY YEAR([DateTime]), MONTH([DateTime])
+                                                     GROUP BY YEAR([DateTime]), MONTH([DateTime]);";
 
         public const string SELECT_SCORES_BYMONTH_ALL = @"SELECT
                                                         DAY([DateTime]) AS 'Day',
+                                                        MONTH([DateTime]) AS 'Month',
+                                                        YEAR([DateTime]) AS 'Year',
                                                         AVG([SecondsElapsed]) AS 'AverageTime',
                                                         AVG([TypedWordCount]*60.0 / [SecondsElapsed]) AS 'AverageWpm',
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
@@ -77,7 +86,8 @@ namespace TypeOnWillie.DataAccess
                                                      WHERE ts.Quit = 'N'
                                                         AND MONTH(ts.DateTime) = MONTH(@endDate)
                                                         AND YEAR(ts.DateTime) = YEAR(@endDate)
-                                                     GROUP BY DAY([DateTime]);";
+                                                     GROUP BY YEAR([DateTime]), MONTH([DateTime]), DAY([DateTime])
+                                                     ORDER BY YEAR([DateTime]), MONTH([DateTime]), DAY([DateTime]);";
 
         public const string SELECT_USER_RECORDS = @"SELECT DISTINCT
                                                         (SELECT TOP 1 

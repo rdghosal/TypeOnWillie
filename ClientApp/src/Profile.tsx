@@ -69,18 +69,22 @@ export const Profile: React.FC = () => {
             return;
         }
 
+        const inputEl = (document.getElementById("monthYearInput") as HTMLInputElement);
+
         let isDisabled = false;
         if (timeScale === ScaleType.YEAR) {
             console.log("Setting to YEAR");
             setDate(new Date().toISOString());
+            inputEl.value = "";
             isDisabled = true;
         } 
 
-        (document.getElementById("monthYearInput") as HTMLInputElement).disabled = isDisabled;
+        inputEl.disabled = isDisabled;
+
     }, [timeScale]);
 
     const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("SCALE", e.target.value)
+        console.log("SCALE", e.target.value);
         setScaleType(parseInt(e.target.value));
     };
 
@@ -193,8 +197,9 @@ export type ScoreCollection = {
     averageAccuracy?: number,
     averageWpm?: number,
     averageTime?: number,
-    month?: Date,
-    day?: Date
+    year?: number,
+    month?: number,
+    day?: number
 };
 
 
@@ -251,8 +256,11 @@ export class ScoreData {
     }
 
     public addLabel(s: ScoreCollection) {
-        const label = (this._timeScale === ScaleType.YEAR) ? s.month! : s.day!;
-        this._labels.push(label.toString());
+        const label = (this._timeScale === ScaleType.YEAR)
+            ? `${s.year!.toString()}-${s.month!.toString()}`
+            : `${s.year!.toString()}-${s.month!.toString()}-${s.day!.toString()}`;
+
+        this._labels.push(label);
     }
 
     public addData(s: ScoreCollection) {
