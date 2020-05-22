@@ -92,8 +92,8 @@ namespace TypeOnWillie.DataAccess
 
             using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-                profile.Metrics = _sqlConnection.Query<UserMetrics>(
-                    TypeSessionCommand.SELECT_USER_METRICS, 
+                profile.Percentiles = _sqlConnection.Query<PercentileCollection>(
+                    TypeSessionCommand.SELECT_USER_PERCENTILES, 
                     new { userId = params_.UserId }).FirstOrDefault();
 
                 profile.TopMisspellings = _sqlConnection.Query<string>(
@@ -101,7 +101,7 @@ namespace TypeOnWillie.DataAccess
                     new { userId = params_.UserId });
 
                 profile.Records = _sqlConnection.Query<RecordCollection>(
-                    TypeSessionCommand.SELECT_TOP_SCORES,
+                    TypeSessionCommand.SELECT_USER_RECORDS,
                     new { userId = params_.UserId }).FirstOrDefault();
 
                 profile.Scores = SelectScores(params_);
@@ -114,37 +114,27 @@ namespace TypeOnWillie.DataAccess
         {
             using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-                if (params_.CurrentDate != null)
-                {
+                string q = (params_.TimeScale == ScaleType.YEAR) 
+                    ? TypeSessionCommand.SELECT_SCORES_LASTYEAR 
+                    : TypeSessionCommand.SELECT_SCORES_BYMONTH;
+
                     return _sqlConnection.Query<ScoreCollection>(
-                        TypeSessionCommand.SELECT_SCORES_LASTYEAR,
-                        new { userId = params_.UserId, endDate = params_.CurrentDate });
-                }
-                else
-                {
-                    return _sqlConnection.Query<ScoreCollection>(
-                        TypeSessionCommand.SELECT_SCORES_BYMONTH,
-                        new { userId = params_.UserId, month = params_.Month, year = params_.Year });
-                }
+                        q,
+                        new { userId = params_.UserId, endDate = params_.EndDate });
             }
-        } 
+        }
 
         private IEnumerable<ScoreCollection> SelectSysScores(ProfileParamsDto params_)
         {
             using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-                if (params_.CurrentDate != null)
-                {
+                string q = (params_.TimeScale == ScaleType.YEAR) 
+                    ? TypeSessionCommand.SELECT_SCORES_LASTYEAR_ALL 
+                    : TypeSessionCommand.SELECT_SCORES_BYMONTH_ALL;
+
                     return _sqlConnection.Query<ScoreCollection>(
-                        TypeSessionCommand.SELECT_SCORES_LASTYEAR_ALL,
-                        new { endDate = params_.CurrentDate });
-                }
-                else
-                {
-                    return _sqlConnection.Query<ScoreCollection>(
-                        TypeSessionCommand.SELECT_SCORES_BYMONTH_ALL,
-                        new { month = params_.Month, year = params_.Year });
-                }
+                        q,
+                        new { endDate = params_.EndDate });
             }
         }
     }

@@ -7,9 +7,19 @@ namespace TypeOnWillie.Models
 {
     public class RecordCollection
     {
-        public string FavoriteSonnet { get; set; }
-        public int TopAccuracy { get; set; }
-        public int TopWpm { get; set; }
-        public int TopTime { get; set; }
+        public int BestAccuracySonnet { get; set; }
+        public int WorstAccuracySonnet { get; set; }
+        public double BestAccuracy { get; set; }
+        public double WorstAccuracy { get; set; }
+
+        public int BestTimeSonnet { get; set; }
+        public int WorstTimeSonnet { get; set; }
+        public int BestTime { get; set; }
+        public int WorstTime { get; set; }
+
+        public int BestWpmSonnet { get; set; }
+        public int WorstWpmSonnet { get; set; }
+        public double BestWpm { get; set; }
+        public double WorstWpm { get; set; }
     }
 }

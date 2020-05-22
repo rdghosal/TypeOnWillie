@@ -12,11 +12,11 @@ namespace TypeOnWillie.Models
         public double AverageTime { get; set; }
 
         public int AverageWpm { get; set; }
-    }
+        
+        public int Month { get; set; }
 
-    public enum RangeType
-    {
-        YEAR,
-        MONTH
+        public int Day { get; set; }
+
+        public int Year { get; set; }
     }
 }
