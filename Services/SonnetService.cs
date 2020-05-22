@@ -6,17 +6,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using TypeOnWillie.Models;
 using TypeOnWillie.DataAccess;
+using Microsoft.Extensions.Configuration;
 
 namespace TypeOnWillie.Services
 {
     public class SonnetService
     {
         private readonly string[] _fileNames;
+        private readonly SonnetSqlDao _sonnetSqlDao;
         private List<Sonnet> _sonnets;
 
-        public SonnetService(string path)
+        public SonnetService(IConfiguration configuration, SonnetSqlDao sonnetSqlDao)
         {
-            _fileNames = Directory.GetFiles(path);
+            _fileNames = Directory.GetFiles(configuration["SonnetPath"]);
+            _sonnetSqlDao = sonnetSqlDao;
         }
 
         public List<Sonnet> GetSonnets()
@@ -78,6 +81,17 @@ namespace TypeOnWillie.Services
 
             // If sonnet was not found
             return null;
+        }
+
+        public SonnetHistoryDto GetSonnetHistory(string userId, int sonnetId)
+        {
+            IEnumerable<Misspelling> misspellings = 
+                _sonnetSqlDao.SelectMisspellingsAll(userId, sonnetId);
+            IEnumerable<SonnetStatistic> statistics = 
+                _sonnetSqlDao.SelectStatisticsAll(userId, sonnetId);
+
+            var sonnetHistory = new SonnetHistoryDto(statistics, misspellings);
+            return sonnetHistory;
         }
     }
 }

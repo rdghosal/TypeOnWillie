@@ -41,5 +41,12 @@ namespace TypeOnWillie.Controllers
             // If no id, return all sonnets
             return Ok(_service.GetSonnets());
         }
+
+        [HttpPost("/stats")]
+        public IActionResult GetSonnetHistory([FromBody] string userId, int sonnetId)
+        {
+            SonnetHistoryDto sonnetHistory = _service.GetSonnetHistory(userId, sonnetId);
+            return Ok(sonnetHistory); 
+        }
     }
 }

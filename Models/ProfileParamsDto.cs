@@ -8,14 +8,6 @@ namespace TypeOnWillie.Models
     public class ProfileParamsDto
     {
         public string UserId { get; set; }
-<<<<<<< HEAD
-
-        public int Month { get; set; }
-
-        public int Year { get; set; }
-
-        public string CurrentDate { get; set; } = null;
-=======
         public string EndDate { get; set; } = DateTime.Now.ToShortDateString();
         public ScaleType TimeScale { get; set; } = ScaleType.YEAR;
 
@@ -25,6 +17,5 @@ namespace TypeOnWillie.Models
     {
         YEAR,
         MONTH
->>>>>>> feature/profile_client
     }
 }

@@ -39,12 +39,14 @@ namespace TypeOnWillie
             services.AddTransient<ITokenService, JwtTokenService>();
             services.AddScoped<UserService>();
             services.AddScoped<TypeSessionService>();
+            services.AddScoped<SonnetService>();
             services.AddScoped<UserSqlDao>();
             services.AddScoped<AuthSqlDao>();
             services.AddScoped<TypeSessionSqlDao>();
+            services.AddScoped<SonnetSqlDao>();
             services.AddScoped<IDatabase>(sp => redisPool.GetDatabase());
             services.AddScoped(serviceProvider => new SqlConnection(Configuration.GetConnectionString("mssql")));
-            services.AddSingleton(new SonnetService(Configuration["SonnetPath"]));
+            //services.AddSingleton(new SonnetService(Configuration["SonnetPath"]));
 
             services.AddControllersWithViews();
 
