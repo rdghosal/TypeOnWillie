@@ -17,10 +17,4 @@ namespace TypeOnWillie.Models
 
         public int Day { get; set; }
     }
-
-    public enum RangeType
-    {
-        YEAR,
-        MONTH
-    }
 }

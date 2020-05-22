@@ -8,11 +8,14 @@ namespace TypeOnWillie.Models
     public class ProfileParamsDto
     {
         public string UserId { get; set; }
+        public string EndDate { get; set; } = DateTime.Now.ToShortDateString();
+        public ScaleType TimeScale { get; set; } = ScaleType.YEAR;
 
-        public int Month { get; set; }
+    }
 
-        public int Year { get; set; }
-
-        public string CurrentDate { get; set; } = null;
+    public enum ScaleType
+    {
+        YEAR,
+        MONTH
     }
 }

@@ -12,9 +12,10 @@ export const Profile: React.FC = () => {
     const { user } = useContext(AppContext);
     const [profileData, setProfile] = useState<Profile | null>(null);
     const [scoreType, setScoreType] = useState<ScoreType | null>(ScoreType.ACCURACY);
-    const [dateType, setDateType] = useState<DateType | null>(null);
-    const [selectMonth, setMonth] = useState<number | null>(null);
-    const [selectYear, setYear] = useState<number | null>(null);
+    const [timeScale, setScaleType] = useState<ScaleType>(ScaleType.YEAR);
+    //const [selectMonth, setMonth] = useState<number | null>(null);
+    //const [selectYear, setYear] = useState<number | null>(null);
+    const [selectDate, setDate] = useState<string|null>(null);
     const [progressLineData, setProgressLine] = useState<ScoreData|null>(null);
     const [skillsGraphData, setSkillsGraph] = useState<SkillsGraphData | null>(null);
 
@@ -23,54 +24,64 @@ export const Profile: React.FC = () => {
             return;
         }
 
-            const url = (user.id === "guest") ? "/api/profile/guest" : "api/profile";
+        const url = (user.id === "guest") ? "/api/profile/guest" : "api/profile";
 
-            fetch(url, {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ // TODO make params class
-                    userId: user.id,
-                    month: (selectMonth) ? selectMonth : 10,
-                    year: (selectMonth) ? selectYear : new Date().getFullYear() - 2,
-                    currentDate: (dateType === DateType.MONTH) ? new Date().toISOString() : null
-                })
+        fetch(url, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ // TODO make params class
+                userId: user.id,
+                endDate: (timeScale === ScaleType.YEAR) ? new Date().toISOString() : getEndDate(selectDate!),
+                timeScale: timeScale
+            })
 
-            }).then(resp => {
-                if (!resp.ok) {
-                    return console.log("Failed to fetch profile!");
-                }
+        }).then(resp => {
+            if (!resp.ok) {
+                return console.log("Failed to fetch profile!");
+            }
 
-                return resp.json();
-            }).then(data => {
-                console.log(data)
-                setProfile(data);
-                console.log(scoreFactory(data.scores, scoreType!, dateType!))
-                setProgressLine(scoreFactory(data.scores, scoreType!, dateType!));
-                setSkillsGraph(skillsDataFactory(data.percentiles));
-            });
+            return resp.json();
+        }).then(data => {
+            console.log(data)
+            setProfile(data);
+            console.log(scoreFactory(data.scores, scoreType!, timeScale!))
+            setProgressLine(scoreFactory(data.scores, scoreType!, timeScale!));
+            setSkillsGraph(skillsDataFactory(data.percentiles));
+        });
 
-    }, [user, scoreType, dateType, selectMonth, selectYear]);
+    }, [user, scoreType, selectDate]);
+
+    useEffect(() => {
+        if (profileData && timeScale === ScaleType.YEAR) {
+            (document.getElementById("monthYearInput") as HTMLInputElement).disabled = true;
+        }
+    }, [profileData]);
 
     useEffect(() => {
         if (!profileData) return;
-        setProgressLine(scoreFactory(profileData.scores, scoreType!, dateType!));
+        setProgressLine(scoreFactory(profileData.scores, scoreType!, timeScale!));
     }, [scoreType]);
 
     useEffect(() => {
+
         if (!profileData) {
+            console.log("No profile!")
             return;
         }
 
         let isDisabled = false;
-        if (dateType === DateType.MONTH) {
+        if (timeScale === ScaleType.YEAR) {
+            console.log("Setting to YEAR");
+            setDate(new Date().toISOString());
             isDisabled = true;
         } 
-        (document.getElementById("selMonth") as HTMLInputElement).disabled = isDisabled;
-    }, [dateType]);
+
+        (document.getElementById("monthYearInput") as HTMLInputElement).disabled = isDisabled;
+    }, [timeScale]);
 
     const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDateType(parseInt(e.target.value));
-
+        console.log("SCALE", e.target.value)
+        setScaleType(parseInt(e.target.value));
     };
 
     const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -80,18 +91,15 @@ export const Profile: React.FC = () => {
 
     const handleDateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         // TODO: setDate
-        console.log(e.target.value)        
-
-        let year = parseInt(e.target.value);
-        const currYear = new Date().getFullYear();
-        
-
-        if (year < 2018 && year > currYear) {
-            year = currYear
+        console.log(e.target.value);
+        const date = e.target.value;
+        if (!date) {
+            return;
+        } else if (date.length < 7) {
+            return alert("Select BOTH month and year!");
         }
-
-        setMonth(parseInt(e.target.value));
-        setYear(year);
+        
+        setDate(e.target.value);
     };
 
     if (!profileData || !user) {
@@ -114,6 +122,11 @@ export const Profile: React.FC = () => {
                     {progressLineData && <ProgressLine data={progressLineData} />}
                     {skillsGraphData && <SkillsGraph data={skillsGraphData} />}
                 </div>
+                <div className="container">
+                    <input type="month" className="form-control" name="month"
+                        min="2018-01" max={new Date().toISOString().substring(0, 7)}
+                        id="monthYearInput" onBlur={e => handleDateInput(e)} />
+                </div>
                 <div className="profile__controls container-fluid">
                     <select name="progressType" onChange={e => handleSelect(e)}>
                         <option value={ScoreType.ACCURACY}>Accuracy</option>
@@ -121,14 +134,12 @@ export const Profile: React.FC = () => {
                         <option value={ScoreType.TIME}>Time</option>
                     </select>
                     <div className="controls__date">
-                        <input type="radio" name="dateType" value={DateType.MONTH}
+                        <label htmlFor="byCurrentDate">The last 12 months</label>
+                        <input type="radio" name="timeScale" id="byCurrentDate" value={ScaleType.YEAR}
+                            onChange={e => handleRadioChange(e)} defaultChecked />
+                        <label htmlFor="bySelectDate">For a select year and month</label>
+                        <input type="radio" name="timeScale" id="bySelectDate" value={ScaleType.MONTH}
                             onChange={e => handleRadioChange(e)} />
-                        <input type="radio" name="dateType" value={DateType.DAY}
-                            onChange={e => handleRadioChange(e)} />
-                            <div className="container">
-                                <input type="month" name="month"
-                                    id="selMonth" onChange={e => handleDateInput(e)} />
-                            </div>
                     </div>
                 </div>
             </div>
@@ -191,12 +202,12 @@ export class ScoreData {
 
     private _labels: string[] = []
     private _data: number[] = []
-    private readonly _dateType: DateType;
+    private readonly _timeScale: ScaleType;
     private readonly _scoreType: ScoreType;
 
 
-    constructor(dt: DateType, st: ScoreType) {
-        this._dateType = dt;
+    constructor(dt: ScaleType, st: ScoreType) {
+        this._timeScale = dt;
         this._scoreType = st;
     }
 
@@ -240,7 +251,7 @@ export class ScoreData {
     }
 
     public addLabel(s: ScoreCollection) {
-        const label = (this._dateType === DateType.MONTH) ? s.month! : s.day!;
+        const label = (this._timeScale === ScaleType.YEAR) ? s.month! : s.day!;
         this._labels.push(label.toString());
     }
 
@@ -281,9 +292,9 @@ export enum ScoreType {
     TIME
 };
 
-export enum DateType {
-    MONTH,
-    DAY
+export enum ScaleType {
+    YEAR,
+    MONTH
 };
 
 function skillsDataFactory(percentiles : PercentileCollection) : SkillsGraphData {
@@ -306,9 +317,9 @@ function skillsDataFactory(percentiles : PercentileCollection) : SkillsGraphData
 }
 
 
-function scoreFactory(scores: Array<ScoreCollection>, scoreType : ScoreType, dateType: DateType) : ScoreData {
+function scoreFactory(scores: Array<ScoreCollection>, scoreType : ScoreType, timeScale: ScaleType) : ScoreData {
 
-    const scoreData = new ScoreData(dateType, scoreType);
+    const scoreData = new ScoreData(timeScale, scoreType);
 
     scores.forEach(data => {
         scoreData.addData(data);
@@ -316,4 +327,8 @@ function scoreFactory(scores: Array<ScoreCollection>, scoreType : ScoreType, dat
     });
 
     return scoreData;
+}
+
+function getEndDate(inDate: string): string {
+    return inDate + "-01";
 }

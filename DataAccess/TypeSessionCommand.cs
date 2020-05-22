@@ -54,8 +54,8 @@ namespace TypeOnWillie.DataAccess
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                      WHERE ts.UserId = @userId
                                                         AND ts.Quit = 'N'
-                                                        AND MONTH(ts.DateTime) = @month
-                                                        AND YEAR(ts.DateTime) = @year
+                                                        AND MONTH(ts.DateTime) = MONTH(@endDate)
+                                                        AND YEAR(ts.DateTime) = YEAR(@endDate)
                                                      GROUP BY DAY([DateTime]);";
 
         public const string SELECT_SCORES_LASTYEAR_ALL = @"SELECT 
@@ -75,8 +75,8 @@ namespace TypeOnWillie.DataAccess
                                                         AVG([CorrectWordCount]*1.0 / [TypedWordCount]*1.0) AS 'AverageAccuracy'
                                                      FROM [type_on_willie].[dbo].[TypeSessions] ts
                                                      WHERE ts.Quit = 'N'
-                                                        AND MONTH(ts.DateTime) = @month
-                                                        AND YEAR(ts.DateTime) = @year
+                                                        AND MONTH(ts.DateTime) = MONTH(@endDate)
+                                                        AND YEAR(ts.DateTime) = YEAR(@endDate)
                                                      GROUP BY DAY([DateTime]);";
 
         public const string SELECT_USER_RECORDS = @"SELECT DISTINCT

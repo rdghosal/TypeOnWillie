@@ -114,18 +114,13 @@ namespace TypeOnWillie.DataAccess
         {
             using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-                if (params_.CurrentDate != null)
-                {
+                string q = (params_.TimeScale == ScaleType.YEAR) 
+                    ? TypeSessionCommand.SELECT_SCORES_LASTYEAR 
+                    : TypeSessionCommand.SELECT_SCORES_BYMONTH;
+
                     return _sqlConnection.Query<ScoreCollection>(
-                        TypeSessionCommand.SELECT_SCORES_LASTYEAR,
-                        new { userId = params_.UserId, endDate = params_.CurrentDate });
-                }
-                else
-                {
-                    return _sqlConnection.Query<ScoreCollection>(
-                        TypeSessionCommand.SELECT_SCORES_BYMONTH,
-                        new { userId = params_.UserId, month = params_.Month, year = params_.Year });
-                }
+                        q,
+                        new { userId = params_.UserId, endDate = params_.EndDate });
             }
         }
 
@@ -133,18 +128,13 @@ namespace TypeOnWillie.DataAccess
         {
             using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-                if (params_.CurrentDate != null)
-                {
+                string q = (params_.TimeScale == ScaleType.YEAR) 
+                    ? TypeSessionCommand.SELECT_SCORES_LASTYEAR_ALL 
+                    : TypeSessionCommand.SELECT_SCORES_BYMONTH_ALL;
+
                     return _sqlConnection.Query<ScoreCollection>(
-                        TypeSessionCommand.SELECT_SCORES_LASTYEAR_ALL,
-                        new { endDate = params_.CurrentDate });
-                }
-                else
-                {
-                    return _sqlConnection.Query<ScoreCollection>(
-                        TypeSessionCommand.SELECT_SCORES_BYMONTH_ALL,
-                        new { month = params_.Month, year = params_.Year });
-                }
+                        q,
+                        new { endDate = params_.EndDate });
             }
         }
     }
