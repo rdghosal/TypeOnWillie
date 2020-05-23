@@ -22,7 +22,12 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
         <Fragment>
             <MainContext.Provider value={{ currentSonnet, setSonnet, user, setUser }}>
                 <Navbar isLogInPage={false} />
-                {params["sonnet"] && user ? <TypeSession sonnetId={params["sonnet"]} userId={user.id} /> : <SonnetMenu /> }
+                {
+                    user &&
+                        params["sonnet"] && currentSonnet
+                        ? <TypeSession sonnetId={params["sonnet"]} userId={user.id} />
+                        : <SonnetMenu />
+                }
             </MainContext.Provider>
         </Fragment>
     );

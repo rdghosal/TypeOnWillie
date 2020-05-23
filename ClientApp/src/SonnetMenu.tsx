@@ -1,10 +1,15 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useContext } from "react";
 import SonnetCard from "./SonnetCard";
 import Sonnet from "./Sonnet";
+import SonnetDetails from "./SonnetDetails";
+import { AppContext } from "./App";
 
-const SonnetMenu : React.FC = () : JSX.Element => {
+const SonnetMenu : React.FC = (props) : JSX.Element => {
 
     const [ sonnetCollection, setSonnetCollection ] = useState<Array<Sonnet> | null>(null);
+    const [ sonnetInFocus, focusSonnet ] = useState<Sonnet|null>(null);
+
+    const { user } = useContext(AppContext);
 
     useEffect(() => {
         // Fetch sonnet data on page load
@@ -24,9 +29,26 @@ const SonnetMenu : React.FC = () : JSX.Element => {
     }, [sonnetCollection]);
 
     return (
-        <Fragment>
-            { sonnetCollection && sonnetCollection!.map((sonnet, i) => <SonnetCard key={i} sonnet={sonnet}/>) }
-        </Fragment>
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-3">
+                    { 
+                        sonnetCollection && sonnetCollection!.map((sonnet:Sonnet, i) => {
+                            return (
+                                <div className="row" key={i}>
+                                    <SonnetCard key={i} sonnet={sonnet} focusSonnet={focusSonnet} />
+                                </div>
+                            );
+                        })
+                    }
+                </div>
+                <div className="col-8">
+                    {
+                        <SonnetDetails sonnet={sonnetInFocus} user={user} />   
+                    }
+                </div>
+            </div>
+        </div>
     );
 }
 

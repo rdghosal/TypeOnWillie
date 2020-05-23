@@ -26,11 +26,18 @@ export default class Sonnet {
     public get wordCount() : number {
         return this._wordCount;
     }
+
+    private readonly _hasUserHistory: boolean;
+    public get hasUserHistory(): boolean {
+        return this._hasUserHistory;
+    }
     
-    public constructor(sonnetId: number, sonnetNumber: string, sonnetLines: string[], sonnetWordCount: number) {
+    public constructor(sonnetId: number, sonnetNumber: string, 
+            sonnetLines: string[], sonnetWordCount: number, hasUserHistory : boolean) {
         this._id = sonnetId;
         this._title = sonnetNumber;
         this._lines = sonnetLines;
         this._wordCount = sonnetWordCount;
+        this._hasUserHistory = hasUserHistory;
     }
 }

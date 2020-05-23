@@ -29,7 +29,7 @@ namespace TypeOnWillie.DataAccess
             }
         }
 
-        public IEnumerable<SonnetStatistic> SelectStatisticsAll(string userId, int sonnetId)
+        public IEnumerable<SonnetStatistic> SelectStatisticsAll(SonnetHistoryParams params_)
         {
             IEnumerable<SonnetStatistic> stats;
             using (var sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
@@ -37,15 +37,15 @@ namespace TypeOnWillie.DataAccess
                 stats = sqlConnection.Query<SonnetStatistic>(SonnetCommand.SELECT_STATS_ALL, 
                     new
                     {
-                        userId = userId,
-                        sonnetId = sonnetId
+                        userId = params_.UserId,
+                        sonnetId = params_.SonnetId
                     });
             }
 
             return stats;
         }
 
-        public IEnumerable<Misspelling> SelectMisspellingsAll(string userId, int sonnetId)
+        public IEnumerable<Misspelling> SelectMisspellingsAll(SonnetHistoryParams params_)
         {
             IEnumerable<Misspelling> misspellings;
             using (var sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
@@ -53,8 +53,8 @@ namespace TypeOnWillie.DataAccess
                 misspellings = sqlConnection.Query<Misspelling>(SonnetCommand.SELECT_MISSPELLINGS_ALL, 
                     new
                     {
-                        userId = userId,
-                        sonnetId = sonnetId
+                        userId = params_.UserId,
+                        sonnetId = params_.SonnetId
                     });
             }
 

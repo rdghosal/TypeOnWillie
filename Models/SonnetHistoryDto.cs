@@ -47,11 +47,11 @@ namespace TypeOnWillie.Models
             {
                 if (s.Scope == ScopeType.GLOBAL)
                 {
-                    sonnetDict.Add("Global", s);        
+                    sonnetDict.Add("global", s);        
                 }
                 else
                 {
-                    sonnetDict.Add("User", s);
+                    sonnetDict.Add("user", s);
                 }
             }
 
@@ -77,8 +77,8 @@ namespace TypeOnWillie.Models
                 }
             }
 
-            misspellingDict.Add("User", userList);
-            misspellingDict.Add("Global", globalList);
+            misspellingDict.Add("user", userList);
+            misspellingDict.Add("global", globalList);
 
             return misspellingDict;
         }

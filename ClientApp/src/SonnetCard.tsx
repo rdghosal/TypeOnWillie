@@ -5,20 +5,14 @@ import { MainContext } from "./Main";
 // import TypeSession from "./TypeSession";
 
 interface Props extends RouteComponentProps {
-    sonnet: Sonnet
+    sonnet: Sonnet,
+    focusSonnet: React.Dispatch<React.SetStateAction<Sonnet | null>>
 }
 
-const SonnetCard: React.FC<Props> = ({ history, sonnet }): JSX.Element => {
-
-    const { setSonnet } = useContext(MainContext);
-
-    const initSession= () : void => {
-        setSonnet(sonnet);
-        history.push(`/app?sonnet=${sonnet.id}`)
-    }
+const SonnetCard: React.FC<Props> = ({ history, sonnet, focusSonnet }): JSX.Element => {
 
     return (
-        <div className="sonnet-card" onClick={ initSession }>
+        <div className="sonnet-card" onClick={() => focusSonnet(sonnet) }>
             <div className="sonnet-card__title">
                 { sonnet.title }
             </div>

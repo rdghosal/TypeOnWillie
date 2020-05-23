@@ -42,10 +42,11 @@ namespace TypeOnWillie.Controllers
             return Ok(_service.GetSonnets());
         }
 
-        [HttpPost("/stats")]
-        public IActionResult GetSonnetHistory([FromBody] string userId, int sonnetId)
+        [HttpPost]
+        [Route("history")]
+        public IActionResult GetSonnetHistory(SonnetHistoryParams params_)
         {
-            SonnetHistoryDto sonnetHistory = _service.GetSonnetHistory(userId, sonnetId);
+            SonnetHistoryDto sonnetHistory = _service.GetSonnetHistory(params_);
             return Ok(sonnetHistory); 
         }
     }

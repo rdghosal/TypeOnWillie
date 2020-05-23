@@ -1,33 +1,126 @@
-import React, { ReactNode } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import Sonnet from "./Sonnet";
+import { RouteComponentProps, withRouter } from "react-router";
+import { MainContext } from "./Main";
+import { User } from "./AuthUtils";
 
 
-// type SonnetProps = {
-//     sonnetNumber: string;
-//     children?: ReactNode;
-// }
+interface ISonnetDetailsProps extends RouteComponentProps {
+    sonnet: Sonnet | null;
+    user: User;
+};
 
-const Sonnet: React.FC = () => {
+const SonnetDetails: React.FC<ISonnetDetailsProps> = (props) => {
+
+    const [ sonnetHistory, setHistory ] = useState<SonnetHistory | null> (null);
+    const { setSonnet } = useContext(MainContext);
+
+    const initSession= () : void => {
+        setSonnet(props.sonnet);
+        props.history.push(`/app?sonnet=${props.sonnet!.id}`)
+    }
+
+    useEffect(() => {
+        if (!props.sonnet) {
+            return;
+        }
+
+        fetch("/api/sonnetmenu/history", {
+            method: "POST",
+            headers: { "Content-Type" : "application/json" },
+            body: JSON.stringify({
+                userId : props.user!.id,
+                sonnetId : props.sonnet!.id
+            })
+        }).then(resp => {
+            if (!resp.ok) {
+                return window.alert("Failed to fetch sonnet stats!");
+            } 
+            return resp.json();
+        }).then(data => {
+            console.log(data);
+            return setHistory(data);
+        });
+    }, [props.sonnet]);
+    
+    if (!props.sonnet) {
+        return <div className="sonnet-details"></div>;
+    }
+
     return (
-        <div className="sonnet">
-            <h1>Sonnet 1</h1>
-            <p>
-                The fairest creatures we desire increase,
-                That thereby beauty's rose might never die,
-                But as the riper should by time decease,
-                His tender heir might bear his memory:
-                But thou, contracted to thine own bright eyes,
-                Feed'st thy light'st flame with self-substantial fuel,
-                Making a famine where abundance lies,
-                Thyself thy foe, to thy sweet self too cruel.
-                Thou that art now the world's fresh ornament
-                And only herald to the gaudy spring,
-                Within thine own bud buriest thy content
-                And, tender churl, makest waste in niggarding.
-                Pity the world, or else this glutton be,
-                To eat the world's due, by the grave and thee.
-            </p>
+        <div className="sonnet-details">
+            <h2>{ props.sonnet!.title }</h2>
+            <button className="sonnet-details__init-button btn btn-primary" onClick={() => initSession()}>
+                Start Typing!
+            </button>
+            
+            { props.sonnet!.lines.map((line: string) => line + "\n") }
+            {
+                sonnetHistory &&
+                    <table className="sonnet-details__stats table table-light">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Other Users</th>
+                            </tr>
+                            <tr>
+                                <th>Accuracy</th>
+                                <th>Time</th>
+                                <th>WPM</th>
+                                <th>Accuracy</th>
+                                <th>Time</th>
+                                <th>WPM</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{sonnetHistory.statistics.user.averageAccuracy}</td>
+                                <td>{sonnetHistory.statistics.user.averageTime}</td>
+                                <td>{sonnetHistory.statistics.user.averageWpm}</td>
+                                <td>{sonnetHistory.statistics.global.averageAccuracy}</td>
+                                <td>{sonnetHistory.statistics.global.averageTime}</td>
+                                <td>{sonnetHistory.statistics.global.averageWpm}</td>
+                            </tr>
+                        </tbody>
+                    </table> 
+            }
         </div>
     );
 }
 
-export default Sonnet;
+type SonnetHistory = {
+
+    statistics: {
+        user: SonnetStatistic,
+        global: SonnetStatistic
+    },
+
+    misspellings: {
+        user: Array<Misspelling>;
+        global: Array<Misspelling>;
+    }
+
+};
+
+type Misspelling = {
+    modelWord: string,
+    frequency: number,
+    lineNumber: number,
+    index: number,
+    scope: ScopeType
+};
+
+type SonnetStatistic = {
+    averageAccuracy: number,
+    averageTime: number,
+    averageWpm: number,
+    scope: ScopeType
+};
+
+enum ScopeType {
+    GLOBAL,
+    USER
+}
+
+
+export default withRouter(SonnetDetails);

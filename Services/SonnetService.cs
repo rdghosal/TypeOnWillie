@@ -83,12 +83,12 @@ namespace TypeOnWillie.Services
             return null;
         }
 
-        public SonnetHistoryDto GetSonnetHistory(string userId, int sonnetId)
+        public SonnetHistoryDto GetSonnetHistory(SonnetHistoryParams params_)
         {
             IEnumerable<Misspelling> misspellings = 
-                _sonnetSqlDao.SelectMisspellingsAll(userId, sonnetId);
+                _sonnetSqlDao.SelectMisspellingsAll(params_);
             IEnumerable<SonnetStatistic> statistics = 
-                _sonnetSqlDao.SelectStatisticsAll(userId, sonnetId);
+                _sonnetSqlDao.SelectStatisticsAll(params_);
 
             var sonnetHistory = new SonnetHistoryDto(statistics, misspellings);
             return sonnetHistory;

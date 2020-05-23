@@ -14,7 +14,7 @@ namespace TypeOnWillie.DataAccess
                                                     AVG(correctwordcount * 1.0/typedwordcount) AS AverageAccuracy
                                                     , AVG(SecondsElapsed * 1.0) AS AverageTime
                                                     , AVG(TypedWordCount * 1.0 /SecondsElapsed*60.0) AS AverageWpm
-                                                    , 'U' AS Scope
+                                                    , 1 AS Scope
                                                 FROM 
                                                     type_on_willie.dbo.TypeSessions
                                                 WHERE 
@@ -25,18 +25,19 @@ namespace TypeOnWillie.DataAccess
                                                     AVG(correctwordcount * 1.0/typedwordcount) AS AverageAccuracy
                                                     , AVG(SecondsElapsed * 1.0) AS AverageTime
                                                     , AVG(TypedWordCount * 1.0 /SecondsElapsed*60.0) AS AverageWpm
-                                                    , 'G' AS Scope
+                                                    , 0 AS Scope
                                                 FROM 
                                                     type_on_willie.dbo.TypeSessions
                                                 WHERE 
                                                     userid <> @userId
-                                                    AND sonnetid = 1;";
+                                                    AND sonnetid = @sonnetId;";
 
         public const string SELECT_MISSPELLINGS_ALL = @"SELECT TOP 5 
-                                                            modelWord
+                                                            ModelWord
                                                             , COUNT(modelword) as 'Frequency'
-                                                            , linenumber, [Index]
-                                                            , 'U' AS Scope
+                                                            , Linenumber
+                                                            , [Index]
+                                                            , 1 AS Scope
                                                         FROM 
                                                             type_on_willie.dbo.TypeSessions ts
                                                         INNER JOIN 
@@ -51,9 +52,9 @@ namespace TypeOnWillie.DataAccess
                                                         SELECT TOP 5 
                                                             modelWord
                                                             , COUNT(modelword) AS 'Frequency'
-                                                            , linenumber
+                                                            , LineNumber
                                                             , [Index]
-                                                            , 'G' AS Scope
+                                                            , 0 AS Scope
                                                         FROM 
                                                             type_on_willie.dbo.TypeSessions ts
                                                         INNER JOIN 
