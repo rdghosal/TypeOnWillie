@@ -52,34 +52,28 @@ def save_sonnets(dirname):
     Saves Sonnets to specified directory, logging filenames to CSV
     """
     csv_path = os.path.join(dirname, "sonnet_map.csv")
-    sonnet_folder = os.path.join(dirname, "Sonnets")
 
-    # Make directory for sonnets
-    if not os.path.exists(sonnet_folder):
-        os.mkdir(sonnet_folder)
-
-    print("Saving sonnets to {0}...".format(sonnet_folder))
-
-    # Save each sonnet as separate text file
-    # and reference to each in CSV
+    # Save sonnet data to CSV
     with open(csv_path, "w", encoding="utf-8", newline="") as sonnet_csv:
-        fieldnames = ["id", "sonnet_length", "punctuation_freq", "cap_letter_freq", "filename"]
-        writer = csv.DictWriter(fieldnames=fieldnames, f=sonnet_csv)
+
+        fieldnames = ["id", "sonnet_length", "punctuation_freq", "cap_letter_freq",\
+             "title", "text"]
+        writer = csv.DictWriter(fieldnames=fieldnames, f=sonnet_csv, delimiter="\t")
+
         for i, sonnet in enumerate(scrape_sonnets()):
-            filename = "{0}_{1}.txt".format(i + 1, sonnet.title)
+
+            print(f"Writing Sonnet {i + 1} to CSV file...")
 
             sonnet_len = 0 # Count for number of words
             punctuation_cnt = 0 # Count for punctuation
             cap_letter_cnt = 0 # Count for all capital letters
 
             # Write sonnet contents to text file         
-            with open(os.path.join(sonnet_folder, filename), "w", encoding="utf-8") as f:
-                for line in sonnet.content:                    
-                    punctuation_cnt += len(re.findall(r"[-,.;:!?\"'\[\]]",line))
-                    cap_letter_cnt += len(re.findall(r"\b\w*[A-Z]\w*\b", line)) 
+            for line in sonnet.text:                    
+                punctuation_cnt += len(re.findall(r"[-,.;:!?\"'\[\]]",line))
+                cap_letter_cnt += len(re.findall(r"\b\w*[A-Z]\w*\b", line)) 
 
-                    sonnet_len += len(line.split())
-                    f.write(line)
+                sonnet_len += len(line.split())
 
             # Write sonnet metadata to csv            
             writer.writerow({
@@ -87,12 +81,12 @@ def save_sonnets(dirname):
                 fieldnames[1]: sonnet_len,
                 fieldnames[2]: cap_letter_cnt,
                 fieldnames[3]: punctuation_cnt,
-                fieldnames[4]: filename
+                fieldnames[4]: sonnet.title,
+                fieldnames[5]: "|".join(sonnet.text)
             })
 
     # Confirmation message
-    print("Sonnets saved in: {0}\nSonnet metadata saved in: {1}".format(
-        os.path.abspath(sonnet_folder), 
+    print("Sonnet data saved in: {0}".format(
         os.path.abspath(csv_path)
         ))
 
@@ -102,7 +96,7 @@ class Sonnet():
     def __init__(self, lines):
         self.__title = lines[0]
         self.__first_verse = lines[2] # Content starts from index 2
-        self.__content = [ line + "\n" for line in lines[2:] ]
+        self.__text = lines[2:]
 
     def __str__(self):
         return "{0}\n{1}...".format(self.__title, self.__first_verse) 
@@ -119,8 +113,8 @@ class Sonnet():
         return self.__first_verse
     
     @property
-    def content(self):
-        return self.__content
+    def text(self):
+        return self.__text
     
     
 if __name__ == "__main__":

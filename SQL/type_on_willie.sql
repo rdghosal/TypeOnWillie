@@ -19,7 +19,8 @@ IF NOT EXISTS (
             [WordCount] INT NOT NULL,
             [CapitalLetterCount] INT NOT NULL,
             [PunctuationCount] INT NOT NULL,
-            [FileName] NVARCHAR(MAX) NOT NULL
+            [Title] VARCHAR(255) NOT NULL,
+            [Text] NVARCHAR(MAX) NOT NULL,
         );
 
         PRINT('Created table [dbo].[Sonnets].');
@@ -30,7 +31,7 @@ IF NOT EXISTS (
         FROM '/tmp/sonnet_map.csv'
         WITH (
             FORMAT='CSV',
-            FIELDTERMINATOR=',',
+            FIELDTERMINATOR='\t',
             ROWTERMINATOR='\n'
         );
         PRINT('Bulk insert into table [dbo].[Sonnets] complete.');
