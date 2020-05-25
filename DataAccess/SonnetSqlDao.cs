@@ -60,5 +60,23 @@ namespace TypeOnWillie.DataAccess
 
             return misspellings;
         }
+
+        public IEnumerable<Sonnet> SelectSonnets(SonnetParams params_)
+        {
+            IEnumerable<Sonnet> sonnets;
+            using (var sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
+            {
+                // TODO: Add guest logic
+                sonnets = sqlConnection.Query<Sonnet>(
+                    SonnetCommand.SELECT_SONNETS_BYUSER,
+                    new
+                    {
+                        userId = params_.UserId
+
+                    });
+            }
+
+            return sonnets;
+        }
     }
 }

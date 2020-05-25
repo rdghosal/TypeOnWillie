@@ -5,7 +5,7 @@ import SessionScore from "./SessionScore";
 import { LoadingMessage } from "./LoadingMessage";
 import CurrentModelText from "./CurrentModelText";
 import TypeHint from "./TypeHint";
-import Sonnet from "./Sonnet";
+import { Sonnet } from "./Sonnet";
 import MisspelledWordList from "./MisspelledWordList";
 import { AppContext } from "./App";
 import { Prompt } from "react-router";

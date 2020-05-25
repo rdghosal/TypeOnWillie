@@ -1,8 +1,9 @@
 import React, { useState, useEffect, Fragment, useContext } from "react";
 import SonnetCard from "./SonnetCard";
-import Sonnet from "./Sonnet";
+import { Sonnet } from "./Sonnet";
 import SonnetDetails from "./SonnetDetails";
 import { AppContext } from "./App";
+import { User } from "./AuthUtils";
 
 const SonnetMenu : React.FC = (props) : JSX.Element => {
 
@@ -12,12 +13,16 @@ const SonnetMenu : React.FC = (props) : JSX.Element => {
     const { user } = useContext(AppContext);
 
     useEffect(() => {
+        if (!user) {
+            return;
+        }
+
         // Fetch sonnet data on page load
         if (sonnetCollection === null) {
             // Retrieve sonnets from cache or fetch
             const cache = localStorage.getItem("sonnets");
             if (!cache) {
-                fetchSonnects()
+                fetchSonnects(user as User)
                     .then(data => {
                         localStorage.setItem("sonnets", JSON.stringify(data));
                         setSonnetCollection(data);
@@ -26,7 +31,7 @@ const SonnetMenu : React.FC = (props) : JSX.Element => {
                 setSonnetCollection(JSON.parse(cache));
             }
         }
-    }, [sonnetCollection]);
+    }, [user, sonnetCollection]);
 
     return (
         <div className="container-fluid">
@@ -55,8 +60,16 @@ const SonnetMenu : React.FC = (props) : JSX.Element => {
 export default SonnetMenu;
 
 
-async function fetchSonnects(): Promise<Array<Sonnet>> {
-    let res = await fetch("api/sonnetmenu");
+async function fetchSonnects(user : User): Promise<Array<Sonnet>> {
+
+    let res = await fetch("api/sonnetmenu", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            userId: user.id
+        })
+    });
+
     let sonnetCollection = await res.json() as Array<Sonnet>;
     return sonnetCollection.sort((a, b) => a.id - b.id); // Sort collection by id asc
 }

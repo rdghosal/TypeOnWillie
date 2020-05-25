@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using TypeOnWillie.DataAccess;
 using TypeOnWillie.Models;
 using TypeOnWillie.Services;
@@ -25,22 +26,22 @@ namespace TypeOnWillie.Controllers
         }
 
         // GET: api/<controller>
-        [HttpGet]
-        public ActionResult Get(int? id)
-        {
-            // Get particular sonnet by sonnet id
-            if (id.HasValue)
-            {
-                if (id < 1 || id > 154)
-                {
-                    return NotFound();
-                }
-                return Ok(_service.GetSonnetById(id));
-            }
+        //[HttpGet]
+        //public ActionResult Get(int? id)
+        //{
+        //    // Get particular sonnet by sonnet id
+        //    if (id.HasValue)
+        //    {
+        //        if (id < 1 || id > 154)
+        //        {
+        //            return NotFound();
+        //        }
+        //        return Ok(_service.GetSonnetById(id));
+        //    }
 
-            // If no id, return all sonnets
-            return Ok(_service.GetSonnets());
-        }
+        //    // If no id, return all sonnets
+        //    return Ok(_service.GetSonnets());
+        //}
 
         [HttpPost]
         [Route("history")]
@@ -48,6 +49,12 @@ namespace TypeOnWillie.Controllers
         {
             SonnetHistoryDto sonnetHistory = _service.GetSonnetHistory(params_);
             return Ok(sonnetHistory); 
+        }
+
+        [HttpPost]
+        public IActionResult GetSonnets(SonnetParams params_)
+        {
+            return Ok(_service.GetSonnets(params_));
         }
     }
 }

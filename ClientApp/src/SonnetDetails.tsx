@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import Sonnet from "./Sonnet";
+import { Sonnet } from "./Sonnet";
 import { RouteComponentProps, withRouter } from "react-router";
 import { MainContext } from "./Main";
 import { User } from "./AuthUtils";

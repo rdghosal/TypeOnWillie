@@ -22,66 +22,84 @@ namespace TypeOnWillie.Services
             _sonnetSqlDao = sonnetSqlDao;
         }
 
-        public List<Sonnet> GetSonnets()
+        //public List<Sonnet> GetSonnetsFromDirectory()
+        //{
+        //    if (_sonnets == null)
+        //    {
+        //        var sonnets = new List<SonnetDto>();
+        //        foreach (string fileName in _fileNames)
+        //        {
+        //            using (StreamReader sr = File.OpenText(fileName))
+        //            {
+        //                // Parse filename
+        //                string baseName = Path.GetFileNameWithoutExtension(fileName);
+        //                int sonnetId = Int32.Parse(baseName.Split("_")[0]);
+        //                string sonnetTitle = baseName.Split("_")[1];
+
+        //                int sonnetWordCount = 0;
+        //                List<string> sonnetContent = new List<string>();
+
+        //                // Load file
+        //                string line = ""; 
+        //                while ((line = sr.ReadLine()) != null)
+        //                {
+        //                    sonnetWordCount += line.Split().Length;
+        //                    sonnetContent.Add(line);
+        //                }
+
+        //                // Instantiate Sonnet and add to list
+        //               SonnetDto sonnet = new SonnetDto 
+        //                { 
+        //                    Id = sonnetId, 
+        //                    Title = sonnetTitle, 
+        //                    WordCount=sonnetWordCount, 
+        //                    Lines=sonnetContent
+        //                };
+
+        //                sonnets.Add(sonnet);
+        //            }
+        //        }
+
+        //        // Cache sonnets
+        //        _sonnets = sonnets;
+        //    }
+
+        //    return _sonnets;
+        //}
+
+        public IEnumerable<SonnetDto> GetSonnets(SonnetParams params_)
         {
-            if (_sonnets == null)
-            {
-                List<Sonnet> sonnets = new List<Sonnet>();
-                foreach (string fileName in _fileNames)
-                {
-                    using (StreamReader sr = File.OpenText(fileName))
-                    {
-                        // Parse filename
-                        string baseName = Path.GetFileNameWithoutExtension(fileName);
-                        int sonnetId = Int32.Parse(baseName.Split("_")[0]);
-                        string sonnetTitle = baseName.Split("_")[1];
-
-                        int sonnetWordCount = 0;
-                        List<string> sonnetContent = new List<string>();
-
-                        // Load file
-                        string line = ""; 
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            sonnetWordCount += line.Split().Length;
-                            sonnetContent.Add(line);
-                        }
-
-                        // Instantiate Sonnet and add to list
-                        Sonnet sonnet = new Sonnet 
-                        { 
-                            Id = sonnetId, 
-                            Title = sonnetTitle, 
-                            WordCount=sonnetWordCount, 
-                            Lines=sonnetContent 
-                        };
-
-                        sonnets.Add(sonnet);
-                    }
-                }
-
-                // Cache sonnets
-                _sonnets = sonnets;
-            }
-
-            return _sonnets;
+            return ConvertSonnets(_sonnetSqlDao.SelectSonnets(params_));
         }
 
-        public Sonnet GetSonnetById(int? id)
+        private IEnumerable<SonnetDto> ConvertSonnets(IEnumerable<Sonnet> sonnets)
         {
-            List<Sonnet> sonnets = (_sonnets != null) ? _sonnets : GetSonnets();
+            var sonnetCollection = new List<SonnetDto>();
 
-            foreach (Sonnet sonnet in sonnets)
+            foreach (var s in sonnets)
             {
-                if (id == sonnet.Id)
-                {
-                    return sonnet;
-                }
+                var sonnet = new SonnetDto(s);
+                sonnetCollection.Add(sonnet);
             }
 
-            // If sonnet was not found
-            return null;
+            return sonnetCollection;
         }
+
+        //public Sonnet GetSonnetById(int? id)
+        //{
+        //    List<Sonnet> sonnets = (_sonnets != null) ? _sonnets : GetSonnets();
+
+        //    foreach (Sonnet sonnet in sonnets)
+        //    {
+        //        if (id == sonnet.Id)
+        //        {
+        //            return sonnet;
+        //        }
+        //    }
+
+        //    // If sonnet was not found
+        //    return null;
+        //}
 
         public SonnetHistoryDto GetSonnetHistory(SonnetHistoryParams params_)
         {

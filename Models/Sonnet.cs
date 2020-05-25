@@ -13,23 +13,19 @@ namespace TypeOnWillie.Models
 
         public int WordCount { get; set; }
         
-        public List<string> Lines { get; set; }
-        
-        public Sonnet()
-        {
-        }
+        public string Text { get; set; }
 
-        public Sonnet(int id, string title, int wordCount, List<string> lines)
+        public HistoryFlag HasHistory { get; set; }
+
+        public IEnumerable<string> GetTextAsLines()
         {
-            Id = id;
-            Title = title;
-            WordCount = wordCount;
-            Lines = lines;
+            return Text.Split("|");
         }
-        
-        public string GetFirstLine()
-        {
-            return Lines[0];
-        }
+    }
+
+    public enum HistoryFlag
+    {
+        FALSE,
+        TRUE
     }
 }

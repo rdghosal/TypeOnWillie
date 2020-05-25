@@ -4,7 +4,7 @@ import SonnetMenu from "./SonnetMenu";
 import queryString from "query-string";
 import { RouteComponentProps } from "react-router";
 import { TypeSession } from "./TypeSession";
-import Sonnet from "./Sonnet";
+import { Sonnet } from "./Sonnet";
 import Login from "./Login";
 import { AppContext } from "./App";
 import { TokenHandler, AuthErrorTypes, User } from "./AuthUtils";

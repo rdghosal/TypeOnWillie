@@ -10,6 +10,42 @@ namespace TypeOnWillie.DataAccess
     {
         public const string SELECT_ALL = @"SELECT * FROM [type_on_willie].[dbo].[Sonnets];";
 
+        public const string SELECT_SONNETS_BYUSER = @"SELECT 
+                                                        s.id
+                                                        , title
+                                                        , wordcount
+                                                        , [text]
+                                                        , 1 AS 'HasHistory'
+                                                    FROM 
+                                                        type_on_willie.dbo.Sonnets s
+                                                    WHERE 
+                                                        id IN (
+                                                            SELECT DISTINCT 
+                                                                sonnetid
+                                                            FROM 
+                                                                type_on_willie.dbo.TypeSessions ts
+                                                            WHERE 
+                                                                userid = @userId
+                                                        )
+                                                    UNION 
+                                                    SELECT 
+                                                        s.id
+                                                        , title
+                                                        , wordcount
+                                                        , [text]
+                                                        , 0 AS 'HasHistory'
+                                                    FROM 
+                                                        type_on_willie.dbo.Sonnets s
+                                                    WHERE 
+                                                        id NOT IN (
+                                                            SELECT DISTINCT 
+                                                                sonnetid
+                                                            FROM 
+                                                                type_on_willie.dbo.TypeSessions ts
+                                                            WHERE 
+                                                                userid = @userId
+                                                        )";
+
         public const string SELECT_STATS_ALL = @"SELECT 
                                                     AVG(correctwordcount * 1.0/typedwordcount) AS AverageAccuracy
                                                     , AVG(SecondsElapsed * 1.0) AS AverageTime

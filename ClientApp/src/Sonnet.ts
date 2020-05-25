@@ -1,4 +1,4 @@
-export default class Sonnet {
+export class Sonnet {
 
     // Max sonnet lines
     static MAX_LINES: number = 14;
@@ -27,17 +27,23 @@ export default class Sonnet {
         return this._wordCount;
     }
 
-    private readonly _hasUserHistory: boolean;
-    public get hasUserHistory(): boolean {
-        return this._hasUserHistory;
+    private readonly _hasHistory: HistoryFlag;
+    public get hasHistory(): HistoryFlag {
+        return this._hasHistory;
     }
     
     public constructor(sonnetId: number, sonnetNumber: string, 
-            sonnetLines: string[], sonnetWordCount: number, hasUserHistory : boolean) {
+            sonnetLines: string[], sonnetWordCount: number, hasHistory : HistoryFlag) {
         this._id = sonnetId;
         this._title = sonnetNumber;
         this._lines = sonnetLines;
         this._wordCount = sonnetWordCount;
-        this._hasUserHistory = hasUserHistory;
+        this._hasHistory = hasHistory;
     }
 }
+
+
+export enum HistoryFlag {
+    FALSE,
+    TRUE
+};
