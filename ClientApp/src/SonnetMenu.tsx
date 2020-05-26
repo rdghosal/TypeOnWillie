@@ -4,10 +4,12 @@ import { Sonnet } from "./Sonnet";
 import SonnetDetails from "./SonnetDetails";
 import { AppContext } from "./App";
 import { User } from "./AuthUtils";
+import SearchBar from "./SearchBar";
 
 const SonnetMenu : React.FC = (props) : JSX.Element => {
 
     const [ sonnetCollection, setSonnetCollection ] = useState<Array<Sonnet> | null>(null);
+    const [ sonnetsDisplayed, setSonnetsDisplayed ] = useState<Array<Sonnet> | null>(null);
     const [ sonnetInFocus, focusSonnet ] = useState<Sonnet|null>(null);
 
     const { user } = useContext(AppContext);
@@ -33,12 +35,22 @@ const SonnetMenu : React.FC = (props) : JSX.Element => {
         }
     }, [user, sonnetCollection]);
 
+    useEffect(() => {
+
+        if (sonnetCollection) {
+            setSonnetsDisplayed(sonnetCollection);
+        }
+
+    }, [sonnetCollection]);
+
     return (
         <div className="container-fluid">
             <div className="row">
                 <div className="col-3">
+                    <SearchBar sonnetsDisplayed={sonnetCollection} sonnetCollection={sonnetCollection}
+                            setSonnetsDisplayed={setSonnetsDisplayed} />                    
                     { 
-                        sonnetCollection && sonnetCollection!.map((sonnet:Sonnet, i) => {
+                        sonnetsDisplayed && sonnetsDisplayed!.map((sonnet:Sonnet, i) => {
                             return (
                                 <div className="row" key={i}>
                                     <SonnetCard key={i} sonnet={sonnet} focusSonnet={focusSonnet} />
