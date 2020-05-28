@@ -5,6 +5,7 @@ import SonnetDetails from "./SonnetDetails";
 import { AppContext } from "./App";
 import { User } from "./AuthUtils";
 import SearchBar from "./SearchBar";
+import RandomButton from "./RandomButton";
 
 const SonnetMenu : React.FC = (props) : JSX.Element => {
 
@@ -49,6 +50,7 @@ const SonnetMenu : React.FC = (props) : JSX.Element => {
                 <div className="col-3">
                     <SearchBar sonnetsDisplayed={sonnetCollection} sonnetCollection={sonnetCollection}
                             setSonnetsDisplayed={setSonnetsDisplayed} />                    
+                    <RandomButton sonnetCollection={sonnetCollection!} focusSonnet={focusSonnet} />
                     { 
                         sonnetsDisplayed && sonnetsDisplayed!.map((sonnet:Sonnet, i) => {
                             return (

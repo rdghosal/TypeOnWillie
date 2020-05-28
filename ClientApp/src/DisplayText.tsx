@@ -35,14 +35,12 @@ function formatAsHtml(lines: string[], misspellings?: MisspellingDict) {
         lineMatrix = getMisspellingMatrix(lines, misspellings); 
     }
 
-    console.log(lineMatrix!);
     lines.forEach((line : string, i : number) => {
         const words : string[] = line.split(" ");
         
         for (let j = 0; j < lineMatrix[i].length; j++) {
             let toAppend: string = "";
             
-            console.log("MATRIX ", lineMatrix[i][j])
             switch (lineMatrix[i][j]) {
                 
                 case Scope.USER:
@@ -85,12 +83,9 @@ function getMisspellingMatrix(lines: string[], misspellings: MisspellingDict) : 
 
     for (var k of keys) {
         misspellings[k].forEach((m:Misspelling, i: number) => {
-            console.log("KEY", k)
             const currVal = matrix[m.lineNumber - 1][m.index];
-            console.log("CURRENT", currVal)
             const newVal = (k === KEY_1) ? Scope.USER : Scope.GLOBAL;
             
-            console.log("NEW", newVal)
             matrix[m.lineNumber - 1][m.index] = (currVal > 0) ? Scope.BOTH : newVal;
         });
     }
