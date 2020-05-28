@@ -3,6 +3,7 @@ import { Sonnet } from "./Sonnet";
 import { RouteComponentProps, withRouter } from "react-router";
 import { MainContext } from "./Main";
 import { User } from "./AuthUtils";
+import DisplayText from "./DisplayText";
 
 
 interface ISonnetDetailsProps extends RouteComponentProps {
@@ -49,12 +50,18 @@ const SonnetDetails: React.FC<ISonnetDetailsProps> = (props) => {
 
     return (
         <div className="sonnet-details">
-            <h2>{ props.sonnet!.title }</h2>
-            <button className="sonnet-details__init-button btn btn-primary" onClick={() => initSession()}>
-                Start Typing!
-            </button>
-            
-            { props.sonnet!.lines.map((line: string) => line + "\n") }
+            <div className="sonnet-details__header container-fluid">
+                <div className="row">
+                    <h2>{ props.sonnet!.title }</h2>
+                    <button className="sonnet-details__init-button btn btn-primary" onClick={() => initSession()}>
+                        Start Typing!
+                    </button>
+                </div>
+            </div>
+            { 
+                sonnetHistory && 
+                    <DisplayText text={props.sonnet.lines} misspellings={sonnetHistory!.misspellings} /> 
+            }
             {
                 sonnetHistory &&
                     <table className="sonnet-details__stats table table-light">
@@ -102,7 +109,7 @@ type SonnetHistory = {
 
 };
 
-type Misspelling = {
+export type Misspelling = {
     modelWord: string,
     frequency: number,
     lineNumber: number,

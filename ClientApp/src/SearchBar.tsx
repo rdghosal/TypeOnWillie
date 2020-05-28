@@ -13,7 +13,6 @@ const SearchBar : React.FC<SearchBarProps> = (props) => {
 
     const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
 
-        let textHasNumber: boolean = false;
         let input = e.target.value;
 
         console.log("INPUT=", input)
@@ -28,7 +27,6 @@ const SearchBar : React.FC<SearchBarProps> = (props) => {
             const numeral = input.split(" ")[1].toUpperCase();
 
             if (!isNaN(parseInt(numeral))) {
-                textHasNumber = true;
                 input = numeral;
             } else {
                 input = title + " " + numeral;
