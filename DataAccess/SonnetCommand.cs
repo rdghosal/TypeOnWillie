@@ -68,6 +68,16 @@ namespace TypeOnWillie.DataAccess
                                                     userid <> @userId
                                                     AND sonnetid = @sonnetId;";
 
+        public const string SELECT_STATS_GLOBAL = @"SELECT 
+                                                    AVG(correctwordcount * 1.0/typedwordcount) AS AverageAccuracy
+                                                    , AVG(SecondsElapsed * 1.0) AS AverageTime
+                                                    , AVG(TypedWordCount * 1.0 /SecondsElapsed*60.0) AS AverageWpm
+                                                    , 0 AS Scope
+                                                FROM 
+                                                    type_on_willie.dbo.TypeSessions
+                                                WHERE 
+                                                    sonnetid = @sonnetId;";
+
         public const string SELECT_MISSPELLINGS_ALL = @"SELECT TOP 5 
                                                             ModelWord
                                                             , COUNT(modelword) as 'Frequency'
@@ -100,6 +110,25 @@ namespace TypeOnWillie.DataAccess
                                                         WHERE 
                                                             userid <> @userId 
                                                             AND sonnetid = @sonnetId
+                                                        GROUP BY 
+                                                            modelword, linenumber, [index]
+                                                        ORDER BY 
+                                                            Frequency DESC;";
+
+        public const string SELECT_MISSPELLINGS_GLOBAL = @"SELECT TOP 5 
+                                                            modelWord
+                                                            , COUNT(modelword) AS 'Frequency'
+                                                            , LineNumber
+                                                            , [Index]
+                                                            , 0 AS Scope
+                                                        FROM 
+                                                            type_on_willie.dbo.TypeSessions ts
+                                                        INNER JOIN 
+                                                            type_on_willie.dbo.Misspellings ms
+                                                        ON 
+                                                            ts.id = ms.TypeSessionId
+                                                        WHERE 
+                                                            sonnetid = @sonnetId
                                                         GROUP BY 
                                                             modelword, linenumber, [index]
                                                         ORDER BY 

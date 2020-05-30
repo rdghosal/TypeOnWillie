@@ -14,6 +14,9 @@ const Navbar: React.FC<INavbarProps> = (props) => {
     const [ isLoggedIn, toggleLogIn ] = useState<boolean>(false);
 
     useEffect(() => {
+
+        if (user && user.id === "guest") return;
+
         // Parse sessionStorage for User data.
         // If absent, go to login
         if (!accessToken) {

@@ -6,14 +6,31 @@ import { AppContext } from "./App";
 import { User } from "./AuthUtils";
 import SearchBar from "./SearchBar";
 import RandomButton from "./RandomButton";
+import queryString from "query-string";
+import { RouteComponentProps, withRouter } from "react-router";
 
-const SonnetMenu : React.FC = (props) : JSX.Element => {
+
+const SonnetMenu : React.FC<RouteComponentProps> = (props) : JSX.Element => {
 
     const [ sonnetCollection, setSonnetCollection ] = useState<Array<Sonnet> | null>(null);
     const [ sonnetsDisplayed, setSonnetsDisplayed ] = useState<Array<Sonnet> | null>(null);
     const [ sonnetInFocus, focusSonnet ] = useState<Sonnet|null>(null);
 
     const { user } = useContext(AppContext);
+
+    useEffect(() => {
+
+        if (!sonnetCollection) return;
+
+        const params = queryString.parse(props.location.search);
+
+        if (params["focus"]) {
+            console.log("found focus", params["focus"][0])
+            const inFocus = parseInt(params["focus"][0]);
+            if (!isNaN(inFocus)) handleFocusByUrl(inFocus);
+        }
+
+    }, []);
 
     useEffect(() => {
         if (!user) {
@@ -44,6 +61,11 @@ const SonnetMenu : React.FC = (props) : JSX.Element => {
 
     }, [sonnetCollection]);
 
+    function handleFocusByUrl(focusId : number) {
+        const sonnetToFocus = sonnetCollection!.filter((s: Sonnet) => s.id === focusId)[0];
+        focusSonnet(sonnetToFocus);
+    }
+
     return (
         <div className="container-fluid">
             <div className="row">
@@ -71,7 +93,7 @@ const SonnetMenu : React.FC = (props) : JSX.Element => {
     );
 }
 
-export default SonnetMenu;
+export default withRouter(SonnetMenu);
 
 
 async function fetchSonnects(user : User): Promise<Array<Sonnet>> {

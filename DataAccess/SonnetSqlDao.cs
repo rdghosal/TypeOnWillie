@@ -34,12 +34,23 @@ namespace TypeOnWillie.DataAccess
             IEnumerable<SonnetStatistic> stats;
             using (var sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-                stats = sqlConnection.Query<SonnetStatistic>(SonnetCommand.SELECT_STATS_ALL, 
-                    new
-                    {
-                        userId = params_.UserId,
-                        sonnetId = params_.SonnetId
-                    });
+                if (params_.UserId == "guest")
+                {
+                    stats = sqlConnection.Query<SonnetStatistic>(SonnetCommand.SELECT_STATS_GLOBAL,
+                        new
+                        {
+                            sonnetId = params_.SonnetId
+                        });
+                }
+                else
+                {
+                    stats = sqlConnection.Query<SonnetStatistic>(SonnetCommand.SELECT_STATS_ALL, 
+                        new
+                        {
+                            userId = params_.UserId,
+                            sonnetId = params_.SonnetId
+                        });
+                }
             }
 
             return stats;
@@ -50,12 +61,23 @@ namespace TypeOnWillie.DataAccess
             IEnumerable<Misspelling> misspellings;
             using (var sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
-                misspellings = sqlConnection.Query<Misspelling>(SonnetCommand.SELECT_MISSPELLINGS_ALL, 
-                    new
-                    {
-                        userId = params_.UserId,
-                        sonnetId = params_.SonnetId
-                    });
+                if (params_.UserId == "guest")
+                {
+                    misspellings = sqlConnection.Query<Misspelling>(SonnetCommand.SELECT_MISSPELLINGS_GLOBAL,
+                        new
+                        {
+                            sonnetId = params_.SonnetId
+                        });
+                }
+                else
+                {
+                    misspellings = sqlConnection.Query<Misspelling>(SonnetCommand.SELECT_MISSPELLINGS_ALL, 
+                        new
+                        {
+                            userId = params_.UserId,
+                            sonnetId = params_.SonnetId
+                        });
+                }
             }
 
             return misspellings;
@@ -67,13 +89,20 @@ namespace TypeOnWillie.DataAccess
             using (var sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
                 // TODO: Add guest logic
-                sonnets = sqlConnection.Query<Sonnet>(
-                    SonnetCommand.SELECT_SONNETS_BYUSER,
-                    new
-                    {
-                        userId = params_.UserId
+                if (params_.UserId == "guest")
+                {
+                    sonnets = sqlConnection.Query<Sonnet>(SonnetCommand.SELECT_ALL);
+                }
+                else
+                {
+                    sonnets = sqlConnection.Query<Sonnet>(
+                        SonnetCommand.SELECT_SONNETS_BYUSER,
+                        new
+                        {
+                            userId = params_.UserId
 
-                    });
+                        });
+                }
             }
 
             return sonnets;

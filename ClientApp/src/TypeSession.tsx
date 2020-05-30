@@ -10,6 +10,7 @@ import MisspelledWordList from "./MisspelledWordList";
 import { AppContext } from "./App";
 import { Prompt } from "react-router";
 import SessionInput from "./SessionInput";
+import { GuestSessionCache, SessionResult } from "./GuestSessionCache";
 
 const DELIM = "|";
 
@@ -57,6 +58,7 @@ interface ISessionState {
 export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) => {
 
     // Current Sonnet in session
+    const { guestCache, setGuestCache } = useContext(AppContext);
     const { currentSonnet, setSonnet } = useContext(MainContext);
 
    // Pointers to column (wordIndex) and row (lineIndex) of sonnet matrix
@@ -179,6 +181,24 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
 
         data!.quit = (state!.isFinished) ? "N" : "Y";
         //data!.dateTime = new Date().toISOString();
+
+        console.log("cache ", guestCache);
+        if (userId === "guest") {
+            if (data!.quit === "Y") {
+                const result = new SessionResult(
+                    data!.sonnetId, 
+                    data!.misspelledWords!,
+                    data!.correctWordCount!,
+                    data!.typedWordCount!,
+                    data!.secondsElapsed!
+                    );
+                
+                
+                (guestCache as GuestSessionCache).update(result);
+                setGuestCache(GuestSessionCache.getCache());
+                return console.log("updated cache", guestCache);
+            }
+        }
 
         const response = await fetch("api/typesession/LogSession", {
             method: "POST",

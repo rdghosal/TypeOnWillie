@@ -3,34 +3,25 @@ import { WordTuple, MisspelledWordMap } from './TypeSession';
 
 
 type SessionInputProps = {
-
     wordIndex: number;
-    setWord:React.Dispatch<React.SetStateAction<number>>;
-
     lineIndex: number;
-    setLine: React.Dispatch<React.SetStateAction<number>>;
-
-    incrementCount:React.Dispatch<React.SetStateAction<number>>;
-
-    incrementCorrectWords:React.Dispatch<React.SetStateAction<number>>;
-
-    pushMisspelled: React.Dispatch<React.SetStateAction<MisspelledWordMap>>;
-
     wordArray: string[];
-
     currentLine: string[];
+
+    setWord:React.Dispatch<React.SetStateAction<number>>;
+    setLine: React.Dispatch<React.SetStateAction<number>>;
     setCurrentLine: React.Dispatch<React.SetStateAction<string[]>>;
-
+    incrementCount:React.Dispatch<React.SetStateAction<number>>;
+    incrementCorrectWords:React.Dispatch<React.SetStateAction<number>>;
+    pushMisspelled: React.Dispatch<React.SetStateAction<MisspelledWordMap>>;
     pushProgress: React.Dispatch<React.SetStateAction<string[]>>
-
     toggleStart: React.Dispatch<React.SetStateAction<boolean>>
     toggleInputType: React.Dispatch<React.SetStateAction<boolean>>
-
 };
 
 
-
 const SessionInput : React.FC<SessionInputProps> = ({
+    
         wordIndex,
         setWord,
         lineIndex,
@@ -44,6 +35,7 @@ const SessionInput : React.FC<SessionInputProps> = ({
         pushProgress,
         toggleStart,
         toggleInputType
+
     }) => {
 
     function evalInput(typedWord:string, modelWord:string) {

@@ -4,6 +4,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { MainContext } from "./Main";
 import { User } from "./AuthUtils";
 import DisplayText from "./DisplayText";
+import { AppContext } from "./App";
 
 
 interface ISonnetDetailsProps extends RouteComponentProps {
@@ -14,6 +15,7 @@ interface ISonnetDetailsProps extends RouteComponentProps {
 const SonnetDetails: React.FC<ISonnetDetailsProps> = (props) => {
 
     const [ sonnetHistory, setHistory ] = useState<SonnetHistory | null> (null);
+    const { user } = useContext(AppContext);
     const { setSonnet } = useContext(MainContext);
 
     const initSession= () : void => {
@@ -81,9 +83,16 @@ const SonnetDetails: React.FC<ISonnetDetailsProps> = (props) => {
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{sonnetHistory.statistics.user.averageAccuracy}</td>
-                                <td>{sonnetHistory.statistics.user.averageTime}</td>
-                                <td>{sonnetHistory.statistics.user.averageWpm}</td>
+                                {
+                                
+                                    user.id !== "guest" &&
+                                    <>
+                                        <td>{sonnetHistory.statistics.user.averageAccuracy}</td>
+                                        <td>{sonnetHistory.statistics.user.averageTime}</td>
+                                        <td>{sonnetHistory.statistics.user.averageWpm}</td>
+                                    </>
+
+                                }
                                 <td>{sonnetHistory.statistics.global.averageAccuracy}</td>
                                 <td>{sonnetHistory.statistics.global.averageTime}</td>
                                 <td>{sonnetHistory.statistics.global.averageWpm}</td>
