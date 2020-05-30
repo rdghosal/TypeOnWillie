@@ -9,6 +9,7 @@ import { Sonnet } from "./Sonnet";
 import MisspelledWordList from "./MisspelledWordList";
 import { AppContext } from "./App";
 import { Prompt } from "react-router";
+import SessionInput from "./SessionInput";
 
 const DELIM = "|";
 
@@ -225,57 +226,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
             .then(data => setSonnet(data));
     }
 
-    function handleInput() {
-        const input = (document.getElementById("session-input") as HTMLInputElement);
-        const currentInput = input.value;
-        console.log(currentInput)
 
-        // Add word count
-        evalInput(currentInput, wordArray[wordIndex]);
-        incrementCount(currentWordCount => currentWordCount += 1);
-
-        if (wordIndex === wordArray.length - 1) {
-            // Move to next line and beginning thereof
-            setWord(0);
-            setLine(lineIndex => lineIndex += 1);
-            
-            // Make array of words typed thus far (+ currentInput) into a string and store
-            const progress = [...currentLine, currentInput].join(" ");
-            pushProgress(currentProgress => [...currentProgress, progress]);
-            setCurrentLine(new Array<string>()); // Reset to empty
-
-        } else {
-            // Store input and move to next word in line
-            setCurrentLine(currentLine => [...currentLine, currentInput]);
-            setWord(wordIndex => wordIndex += 1);
-        }
-
-        // Clear input field
-        input.value = "";
-    }
-
-    function evalInput(typedWord:string, modelWord:string) {
-        // Adds to score if typed and model word are identical
-        typedWord = typedWord.replace(/\s*$/, ""); // Strip all space from rear of input only
-        if (typedWord === modelWord) {
-            incrementCorrectWords(correctWordCount => correctWordCount += 1);
-        } else {
-            const currentWords = new WordTuple(modelWord, typedWord, wordIndex, lineIndex + 1);
-            pushMisspelled(misspelledWords => {
-                const temp = misspelledWords[lineIndex];
-                let newWords = (temp) ? [...temp, currentWords] : [ currentWords ];
-                return {
-                    ...misspelledWords,
-                    [lineIndex] : newWords
-                }
-            });
-        }
-    }
-
-    function handleKeyUp(e : React.KeyboardEvent<HTMLInputElement>) {
-        const targetKey = (wordIndex === wordArray.length - 1) ? 13 : 32;
-        if (e.keyCode === targetKey) return handleInput(); 
-    }
 
     return (
         <div className="typesession">
@@ -296,8 +247,22 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
                             correctWordCount={correctWordCount} />
                         { !isFinished && 
                             <CurrentModelText wordArray={wordArray} wordIndex={wordIndex} /> }
-                        <input type="text" id="session-input" 
-                            onKeyUp={ handleKeyUp } onClick={() => toggleStart(true)} onTouchStart={() => toggleInputType(true)}/>
+                        
+                        <SessionInput 
+                            wordIndex={wordIndex} 
+                            setWord={setWord}
+                            lineIndex={lineIndex}
+                            setLine={setLine}
+                            currentLine={currentLine}
+                            setCurrentLine={setCurrentLine}
+                            incrementCount={incrementCount}
+                            incrementCorrectWords={incrementCorrectWords}
+                            pushMisspelled={pushMisspelled}
+                            wordArray={wordArray}
+                            pushProgress={pushProgress}
+                            toggleStart={toggleStart}
+                            toggleInputType={toggleInputType}/>
+
                         <TypeHint endOfLine={ wordIndex === wordArray.length - 1 }/>
                         <div className="typesession__model-text">
                             { currentSonnet.lines.map((line:string, i:number) => (i > lineIndex) && <p key={i}>{line}</p>) }
