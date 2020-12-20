@@ -31,7 +31,7 @@ export const Profile: React.FC = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ // TODO make params class
                 userId: user.id,
-                endDate: (timeScale === ScaleType.YEAR) ? new Date().toISOString() : getEndDate(selectDate!),
+                endDate: (timeScale === ScaleType.YEAR) ? new Date().toISOString().substring(0,10) : getEndDate(selectDate!),
                 timeScale: timeScale
             })
 
@@ -41,6 +41,7 @@ export const Profile: React.FC = () => {
             }
 
             return resp.json();
+
         }).then(data => {
             console.log(data)
             setProfile(data);
@@ -74,7 +75,7 @@ export const Profile: React.FC = () => {
         let isDisabled = false;
         if (timeScale === ScaleType.YEAR) {
             console.log("Setting to YEAR");
-            setDate(new Date().toISOString());
+            setDate(new Date().toISOString().substring(0,10));
             inputEl.value = "";
             isDisabled = true;
         } 

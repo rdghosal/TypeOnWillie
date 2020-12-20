@@ -77,11 +77,12 @@ const Login = (props : RouteComponentProps) => {
                     <button className="btn btn-primary" type="submit">Login</button>
                     <button className="btn btn-secondary" type="button"
                         onClick={() => props.history.push("/register") }>Sign Up</button>
-                    <button className="btn btn-warning" type="button" onClick={ handleGuest }>Continue as Guest</button>
                 </form>
             </div>
         </Fragment>
     );
 }
+
+// <button className="btn btn-warning" type="button" onClick={ handleGuest }>Continue as Guest</button>
 
 export default Login;

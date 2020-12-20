@@ -46,6 +46,7 @@ const SessionInput : React.FC<SessionInputProps> = ({
         } else {
             const currentWords = new WordTuple(modelWord, typedWord, wordIndex, lineIndex + 1);
             pushMisspelled((misspelledWords: MisspelledWordMap) => {
+                console.log(misspelledWords);
                 const temp = misspelledWords[lineIndex];
                 let newWords = (temp) ? [...temp, currentWords] : [ currentWords ];
                 return {
@@ -59,7 +60,6 @@ const SessionInput : React.FC<SessionInputProps> = ({
     function handleInput() {
         const input = (document.getElementById("session-input") as HTMLInputElement);
         const currentInput = input.value;
-        console.log(currentInput)
 
         // Add word count
         evalInput(currentInput, wordArray[wordIndex]);

@@ -14,7 +14,8 @@ const SessionTimer = ({ isStarted, isFinished, currentWordCount } : SessionTimer
         if (!intervalId && !isFinished && isStarted) {
             const id = setInterval(() => incrementTime(), 1000);
             setIntervalId(id);
-        } else if (isFinished) {
+        } else if (!isStarted || isFinished) {
+            setIntervalId(null);
             clearInterval(intervalId);
         }
     }, [isStarted, isFinished]);

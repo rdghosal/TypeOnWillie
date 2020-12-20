@@ -10,7 +10,7 @@ import MisspelledWordList from "./MisspelledWordList";
 import { AppContext } from "./App";
 import { Prompt } from "react-router";
 import SessionInput from "./SessionInput";
-import { GuestSessionCache, SessionResult } from "./GuestSessionCache";
+import { GuestSessionCache, SessionResult, CacheHandler } from "./GuestSessionCache";
 
 const DELIM = "|";
 
@@ -184,20 +184,21 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
 
         console.log("cache ", guestCache);
         if (userId === "guest") {
-            if (data!.quit === "Y") {
-                const result = new SessionResult(
-                    data!.sonnetId, 
-                    data!.misspelledWords!,
-                    data!.correctWordCount!,
-                    data!.typedWordCount!,
-                    data!.secondsElapsed!
-                    );
-                
-                
-                (guestCache as GuestSessionCache).update(result);
-                setGuestCache(GuestSessionCache.getCache());
-                return console.log("updated cache", guestCache);
-            }
+            //if (data!.quit === "Y") {
+            const result = new SessionResult(
+                data!.sonnetId, 
+                data!.misspelledWords!,
+                data!.correctWordCount!,
+                data!.typedWordCount!,
+                data!.secondsElapsed!
+                );
+            
+
+            console.log("CACHE BEFORE: ", guestCache)
+            CacheHandler.updateCache(guestCache, result);
+            console.log("CACHE AFTER: ", guestCache)
+            setGuestCache(guestCache);
+            //}
         }
 
         const response = await fetch("api/typesession/LogSession", {
@@ -233,6 +234,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
         wordTupleCollection.forEach((wsl) => {
             for (let i = 0; i < wsl.length; i++) {
                 wordTupleList.push(wsl[i]);
+                console.log("misspellings ", wordTupleList);
             }
         });
 

@@ -66,7 +66,6 @@ const Navbar: React.FC<INavbarProps> = (props) => {
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarLinks" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
             </button>
-            { isLoggedIn && 
                 <div className="collapse navbar-collapse" id="navbarLinks">
                     <ul className="navbar-nav ml-auto">
                         <li className="nav-item">
@@ -75,16 +74,25 @@ const Navbar: React.FC<INavbarProps> = (props) => {
                         <li className="nav-item">
                             <Link className="react-link nav-link" to="/app">Sonnet Menu</Link>
                         </li>
-                        <li className="nav-item">
-                            { 
-                                isLoggedIn 
-                                    ? <p className="nav-link fake-link" onClick={ handleLogOut }>Log Out</p>
-                                    : <p className="nav-link fake-link" onClick={() => props.history.push("/register")}>Sign Up</p>
-                            }
-                        </li>
+                        {isLoggedIn
+                            ?
+                                <>
+                                    <li>
+                                        <Link className="react-link nav-link" to="/profile">View Profile</Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <p className="nav-link fake-link" onClick={handleLogOut}>Log Out</p>
+                                    </li>
+                                </>
+                                
+                            :
+                                <li>
+                                    <p className="nav-link fake-link" onClick={() => props.history.push("/register")}>Sign Up</p>
+                                </li>
+
+                        }
                     </ul>
                 </div>
-            }
         </nav>
     );
 }
