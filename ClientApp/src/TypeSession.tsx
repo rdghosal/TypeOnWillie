@@ -11,6 +11,7 @@ import { AppContext } from "./App";
 import { Prompt } from "react-router";
 import SessionInput from "./SessionInput";
 import { GuestSessionCache, SessionResult, CacheHandler } from "./GuestSessionCache";
+import ResultModal from "./ResultModal";
 
 const DELIM = "|";
 
@@ -289,12 +290,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
                         <div className="typesession__model-text">
                             { currentSonnet.lines.map((line:string, i:number) => (i > lineIndex) && <p key={i}>{line}</p>) }
                         </div>
-                        <div className="typesession__progress--sonnet">
-                            { currentProgress.map((line:string, i:number) => <p key={i}>{line}</p>) }
-                            <p>{ currentLine.join(" ") }</p>
-                        </div>
-                        <MisspelledWordList 
-                            misspelledWords={ misspelledWords } lineIndex={lineIndex} />
+						{ isFinished && <ResultModal completeLines={currentProgress}/> }
                       </>
                     : <LoadingMessage insertText={"your session"} />
             }

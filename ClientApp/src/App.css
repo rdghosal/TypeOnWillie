@@ -7,3 +7,7 @@
 .type-hint__msg--key-name {
   font-size: 30px;
 }
+
+.sonnet-card:hover {
+	cursor:pointer;
+}
