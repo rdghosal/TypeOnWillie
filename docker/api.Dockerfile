@@ -6,5 +6,6 @@ RUN apt-get install -y nodejs
 WORKDIR /app
 COPY *.csproj /app
 RUN dotnet restore
+COPY . .
 ENTRYPOINT ["dotnet", "watch", "run", "--no-restore", "--urls", "https://0.0.0.0:5001;http://0.0.0.0:5000"]
 
