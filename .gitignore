@@ -1,9 +1,11 @@
 # GENERAL
 test_*
 Old
+*.bak
 
 # Docker
 .env
+docker/db.Dockerfile
 docker-compose.yml
 
 # React 
