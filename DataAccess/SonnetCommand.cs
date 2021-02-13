@@ -54,7 +54,9 @@ namespace TypeOnWillie.DataAccess
                                                 FROM 
                                                     type_on_willie.dbo.TypeSessions
                                                 WHERE 
-                                                    userid = @userId
+                                                    typedwordcount > 0
+                                                    AND secondselapsed > 0
+                                                    AND userid = @userId
                                                     AND sonnetid = @sonnetId
                                                 UNION
                                                 SELECT 
@@ -65,7 +67,9 @@ namespace TypeOnWillie.DataAccess
                                                 FROM 
                                                     type_on_willie.dbo.TypeSessions
                                                 WHERE 
-                                                    userid <> @userId
+                                                    typedwordcount > 0
+                                                    AND secondselapsed > 0
+                                                    AND userid <> @userId
                                                     AND sonnetid = @sonnetId;";
 
         public const string SELECT_STATS_GLOBAL = @"SELECT 
