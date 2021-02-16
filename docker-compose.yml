@@ -1,0 +1,39 @@
+version: "3"
+services:
+    api:
+        build:
+            context: .
+            dockerfile: ./docker/api.Dockerfile
+        ports:
+            - "5000:5000"
+            - "5001:5001"
+        volumes:
+            - ${PWD}:/app
+            - /app/bin/
+            - /app/obj/
+        depends_on:
+            - db
+            - cache
+    db:
+        build:
+            context: .
+            dockerfile: ./docker/db.Dockerfile
+            args:
+                - DBNAME=${DBNAME}
+                - DB_USER=${DB_USER}
+                - SA_PASSWORD=${SA_PASSWORD}
+        ports:
+            - "1433:1433"
+        env_file:
+            - .env
+        volumes:
+            - vol_mssql:/var/opt/mssql
+    cache:
+        image: redis
+        volumes:
+            - vol_redis:/data 
+        ports:
+            - "6379:6379"
+volumes:
+    vol_mssql:
+    vol_redis:
