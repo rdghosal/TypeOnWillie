@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/mssql/server:2019-CU8-ubuntu-16.04 AS test-db
+FROM mcr.microsoft.com/mssql/server:2019-latest AS test-db
 EXPOSE 1433
 USER root
 ARG SA_PASSWORD

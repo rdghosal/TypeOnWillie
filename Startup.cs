@@ -49,6 +49,7 @@ namespace TypeOnWillie
             //services.AddSingleton(new SonnetService(Configuration["SonnetPath"]));
 
             services.AddControllersWithViews();
+            //services.AddRazorPages().AddRazorRuntimeCompilation();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

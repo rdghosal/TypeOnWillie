@@ -15,42 +15,18 @@ export const Profile: React.FC = () => {
     const [timeScale, setScaleType] = useState<ScaleType>(ScaleType.YEAR);
     //const [selectMonth, setMonth] = useState<number | null>(null);
     //const [selectYear, setYear] = useState<number | null>(null);
-    const [selectDate, setDate] = useState<string|null>(null);
+    const [selectDate, setDate] = useState<string|null>(getCurrDateString());
     const [progressLineData, setProgressLine] = useState<ScoreData|null>(null);
     const [skillsGraphData, setSkillsGraph] = useState<SkillsGraphData | null>(null);
+
 
     useEffect(() => {
         if (!user) {
             return;
         }
-
-        const url = (user.id === "guest") ? "/api/profile/guest" : "api/profile";
-
-        fetch(url, {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ // TODO make params class
-                userId: user.id,
-                endDate: (timeScale === ScaleType.YEAR) ? new Date().toISOString().substring(0,10) : getEndDate(selectDate!),
-                timeScale: timeScale
-            })
-
-        }).then(resp => {
-            if (!resp.ok) {
-                return console.log("Failed to fetch profile!");
-            }
-
-            return resp.json();
-
-        }).then(data => {
-            console.log(data)
-            setProfile(data);
-            console.log(scoreFactory(data.scores, scoreType!, timeScale!))
-            setProgressLine(scoreFactory(data.scores, scoreType!, timeScale!));
-            setSkillsGraph(skillsDataFactory(data.percentiles));
-        });
-
+        getProfileData();
     }, [user, scoreType, selectDate]);
+
 
     useEffect(() => {
         if (profileData && timeScale === ScaleType.YEAR) {
@@ -58,10 +34,12 @@ export const Profile: React.FC = () => {
         }
     }, [profileData]);
 
+
     useEffect(() => {
         if (!profileData) return;
         setProgressLine(scoreFactory(profileData.scores, scoreType!, timeScale!));
     }, [scoreType]);
+
 
     useEffect(() => {
 
@@ -70,19 +48,25 @@ export const Profile: React.FC = () => {
             return;
         }
 
-        const inputEl = (document.getElementById("monthYearInput") as HTMLInputElement);
+        console.log("printing scaletype again, ", timeScale)
 
+        const inputEl = (document.getElementById("monthYearInput") as HTMLInputElement);
         let isDisabled = false;
+
         if (timeScale === ScaleType.YEAR) {
             console.log("Setting to YEAR");
             setDate(new Date().toISOString().substring(0,10));
             inputEl.value = "";
             isDisabled = true;
-        } 
+        } else {
+            let newDate = (!inputEl.value) ? null : inputEl.value;
+            setDate(getEndDate(newDate));
+        }
 
         inputEl.disabled = isDisabled;
-
+        
     }, [timeScale]);
+
 
     const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         console.log("SCALE", e.target.value);
@@ -102,10 +86,51 @@ export const Profile: React.FC = () => {
             return;
         } else if (date.length < 7) {
             return alert("Select BOTH month and year!");
+        } else if (!verifyDate(date)) {
+            return alert("Please input valid date!");
         }
         
-        setDate(e.target.value);
+        setDate(getEndDate(e.target.value));
     };
+
+    function getCurrDateString() : string {
+        return new Date().toISOString().substr(0, 10);
+    }
+
+    async function getProfileData() {
+
+        const url = (user.id === "guest") ? "/api/profile/guest" : "api/profile";
+
+        console.log("Current select date: ", selectDate);
+        fetch(url, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ // TODO make params class
+                userId: user.id,
+                endDate: selectDate,
+                timeScale: timeScale
+            })
+
+        }).then(resp => {
+            if (!resp.ok) {
+                return console.log("Failed to fetch profile!");
+            }
+
+            return resp.json();
+
+        }).then(data => {
+
+            if (!data) return;
+
+            console.log(data)
+            setProfile(data);
+            console.log(scoreFactory(data.scores, scoreType!, timeScale!))
+            setProgressLine(scoreFactory(data.scores, scoreType!, timeScale!));
+            setSkillsGraph(skillsDataFactory(data.percentiles));
+        });
+    }
+
+
 
     if (!profileData || !user) {
         return (
@@ -338,6 +363,15 @@ function scoreFactory(scores: Array<ScoreCollection>, scoreType : ScoreType, tim
     return scoreData;
 }
 
-function getEndDate(inDate: string): string {
+function getEndDate(inDate: string | null): string {
+    if (!inDate) {
+        inDate = new Date().toISOString().substr(0,7);
+        console.log(`New Date ${inDate}`);
+    }
     return inDate + "-01";
+}
+
+function verifyDate(dateStr : string) : boolean {
+    const dateDt = new Date(dateStr);
+    return dateDt instanceof Date && !isNaN(dateDt.valueOf());
 }

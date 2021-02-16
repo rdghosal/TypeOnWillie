@@ -13,7 +13,6 @@ namespace TypeOnWillie.DataAccess
 {
     public class SonnetSqlDao : SqlDao
     {
-
         private readonly IConfiguration _config;
         public SonnetSqlDao(SqlConnection sqlConnection, IConfiguration configuration) : base(sqlConnection)
         {
