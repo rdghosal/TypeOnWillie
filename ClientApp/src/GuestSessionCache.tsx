@@ -119,7 +119,7 @@ export class CacheHandler {
         
         const temp = new Array<WordTuple>();
 
-
+        // TODO : Add algorithm to randomize misspellings added when over 5
         for (let i = 0; i < UBOUND; i++) {
             temp.push(s.misspellings[i]);
         }

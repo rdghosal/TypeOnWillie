@@ -30,8 +30,6 @@ const Login = (props : RouteComponentProps) => {
             return false;
         }
 
-
-
         // Save token and username/id to memory
         const token = await TokenHandler.getToken({ username, password } as UserCredentials);
         if (!token) {
@@ -77,6 +75,8 @@ const Login = (props : RouteComponentProps) => {
                     <button className="btn btn-primary" type="submit">Login</button>
                     <button className="btn btn-secondary" type="button"
                         onClick={() => props.history.push("/register") }>Sign Up</button>
+                    <button className="btn btn-info" type="button"
+                        onClick={() => handleGuest() }>Continue As Guest</button>
                 </form>
             </div>
         </Fragment>

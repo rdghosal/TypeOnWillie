@@ -80,7 +80,9 @@ namespace TypeOnWillie.DataAccess
                                                 FROM 
                                                     type_on_willie.dbo.TypeSessions
                                                 WHERE 
-                                                    sonnetid = @sonnetId;";
+                                                    typedwordcount > 0
+                                                    AND SecondsElapsed > 0 
+                                                    AND sonnetid = @sonnetId;";
 
         public const string SELECT_MISSPELLINGS_ALL = @"SELECT TOP 5 
                                                             ModelWord
