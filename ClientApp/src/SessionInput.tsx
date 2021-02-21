@@ -7,6 +7,7 @@ type SessionInputProps = {
     lineIndex: number;
     wordArray: string[];
     currentLine: string[];
+    isStarted: boolean;
 
     setWord:React.Dispatch<React.SetStateAction<number>>;
     setLine: React.Dispatch<React.SetStateAction<number>>;
@@ -17,11 +18,11 @@ type SessionInputProps = {
     pushProgress: React.Dispatch<React.SetStateAction<string[]>>
     toggleStart: React.Dispatch<React.SetStateAction<boolean>>
     toggleInputType: React.Dispatch<React.SetStateAction<boolean>>
+    togglePause: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 
 const SessionInput : React.FC<SessionInputProps> = ({
-    
         wordIndex,
         setWord,
         lineIndex,
@@ -33,9 +34,10 @@ const SessionInput : React.FC<SessionInputProps> = ({
         pushMisspelled, 
         wordArray,
         pushProgress,
+        isStarted,
         toggleStart,
-        toggleInputType
-
+        toggleInputType,
+        togglePause
     }) => {
 
     function evalInput(typedWord:string, modelWord:string) {
@@ -85,6 +87,14 @@ const SessionInput : React.FC<SessionInputProps> = ({
         input.value = "";
     }
 
+    const initSession = () => {
+        togglePause(false);
+        if (!isStarted) {
+        console.log("Initing session...")
+            toggleStart(true);
+        }
+    }
+
     function handleKeyUp(e : React.KeyboardEvent<HTMLInputElement>) {
         const targetKey = (wordIndex === wordArray.length - 1) ? 13 : 32;
         if (e.keyCode === targetKey) return handleInput(); 
@@ -93,8 +103,8 @@ const SessionInput : React.FC<SessionInputProps> = ({
     return (
         <div>
             <input type="text" id="session-input" 
-                onBlur={() => toggleStart(false)}
-                onKeyUp={ handleKeyUp } onClick={() => toggleStart(true)} onTouchStart={() => toggleInputType(true)}/>
+                onBlur={() => togglePause(true)}
+                onKeyUp={ handleKeyUp } onClick={ initSession } onTouchStart={ initSession }/>
             
         </div>
     )

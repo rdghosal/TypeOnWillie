@@ -49,7 +49,7 @@ const Login = (props : RouteComponentProps) => {
         const guest = {
             id: "guest"
         };
-        // sessionStorage.setItem("user", JSON.stringify(guest));
+        sessionStorage.setItem("user", JSON.stringify(guest));
         setUser(guest);
         props.history.push("/app");
     }

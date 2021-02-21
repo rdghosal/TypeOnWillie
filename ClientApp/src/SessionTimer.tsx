@@ -1,24 +1,31 @@
-import React, { useEffect, useState } from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 type SessionTimerProps = {
+    intervalId: any
+    setIntervalId: Dispatch<SetStateAction<NodeJS.Timeout | null>>, 
     isStarted: boolean,
     isFinished: boolean,
-    currentWordCount: number
+    currentWordCount: number,
+    clearTimer: (id: NodeJS.Timeout) => void,
+    isPaused: boolean
 };
 
-const SessionTimer = ({ isStarted, isFinished, currentWordCount } : SessionTimerProps) => {
+const SessionTimer = ({ isStarted
+    , isFinished
+    , currentWordCount
+    , intervalId
+    , setIntervalId
+    , clearTimer
+    , isPaused} : SessionTimerProps) => {
 
-    const [ intervalId, setIntervalId ] = useState<any>();
 
     useEffect(() => {
-        if (!intervalId && !isFinished && isStarted) {
+        if (!intervalId && !isPaused) {
             const id = setInterval(() => incrementTime(), 1000);
+            console.log("Starting interval ", id);
             setIntervalId(id);
-        } else if (!isStarted || isFinished) {
-            setIntervalId(null);
-            clearInterval(intervalId);
         }
-    }, [isStarted, isFinished]);
+    }, [isPaused, isFinished]);
 
     useEffect(() => {
         const speedEl = document.getElementById("typingSpeed");

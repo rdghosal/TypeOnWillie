@@ -12,6 +12,7 @@ import { Prompt } from "react-router";
 import SessionInput from "./SessionInput";
 import { GuestSessionCache, SessionResult, CacheHandler } from "./GuestSessionCache";
 import ResultModal from "./ResultModal";
+import { clear } from "console";
 
 const DELIM = "|";
 
@@ -53,7 +54,9 @@ interface ISessionData {
 
 interface ISessionState {
     isFinished: boolean,
-    isStarted: boolean
+    isStarted: boolean,
+    isPaused: boolean,
+    intervalId: NodeJS.Timeout | null
 }
 
 export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) => {
@@ -74,8 +77,10 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
     const [ correctWordCount, incrementCorrectWords ] = useState<number>(0);
     
     // To track session
+    const [ intervalId, setIntervalId ] = useState<NodeJS.Timeout|null>(null);
     const [ isStarted, toggleStart ] = useState<boolean>(false);
     const [ isFinished, toggleFinish ] = useState<boolean>(false);
+    const [ isPaused, togglePause ] = useState<boolean>(true);
     const [ currentWordCount, incrementCount ] = useState<number>(0);
 
     // Track whether using touch keyboard
@@ -100,6 +105,8 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
         /**
          * Update ref to be used at component unmount
          */
+
+        console.log("Current state: ", sessionState.current);
 
         // Return if session yet started
         if (!isStarted) return;
@@ -126,10 +133,18 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
 
         state.isFinished = isFinished;
         state.isStarted = isStarted;
+        state.isPaused = isPaused;
+        state.intervalId = intervalId;
+        console.log("Current interval Id", intervalId);
+        if (state.intervalId && (isPaused || isFinished)) {
+            clearTimer(state.intervalId);
+        }
 
         sessionState.current = state;
 
-    }, [isFinished,
+    }, [intervalId,
+        isPaused,
+        isFinished,
         isStarted,
         misspelledWords,
         userId,
@@ -145,6 +160,7 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
         if (currentWordCount > currentSonnet.wordCount - 1) {
             const inputEl = (document.getElementById("session-input") as HTMLInputElement);
             inputEl.disabled = true;
+            togglePause(true);
             return toggleFinish(true); // TODO test
         }
     }, [currentWordCount]);
@@ -160,9 +176,18 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
     function handleDismount() {
         console.log("Cleanup!")
         const state = sessionState.current;
+
         if (!state) return;
         if ((!state!.isFinished && state!.isStarted) || state!.isFinished) {
+            console.log("logging..., current session", state.intervalId);
+
+            toggleStart(false);
+            toggleFinish(true);
+            
             logSession(isFinished);
+        }
+        if (state.intervalId) {
+            clearTimer(state.intervalId!);
         }
     }
 
@@ -250,6 +275,11 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
     }
 
 
+    function clearTimer(id: NodeJS.Timeout) {
+        console.log("Clearing interval, ", id);
+        clearInterval(id);
+        setIntervalId(null);
+    }
 
     return (
         <div className="typesession">
@@ -257,13 +287,17 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
                 currentSonnet
                     ? <>
                         <Prompt
-                            when={!isFinished && isStarted}
+                            when={isStarted && !isFinished}
                             message={"Are you sure you want to quit and lose this session?"} />
                         <h2>{ currentSonnet.title }</h2>
                         <SessionTimer 
+                            intervalId={intervalId}
+                            setIntervalId={setIntervalId}
                             currentWordCount={currentWordCount}
                             isStarted={isStarted} 
-                            isFinished={isFinished} />
+                            isFinished={isFinished} 
+                            isPaused={isPaused}
+                            clearTimer={clearTimer}/>
                         <SessionScore 
                             currentWordCount={currentWordCount} 
                             remainingWords={currentSonnet.wordCount - currentWordCount} 
@@ -283,7 +317,9 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
                             pushMisspelled={pushMisspelled}
                             wordArray={wordArray}
                             pushProgress={pushProgress}
+                            isStarted={isStarted}
                             toggleStart={toggleStart}
+                            togglePause={togglePause}
                             toggleInputType={toggleInputType}/>
 
                         <TypeHint endOfLine={ wordIndex === wordArray.length - 1 }/>
