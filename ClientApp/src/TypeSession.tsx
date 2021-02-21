@@ -303,7 +303,10 @@ export const TypeSession: React.FC<TypeSessionProps> = ({ sonnetId, userId }) =>
                             remainingWords={currentSonnet.wordCount - currentWordCount} 
                             correctWordCount={correctWordCount} />
                         { !isFinished && 
-                            <CurrentModelText wordArray={wordArray} wordIndex={wordIndex} /> }
+                            <CurrentModelText 
+                                typedLine={currentLine}
+                                wordArray={wordArray}
+                                wordIndex={wordIndex} /> }
                         
                         <SessionInput 
                             wordIndex={wordIndex} 

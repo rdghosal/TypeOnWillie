@@ -40,11 +40,17 @@ const SessionInput : React.FC<SessionInputProps> = ({
         togglePause
     }) => {
 
-    function evalInput(typedWord:string, modelWord:string) {
+    function evalInput(typedWord:string, modelWord:string) : boolean {
         // Adds to score if typed and model word are identical
-        typedWord = typedWord.replace(/\s*$/, ""); // Strip all space from rear of input only
+        // Returns true if matching and vice-versa
+        let isMatching: boolean;
+        isMatching = false;
+
+        typedWord = typedWord.replace(/\s/g, ""); // Strip all space from rear of input only
+        console.log(typedWord)
         if (typedWord === modelWord) {
             incrementCorrectWords(correctWordCount => correctWordCount += 1);
+            isMatching = true;
         } else {
             const currentWords = new WordTuple(modelWord, typedWord, wordIndex, lineIndex + 1);
             pushMisspelled((misspelledWords: MisspelledWordMap) => {
@@ -57,14 +63,25 @@ const SessionInput : React.FC<SessionInputProps> = ({
                 }
             });
         }
+
+        return isMatching;
     }
 
     function handleInput() {
+
+        let isMatching : boolean;
+        isMatching = false;
+
         const input = (document.getElementById("session-input") as HTMLInputElement);
-        const currentInput = input.value;
+        let currentInput = input.value;
+
+        // Check if matching and pre/append highlighting if misspelling
+        isMatching = evalInput(currentInput, wordArray[wordIndex]);
+        if (!isMatching) {
+            currentInput = `<span style="color:red;">${currentInput}</span>`;
+        }
 
         // Add word count
-        evalInput(currentInput, wordArray[wordIndex]);
         incrementCount(currentWordCount => currentWordCount += 1);
 
         if (wordIndex === wordArray.length - 1) {

@@ -21,7 +21,6 @@ export const Main: React.FC<RouteComponentProps> = (props) => {
     return (
         <Fragment>
             <MainContext.Provider value={{ currentSonnet, setSonnet, user, setUser }}>
-                <Navbar isLogInPage={false} />
                 {
                     user &&
                         params["sonnet"] && currentSonnet

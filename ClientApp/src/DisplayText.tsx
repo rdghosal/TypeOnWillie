@@ -57,6 +57,7 @@ function formatAsHtml(lines: string[], misspellings?: MisspellingDict) {
                     break;
             }
 
+            toAppend = (toAppend.indexOf("undefined") > -1) ? "" : toAppend;
             htmlString += toAppend + " ";
         }
 

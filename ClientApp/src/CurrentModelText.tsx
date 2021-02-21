@@ -1,12 +1,13 @@
 import React, { useState, useEffect, Fragment } from 'react'
 
 type CurrentModelTextProps = {
+    typedLine: string[],
     wordArray: string[],
     wordIndex: number
 }
 
 
-const CurrentModelText = ({ wordArray, wordIndex } : CurrentModelTextProps) => {
+const CurrentModelText = ({ wordArray, wordIndex, typedLine } : CurrentModelTextProps) => {
 
     const [ wordString, appendWord ] = useState<string | undefined>();
 
@@ -19,14 +20,21 @@ const CurrentModelText = ({ wordArray, wordIndex } : CurrentModelTextProps) => {
         // Add previous word to line
         const prev = wordIndex - 1;
         if (prev < 0 || !wordArray) return;
-        let newWord = (wordString) ? wordString + " " + wordArray[prev] : wordArray[prev];
+        let newWord = (wordString) ? wordString + " " + typedLine[prev] : typedLine[prev];
         appendWord(newWord);
     }, [wordIndex]);
+
+    const makeCurrentLine = () : {"__html" : string } | undefined  => {
+
+        return wordIndex > 0 ? { "__html": wordString + " " } : undefined;
+    }
 
     return (
         <div className="typesession__model-text">
             <div className="model-text__line">
-                { wordIndex > 0 ? wordString + " " : null}<h2>{ wordArray[wordIndex] }</h2>
+                <p className="model-text__text"
+                    dangerouslySetInnerHTML={makeCurrentLine()}></p>
+                <h2>{ wordArray[wordIndex] }</h2>
             </div>
         </div>
     )

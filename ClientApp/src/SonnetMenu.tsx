@@ -8,6 +8,7 @@ import SearchBar from "./SearchBar";
 import RandomButton from "./RandomButton";
 import queryString from "query-string";
 import { RouteComponentProps, withRouter } from "react-router";
+import Navbar from "./Navbar";
 
 
 const SonnetMenu : React.FC<RouteComponentProps> = (props) : JSX.Element => {
@@ -67,29 +68,32 @@ const SonnetMenu : React.FC<RouteComponentProps> = (props) : JSX.Element => {
     }
 
     return (
-        <div className="container-fluid">
-            <div className="row">
-                <div className="col-3">
-                    <SearchBar sonnetsDisplayed={sonnetCollection} sonnetCollection={sonnetCollection}
-                            setSonnetsDisplayed={setSonnetsDisplayed} />                    
-                    <RandomButton sonnetCollection={sonnetCollection!} focusSonnet={focusSonnet} />
-                    { 
-                        sonnetsDisplayed && sonnetsDisplayed!.map((sonnet:Sonnet, i) => {
-                            return (
-                                <div className="row" key={i}>
-                                    <SonnetCard key={i} sonnet={sonnet} focusSonnet={focusSonnet} />
-                                </div>
-                            );
-                        })
-                    }
-                </div>
-                <div className="col-8">
-                    {
-                        <SonnetDetails sonnet={sonnetInFocus} user={user} />   
-                    }
+        <>
+            <Navbar isLogInPage={false} />
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-3">
+                        <SearchBar sonnetsDisplayed={sonnetCollection} sonnetCollection={sonnetCollection}
+                                setSonnetsDisplayed={setSonnetsDisplayed} />                    
+                        <RandomButton sonnetCollection={sonnetCollection!} focusSonnet={focusSonnet} />
+                        { 
+                            sonnetsDisplayed && sonnetsDisplayed!.map((sonnet:Sonnet, i) => {
+                                return (
+                                    <div className="row" key={i}>
+                                        <SonnetCard key={i} sonnet={sonnet} focusSonnet={focusSonnet} />
+                                    </div>
+                                );
+                            })
+                        }
+                    </div>
+                    <div className="col-8">
+                        {
+                            <SonnetDetails sonnet={sonnetInFocus} user={user} />   
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 
