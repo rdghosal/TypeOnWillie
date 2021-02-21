@@ -5,6 +5,7 @@ import { MainContext } from "./Main";
 import { User } from "./AuthUtils";
 import DisplayText from "./DisplayText";
 import { AppContext } from "./App";
+import { GuestSessionCache } from "./GuestSessionCache";
 
 
 interface ISonnetDetailsProps extends RouteComponentProps {
@@ -42,6 +43,15 @@ const SonnetDetails: React.FC<ISonnetDetailsProps> = (props) => {
             return resp.json();
         }).then(data => {
             console.log(data);
+            console.log(data.misspellings.user)
+            if (data.misspellings["user"].length === 0) {
+                const gc = GuestSessionCache.getCache();
+                console.log("adding guest misspellings");
+                if (gc && props.sonnet!.id in gc.resultCollection) {
+                    data.misspellings["user"] = gc.resultCollection[props.sonnet!.id]!.results.misspellings;
+                }
+                console.log(data);
+            }
             return setHistory(data);
         });
     }, [props.sonnet]);

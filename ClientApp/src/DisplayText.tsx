@@ -44,13 +44,13 @@ function formatAsHtml(lines: string[], misspellings?: MisspellingDict) {
             switch (lineMatrix[i][j]) {
                 
                 case Scope.USER:
-                    toAppend = `<mark>${words[j]}</mark>`
-                    break;
-                case Scope.GLOBAL:
                     toAppend = `<span style="color:red;">${words[j]}</span>`
                     break;
-                case Scope.BOTH:
+                case Scope.GLOBAL:
                     toAppend = `<span style="color:green;">${words[j]}</span>`
+                    break;
+                case Scope.BOTH:
+                    toAppend = `<span style="color:blue;">${words[j]}</span>`
                     break;
                 case Scope.NONE:
                     toAppend = words[j];
@@ -83,10 +83,11 @@ function getMisspellingMatrix(lines: string[], misspellings: MisspellingDict) : 
 
     for (var k of keys) {
         misspellings[k].forEach((m:Misspelling, i: number) => {
-            const currVal = matrix[m.lineNumber - 1][m.index];
-            const newVal = (k === KEY_1) ? Scope.USER : Scope.GLOBAL;
-            
-            matrix[m.lineNumber - 1][m.index] = (currVal > 0) ? Scope.BOTH : newVal;
+            if (m) {
+                const currVal = matrix[m.lineNumber - 1][m.index];
+                const newVal = (k === KEY_1) ? Scope.USER : Scope.GLOBAL;
+                matrix[m.lineNumber - 1][m.index] = (currVal > 0) ? Scope.BOTH : newVal;
+            }
         });
     }
 

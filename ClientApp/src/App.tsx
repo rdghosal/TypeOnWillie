@@ -34,7 +34,7 @@ const AppContextProvider : React.FC = (props) => {
     useEffect(() => {
         console.log("let's take a look at the User data: ", user);
 
-        if (user && user.id === "guest") return;
+        if (user || getCachedUser()) return;
 
         const currUrl : string = window.location.href; 
         if (currUrl.indexOf("/login") === -1 && currUrl.indexOf("/register") === -1) {
