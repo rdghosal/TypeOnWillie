@@ -36,9 +36,8 @@ const AppContextProvider : React.FC = (props) => {
 
         if (user && user.id === "guest") return;
 
-        // Parse sessionStorage for User data.
-        // If absent, go to login
-        if (window.location.href.indexOf("/login") === -1) {
+        const currUrl : string = window.location.href; 
+        if (currUrl.indexOf("/login") === -1 && currUrl.indexOf("/register") === -1) {
 
             if (!accessToken) {
                 TokenHandler.refreshAccessToken()
@@ -71,7 +70,7 @@ export const App: React.FC = () => {
   return (
       <Router>
           <Switch>
-              <Route exact path="/" render={ props => <AppContextProvider><Landing {...props} /></AppContextProvider> } />
+              <Route exact path="/" render={ props => <Landing {...props} /> } />
               <Route path="/app" render={props => <AppContextProvider><Main {...props}/></AppContextProvider>} />
               <Route path="/login" render={props => <AppContextProvider><Login {...props} /></AppContextProvider>} />
               <Route path="/register" render={props => <AppContextProvider><Register {...props}/></AppContextProvider>} />

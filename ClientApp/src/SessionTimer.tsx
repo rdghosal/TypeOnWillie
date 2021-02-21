@@ -25,7 +25,7 @@ const SessionTimer = ({ isStarted
             console.log("Starting interval ", id);
             setIntervalId(id);
         }
-    }, [isPaused, isFinished]);
+    }, [isPaused]);
 
     useEffect(() => {
         const speedEl = document.getElementById("typingSpeed");
