@@ -14,30 +14,10 @@ const Navbar: React.FC<INavbarProps> = (props) => {
     const [ isLoggedIn, toggleLogIn ] = useState<boolean>(false);
 
     useEffect(() => {
-
-        if (user && user.id === "guest") return;
-
-        // Parse sessionStorage for User data.
-        // If absent, go to login
-        if (!accessToken) {
-            TokenHandler.refreshAccessToken()
-                .then(token => {
-                    if (token === AuthErrorTypes.EXPIRED || token === AuthErrorTypes.INVALID) {
-                        // TODO errors handle separately
-                        return props.history.push("/login");
-                    }
-                    console.log(token);
-                    setToken(token);
-                });
-        }
-    }, [accessToken]);
-
-    useEffect(() => {
         if (accessToken) {
-            if (!user) { setUser(TokenHandler.parseClaims(accessToken)) }
             toggleLogIn(true);
         }
-    }, [user, accessToken]);
+    }, [accessToken]);
 
     const handleLogOut = async () => {
         // Send refreshToken and accessToken to back-end for blacklisting

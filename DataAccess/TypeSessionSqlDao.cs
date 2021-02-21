@@ -27,17 +27,33 @@ namespace TypeOnWillie.DataAccess
             using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
                 _sqlConnection.Open();
-                return _sqlConnection.Execute(TypeSessionCommand.INSERT, new
+                if (typeSession.UserId != "guest") 
                 {
-                    userId = typeSession.UserId,
-                    sonnetId = typeSession.SonnetId,
-                    secondsElapsed = typeSession.SecondsElapsed,
-                    correctWordCount = typeSession.CorrectWordCount,
-                    typedWordCount = typeSession.TypedWordCount,
-                    misspelledWordCount = typeSession.MisspelledWordCount,
-                    quit = typeSession.Quit,
-                    touchScreen = typeSession.TouchScreen
-                });
+                    return _sqlConnection.Execute(TypeSessionCommand.INSERT, new
+                    {
+                        userId = typeSession.UserId,
+                        sonnetId = typeSession.SonnetId,
+                        secondsElapsed = typeSession.SecondsElapsed,
+                        correctWordCount = typeSession.CorrectWordCount,
+                        typedWordCount = typeSession.TypedWordCount,
+                        misspelledWordCount = typeSession.MisspelledWordCount,
+                        quit = typeSession.Quit,
+                        touchScreen = typeSession.TouchScreen
+                    });
+                }
+                else 
+                {
+                    return _sqlConnection.Execute(TypeSessionCommand.INSERT_GUEST, new
+                    {
+                        sonnetId = typeSession.SonnetId,
+                        secondsElapsed = typeSession.SecondsElapsed,
+                        correctWordCount = typeSession.CorrectWordCount,
+                        typedWordCount = typeSession.TypedWordCount,
+                        misspelledWordCount = typeSession.MisspelledWordCount,
+                        quit = typeSession.Quit,
+                        touchScreen = typeSession.TouchScreen
+                    });
+                }
             }
         }
 
@@ -46,14 +62,22 @@ namespace TypeOnWillie.DataAccess
             List<WordTuple> wordTuples = typeSession.MisspelledWords;
             using (var _sqlConnection = new SqlConnection(_config.GetConnectionString("mssql")))
             {
+                dynamic result = null;
                 _sqlConnection.Open();
 
                 // Find latest TypeSession.Id
-                var result = _sqlConnection.Query<TypeSession>(TypeSessionCommand.SELECT, 
-                new 
-                { 
-                    userId = typeSession.UserId
-                }).FirstOrDefault();
+                if (typeSession.UserId != "guest")
+                {
+                    result = _sqlConnection.Query<TypeSession>(TypeSessionCommand.SELECT, 
+                    new 
+                    { 
+                        userId = typeSession.UserId
+                    }).FirstOrDefault();
+                }
+                else
+                {
+                    result = _sqlConnection.Query<TypeSession>(TypeSessionCommand.SELECT_GUEST).FirstOrDefault();
+                }
 
                 // Iterate over each List of WordTuples and INSERT
                 foreach (WordTuple wt in wordTuples)

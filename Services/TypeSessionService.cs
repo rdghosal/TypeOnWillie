@@ -19,6 +19,7 @@ namespace TypeOnWillie.Services
         public void AddTypeSession(TypeSession typeSession)
         {
             _dao.InsertTypeSession(typeSession);
+            Console.WriteLine("Completed to write session.");
             _dao.InsertWordTuples(typeSession);
         }
     }

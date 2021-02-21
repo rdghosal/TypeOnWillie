@@ -13,12 +13,28 @@ namespace TypeOnWillie.DataAccess
                                        (UserId, SonnetId, SecondsElapsed, CorrectWordCount, TypedWordCount, MisspelledWordCount, Quit, TouchScreen)
                                        VALUES (@userId, @sonnetId, @secondsElapsed, @correctWordCount, @typedWordCount, @misspelledWordCount, @quit, @touchScreen);";
 
+        public const string INSERT_GUEST = @"INSERT INTO [type_on_willie].[dbo].[TypeSessions] 
+                                       (UserId, SonnetId, SecondsElapsed, CorrectWordCount, TypedWordCount, MisspelledWordCount, Quit, TouchScreen)
+                                       VALUES ((
+                                           SELECT Id
+                                           FROM [type_on_willie].[dbo].[Users]
+                                           WHERE Username = 'GUEST'
+                                       ), @sonnetId, @secondsElapsed, @correctWordCount, @typedWordCount, @misspelledWordCount, @quit, @touchScreen);";
         public const string SELECT = @"SELECT Id
                                        FROM [type_on_willie].[dbo].[TypeSessions]
                                        WHERE DateTime = (SELECT MAX(DateTime) 
                                                          FROM [type_on_willie].[dbo].[TypeSessions]
                                                          WHERE UserId = @userId);";
 
+        public const string SELECT_GUEST = @"SELECT Id
+                                       FROM [type_on_willie].[dbo].[TypeSessions]
+                                       WHERE DateTime = (SELECT MAX(DateTime) 
+                                                         FROM [type_on_willie].[dbo].[TypeSessions]
+                                                         WHERE UserId = (
+                                                             SELECT Id
+                                                             FROM [type_on_willie].[dbo].[Users]
+                                                             WHERE Username = 'GUEST'
+                                                         ));";
         public const string SELECT_ALL_SONNETS = @"SELECT
                                                     DISTINCT [SonnetId]
                                                  FROM 
